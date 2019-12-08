@@ -1,9 +1,11 @@
 FROM python:3.7
 ENV PYTHONUBUFFERED 1
 ENV DONTWRITEBYTECODE 1
-
-RUN mkdir /src
-ADD requirements.txt /code/
+RUN mkdir /app
+WORKDIR /app
+ADD requirements.txt /app/
 RUN pip install -r requirements.txt
-ADD . /code/
-CMD sh init.sh && python3 manage.py runserver 0.0.0.0:8000
+ADD ./ /app
+EXPOSE 8000
+ENTRYPOINT ["python", "manage.py"]
+CMD ["runserver","0.0.0.0:8000"]
