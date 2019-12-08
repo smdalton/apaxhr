@@ -22,11 +22,11 @@ TEMPLATE_DIR = os.path.join(BASE_DIR, '/templates')
 # See https://docs.djangoproject.com/en/3.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = '@@+_+=x&s!!3lio5kfl#+i^b5i165m4z9*am7^i2!-6@o6v4h('
+SECRET_KEY = os.environ.get('SECRET_KEY','change me to a real key')
 def osget(var):
     return os.environ.get(var)
 
-if os.environ.get('DEPLOYMENT') == 1:
+if os.environ.get('PRODUCTION') == 1:
     pass
 
 
@@ -92,14 +92,17 @@ WSGI_APPLICATION = 'apaxhr.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/3.0/ref/settings/#databases
-
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+    "default": {
+        "ENGINE": os.environ.get("SQL_ENGINE", "django.db.backends.sqlite3"),
+        "NAME": os.environ.get("SQL_DATABASE", os.path.join(BASE_DIR, "db.sqlite3")),
+        "USER": os.environ.get("SQL_USER", "user"),
+        "PASSWORD": os.environ.get("SQL_PASSWORD", "password"),
+
+        "HOST": os.environ.get("SQL_HOST", "localhost"),
+        "PORT": os.environ.get("SQL_PORT", "5432"),
     }
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/3.0/ref/settings/#auth-password-validators
