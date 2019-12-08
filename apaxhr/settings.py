@@ -38,7 +38,17 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'apaxhr_hrbase'
+    'apaxhr_hrbase',
+    'django_countries',
+    'django_nose',
+]
+
+TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
+NOSE_ARGS = [
+    '--with-cover',
+    '--cover-package=apaxhr_hrbase',
+    '--cover-package=apaxhr',
+    # Change `MY_APP` to your `app` name
 ]
 
 MIDDLEWARE = [

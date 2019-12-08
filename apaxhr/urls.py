@@ -19,5 +19,8 @@ from django.urls import path, include
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('hrbase/', include('apaxhr_hrbase.urls') )
+    #default path so localhost query returns a route
+    path('', include('apaxhr_hrbase.urls'),
+    #path('hrbase/', include('apaxhr_hrbase.urls')),
+)
 ]
