@@ -62,7 +62,7 @@ nosetests.xml
 coverage.xml
 *.cover
 .hypothesis/
-secrets.sh
+*secrets.sh
 # Jupyter Notebook
 .ipynb_checkpoints
 

@@ -6,5 +6,3 @@ unset SQL_ENGINE
 unset SQL_PORT
 unset SQL_NAME
 unset SECRET_KEY
-
-

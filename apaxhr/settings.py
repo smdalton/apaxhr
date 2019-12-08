@@ -15,23 +15,20 @@ import os
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 TEMPLATE_DIR = os.path.join(BASE_DIR, '/templates')
-
-
+DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+STATICFILES_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = os.environ.get('SECRET_KEY','change me to a real key')
-def osget(var):
-    return os.environ.get(var)
-
-if os.environ.get('PRODUCTION') == 1:
-    pass
-
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
+if os.environ.get('Debug'):
+    DEBUG = True
+
 
 ALLOWED_HOSTS = ['*']
 
@@ -48,6 +45,7 @@ INSTALLED_APPS = [
     'apaxhr_hrbase',
     'django_countries',
     'django_nose',
+    'storages',
 ]
 
 TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
@@ -98,7 +96,6 @@ DATABASES = {
         "NAME": os.environ.get("SQL_DATABASE", os.path.join(BASE_DIR, "db.sqlite3")),
         "USER": os.environ.get("SQL_USER", "user"),
         "PASSWORD": os.environ.get("SQL_PASSWORD", "password"),
-
         "HOST": os.environ.get("SQL_HOST", "localhost"),
         "PORT": os.environ.get("SQL_PORT", "5432"),
     }
