@@ -10,4 +10,4 @@ services:
       - ./.env.prod
     ports:
       - "8000:8000"
-    command: ["./start_prod.sh"]
+    command: ["./scripts/start_prod.sh"]
