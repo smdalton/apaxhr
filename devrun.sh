@@ -1,4 +1,5 @@
 #!/bin/bash
+# Haha
 
 # exec docker-compose -f docker-compose.dev.yml down
 docker-compose -f docker-compose.dev.yml build
