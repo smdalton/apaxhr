@@ -7,5 +7,4 @@ ADD requirements.txt /app/
 RUN pip install -r requirements.txt
 ADD ./ /app
 EXPOSE 8000
-#CMD ["manage.py makemigrations"]
-#CMD ["manage.py migrate"]
+

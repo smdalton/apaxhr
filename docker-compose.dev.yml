@@ -4,10 +4,10 @@ services:
     build: .
     stdin_open: true
     tty: true
-    command: python3 manage.py runserver 0.0.0.0:8000
     volumes:
       - .:/code
     env_file:
       - ./.env.dev
     ports:
       - "8000:8000"
+    command: ["./scripts/start_dev.sh"]
