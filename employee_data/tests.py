@@ -7,6 +7,11 @@ import datetime
 from django.utils import timezone
 # Create your tests here.
 
+
+class EmployeeTestCase(TestCase):
+    pass
+
+
 class PassportTestCase(TestCase):
 
     def setUp(self):
@@ -23,3 +28,7 @@ class PassportTestCase(TestCase):
         user = User.objects.get(employee_user=self.employee)
         self.assertEquals(user, self.user, 'users do not match')
     # def test_employee_exists(self):
+
+
+class DataBaseConnectionTestCase(TestCase):
+    pass

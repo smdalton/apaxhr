@@ -15,12 +15,15 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
-
+from django.conf import settings
+from django.conf.urls.static import static
+from django.contrib.auth import views as auth_views
+from . import views
+import os
 
 urlpatterns = [
+    path('', views.HomePageView.as_view(),name='homepage'),
+    path('login', auth_views.auth_login),
     path('admin/', admin.site.urls),
-    #default path so localhost query returns a route
-    path('', include('apaxhr_hrbase.urls'),
-    #path('hrbase/', include('apaxhr_hrbase.urls')),
-)
-]
+    path('', include('employee_data.urls'))
+] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
