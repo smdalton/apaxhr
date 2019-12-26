@@ -1,56 +1,45 @@
 from django.db import models
 from django.contrib.auth.models import User
+from django.db.models.signals import post_save
+from django.dispatch import receiver
+
 import uuid
 from django_countries.fields import CountryField
 # Create your models here.
 from . import database_choices as db_choice
+import datetime as dt
+import django.utils.timezone as tz
 
+now = dt.datetime.now()
 
-class PublicImage(models.Model):
-    title = models.TextField(max_length=25)
-    image = models.ImageField(upload_to='media/profile_pictures', blank=False)
-    pass
 
 class Employee(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
-    profile_picture = models.ImageField(upload_to='media/profile_pictures', blank=False)
-    fname = models.CharField(max_length=25, blank=False)
-    mname = models.CharField(max_length=25, blank=False)
-    lname = models.CharField(max_length=25, blank=False)
-    bio = models.TextField(max_length=1000, blank=False)
-    role = models.CharField(
+    first_name = models.CharField(max_length=25, blank=False, default='')
+    middle_name = models.CharField(max_length=25, blank=False, default='')
+    last_name = models.CharField(max_length=25, blank=False, default='')
+    bio = models.TextField(max_length=1000, blank=False, default='')
+    employee_role = models.CharField(
         max_length=50,
-        choices=db_choice.roles
+        choices=db_choice.roles,
+        default='',
     )
+    def get_last_name(self):
+        return str(self.user.last_name)
 
     def __str__(self):
-        return self.fname + ' ' + self.lname
+        return f"{self.user.first_name}"
 
-class DocumentationInfo(models.Model):
-    related_employee = models.ForeignKey(Employee, on_delete=models.CASCADE)
-    work_permit_valid = models.BooleanField(blank=True,default=False)
-    passport_valid = models.BooleanField(blank=True, default=False)
-    registry_of_stay_valid = models.BooleanField(blank=True, default=False)
+class EmployeeWorkHistory(models.Model):
+    employee = models.ForeignKey(Employee, on_delete=models.CASCADE)
+    join_date = models.DateTimeField()
 
-    def get_passport_validity(self):
-        return False
-
-    def get_registry_of_stay_validity(self):
-        return False
-
-    def get_work_permit_validity(self):
-        return False
-
-    def get_validity_of_all_documents(self):
-        return False
-
-
-# store this image in the db with a thumbnail as well
 class Passport(models.Model):
-    owner = models.ForeignKey(Employee, on_delete=models.CASCADE)
-    expiration_date = models.DateTimeField(blank=False)
-    issue_date = models.DateTimeField(blank=False)
-
+    owner = models.OneToOneField(Employee, on_delete=models.CASCADE)
+    expiration_date = models.DateTimeField(blank=False, default=now)
+    issue_date = models.DateTimeField(blank=False, default=now)
+    image = models.ImageField()
+    pdf = models.FileField()
 
     def get_image(self):
         image = None
@@ -60,19 +49,43 @@ class Passport(models.Model):
         result = True
         return result
 
+    # profile_picture = models.ImageField(null=True, upload_to='media/profile_pictures', blank=False)
+
+    def __str__(self):
+        return f"Employee: {self.fname}"
+
 
 # store this image in the db with a thumbnail as well
-class WorkPermit(models.Model):
 
-    pass
+# store this image in the db with a thumbnail as well
+#
+
+
+
+
+class DocumentImage(models.Model):
+    owner = models.ForeignKey(Employee, on_delete=models.CASCADE)
+    image = models.ImageField(upload_to='document_images',blank=False, null=True)
+
+class PublicImage(models.Model):
+    owner = models.ForeignKey(Employee, on_delete=models.CASCADE)
+    title = models.TextField(max_length=25, default='')
+    image = models.ImageField(upload_to='profile_pictures', blank=False, null=True)
+
+
+class WorkPermit(models.Model):
+    owner = models.OneToOneField(Employee, on_delete=models.CASCADE)
+    expiration = models.DateTimeField(blank=False, default=now)
+    pdf = models.FileField(upload_to='document_images',blank=False, null=True)
+    image = models.ImageField(upload_to='work_permit_images', blank=True, null=True)
+
 
 # store this image in the db with a thumbnail as well
 class RegistryOfStayForm(models.Model):
+    owner = models.OneToOneField(Employee, on_delete=models.CASCADE)
+    expiration = models.DateTimeField(blank=False, default=now)
+    issued = models.DateTimeField(blank=False, default=now)
+    pdf = models.FileField(upload_to='document_images',blank=False, null=True)
 
-    pass
 
-class DocumentImage(models.Model):
-
-    pass
-
-#TODO delete this test stub
+# #TODO delete this test stub

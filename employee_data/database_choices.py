@@ -3,5 +3,6 @@ roles = (
     ('pt','Part Time Teacher'),
     ('training', 'Teacher in Training'),
     ('ht', 'Head Teacher'),
-    ('st', 'Senior Teacher')
+    ('st', 'Senior Teacher'),
+    ('sup', 'Support Staff'),
 )

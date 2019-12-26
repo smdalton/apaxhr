@@ -1,5 +1,5 @@
 from django.apps import AppConfig
 
 
-class ApaxhrHrbaseConfig(AppConfig):
+class EmployeeDataConfig(AppConfig):
     name = 'employee_data'
