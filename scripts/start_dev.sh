@@ -6,8 +6,10 @@ echo Starting Gunicorn.
 
 #python manage.py makemigrations
 #python manage.py migrate
+##python manage.py collectstatic --no-input
+#exec python manage.py runserver
 
 
-exec gunicorn apaxhr.wsgi:application \
-    --bind 0.0.0.0:8000\
+gunicorn apaxhr.wsgi:application \
+    --bind 0.0.0.0\
     --workers 3

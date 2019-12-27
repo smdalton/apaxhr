@@ -5,7 +5,8 @@
 
     <meta charset="UTF-8">
     <title>APAX HRS</title>
-    {% block header_block %} {% endblock %}
+    {% block header_block %}
+    {% endblock %}
 </head>
 <body>
 
@@ -14,23 +15,20 @@
 {% block nav_block %}
     {% include "apaxhr/header-footer/nav.html" %}
 {% endblock %}
-
   <!-- Page Content -->
   <div class="container">
     <div class="row">
       <div class="col-lg-12 text-center">
-        <h1 class="mt-5">APAX HR Automation</h1>
-        <p class="lead"></p>
-        <ul class="list-unstyled">
-          <li>A business problem</li>
-          <li>can be solved</li>
-            <li>once in a program</li>
-            <li>and never be solved again!</li>
-        </ul>
+        <h1 class="mt-5">APAX HR Tools</h1>
+          <p class="lead"> <a url:>Go to Admin</a></p>
+
       </div>
     </div>
   </div>
 
+  {% block content%}
+
+  {%  endblock %}
   <!-- Bootstrap core JavaScript -->
 
 

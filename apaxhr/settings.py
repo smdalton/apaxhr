@@ -39,32 +39,30 @@ STATICFILES_FINDERS = (
 SECRET_KEY = os.environ.get('SECRET_KEY','change me to a real key')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = None
-if os.environ.get('DEBUG'):
-    DEBUG = True
 DEBUG = True
 
-ALLOWED_HOSTS = ['*','[::1]']
-# ALLOWED_HOSTS = os.environ.get('DJANGO_ALLOWED_HOSTS','*').split(' ')
-
+ALLOWED_HOSTS = ['*']
 
 # Application definition
 
 
 INSTALLED_APPS = [
     'django.contrib.admin',
-    'livereload',
+    #'livereload',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'employee_data',
+    # Local
+    'users.apps.UsersConfig',
+    'core_hr',
     'django_countries',
     'django_nose',
     'storages',
 
 ]
+
 
 TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
 NOSE_ARGS = [
@@ -75,7 +73,7 @@ NOSE_ARGS = [
 ]
 
 MIDDLEWARE = [
-    'livereload.middleware.LiveReloadScript',
+    #'livereload.middleware.LiveReloadScript',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -113,7 +111,7 @@ WSGI_APPLICATION = 'apaxhr.wsgi.application'
 DATABASES = {
     "default": {
         "ENGINE": os.environ.get("SQL_ENGINE", "django.db.backends.sqlite3"),
-        "NAME": os.environ.get("SQL_DATABASE", os.path.join(BASE_DIR, "db.sqlite3")),
+        "NAME": os.environ.get("SQL_DATABASE", os.path.join(BASE_DIR, "devdb.sqlite3")),
         "USER": os.environ.get("SQL_USER", "user"),
         "PASSWORD": os.environ.get("SQL_PASSWORD", "password"),
         "HOST": os.environ.get("SQL_HOST", "localhost"),

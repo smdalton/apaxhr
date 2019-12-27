@@ -20,10 +20,13 @@ from django.conf.urls.static import static
 from django.contrib.auth import views as auth_views
 from . import views
 import os
+admin.site.site_header = "APAX Admin"
+admin.site.site_title = "APAX Admin Portal"
+admin.site.index_title = "APAX HR administrator Portal"
 
 urlpatterns = [
     path('', views.HomePageView.as_view(),name='homepage'),
     path('login', auth_views.auth_login),
     path('admin/', admin.site.urls),
-    path('', include('employee_data.urls'))
+    path('', include('core_hr.urls'))
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

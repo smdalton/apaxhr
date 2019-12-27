@@ -7,7 +7,7 @@ services:
     volumes:
       - .:/code
     env_file:
-      - ./.env.prod
+      - scripts/.env.prod
     ports:
-      - "8000:8000"
-    command: ["./scripts/start_prod.sh"]
+      - "80:8000"
+    command: python3 manage.py runserver 0.0.0.0:8000
