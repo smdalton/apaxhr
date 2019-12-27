@@ -1,4 +1,4 @@
-from employee_data import models
+from core_hr import models
 from django.contrib import admin
 
 

@@ -1,5 +1,5 @@
 from django.core.management.base import BaseCommand, CommandError
-from employee_data.models import Employee, Passport, PublicImage, RegistryOfStayForm, User
+from core_hr.models import Employee, Passport, PublicImage, RegistryOfStayForm, User
 from django.conf import settings
 import os
 
@@ -59,7 +59,7 @@ class Command(BaseCommand):
         pass
 
     def create_five_users(self):
-        from employee_data.database_choices import roles
+        from core_hr.database_choices import roles
 
         for index in range(len(roles)):
             self.create_user_employee(role=roles[index][0], number=index)
