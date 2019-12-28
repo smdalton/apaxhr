@@ -4,10 +4,11 @@ import time
 def start_dev_server():
     os.system('echo Starting dev server.')
     os.system('python3 manage.py dev_db')
+    os.system('python3 manage.py makemigrations')
+    os.system('python3 manage.py migrate')
     time.sleep(1)
     os.system('python3 -W ignore manage.py runserver 0.0.0.0:8000')
     os.system('pwd')
-
 
 start_dev_server()
 
