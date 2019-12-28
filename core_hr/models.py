@@ -63,10 +63,6 @@ class Passport(models.Model):
 
 
 
-class DocumentImage(models.Model):
-    owner = models.ForeignKey(Employee, on_delete=models.CASCADE)
-    image = models.ImageField(upload_to='document_images',blank=False, null=True)
-
 class PublicImage(models.Model):
     owner = models.ForeignKey(Employee, on_delete=models.CASCADE)
     title = models.TextField(max_length=25, default='')

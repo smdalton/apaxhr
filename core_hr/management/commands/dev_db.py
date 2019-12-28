@@ -22,7 +22,7 @@ class Command(BaseCommand):
             os.system('python3 manage.py makemigrations --no-input')
             os.system('python3 manage.py migrate')
         else:
-            self.stdout.write('Running on production wipe_db aborted')
+            self.stdout.write('Running on production postgresql wipe_db aborted')
             return
 
     def create_user_employee(self, role, number):

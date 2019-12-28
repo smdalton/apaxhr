@@ -67,7 +67,7 @@ INSTALLED_APPS = [
 TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
 NOSE_ARGS = [
     '--with-cover',
-    '--cover-package=apaxhr_hrbase',
+    '--cover-package=core_hr',
     '--cover-package=apaxhr',
     # Change `MY_APP` to your `app` name
 ]

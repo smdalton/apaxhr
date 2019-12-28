@@ -9,26 +9,98 @@ from django.utils import timezone
 
 
 class EmployeeTestCase(TestCase):
-    pass
+
+    def setup(self):
+        self.fail('Make an employee test case')
+
+    def test_employee_has_photo_avatar(self):
+        self.fail('Implement photo checking')
+
 
 
 class PassportTestCase(TestCase):
 
     def setUp(self):
-        self.date = datetime.datetime.now()
-        self.user = User.objects.create_user(username="admin")
-        self.employee = Employee.objects.create(user=self.user, date_joined=self.date)
-        self.passport = Passport.objects.create(owner=self.employee, expiration=self.date)
+        self.fail('Make an employee test case')
 
     def test_passport_exists(self):
-        passport = Passport.objects.get(owner__user__username="admin")
-        self.assertEqual(passport, self.passport, 'passports do not match')
+        self.fail('create and check for existence of a passport')
+
+    def test_passport_expired(self):
+        self.fail('create several passports and an expired passport and check for expired passports')
 
     def test_user_exists(self):
-        user = User.objects.get(employee_user=self.employee)
-        self.assertEquals(user, self.user, 'users do not match')
+        self.fail('Make an employee test case')
+
     # def test_employee_exists(self):
 
 
-class DataBaseConnectionTestCase(TestCase):
-    pass
+class WorkPermitTestCase(TestCase):
+
+    document_name = 'Work Permit'
+    def setUp(self):
+        self.fail('Make an employee test case')
+        self.document_name = 'Work Permit'
+
+    def test_passport_exists(self):
+        self.fail(f"create and check for existence of a {self.document_name}")
+
+    def test_passport_expired(self):
+        self.fail('create several passports and an expired passport and check for expired passports')
+
+    def test_user_exists(self):
+        self.fail('Make an employee test case')
+
+
+class VisaTestCase(TestCase):
+
+    def setUp(self):
+        self.fail('Make an employee test case')
+
+    def test_passport_exists(self):
+        self.fail('create and check for existence of a passport')
+
+    def test_passport_expired(self):
+        self.fail('create several passports and an expired passport and check for expired passports')
+
+    def test_user_exists(self):
+        self.fail('Make an employee test case')
+
+
+class RegistryOfStayTestCase(TestCase):
+
+    def setUp(self):
+        self.fail('Make an employee test case')
+
+    def test_passport_exists(self):
+        self.fail('create and check for existence of a passport')
+
+    def test_passport_expired(self):
+        self.fail('create several passports and an expired passport and check for expired passports')
+
+    def test_user_exists(self):
+        self.fail('Make an employee test case')
+
+
+class DocumentTestCase(TestCase):
+
+    def setUp(self):
+        self.fail('Make an employee test case')
+
+    def test_passport_exists(self):
+        self.fail('create and check for existence of a passport')
+
+    def test_passport_expired(self):
+        self.fail('create several passports and an expired passport and check for expired passports')
+
+    def test_user_exists(self):
+        self.fail('Make an employee test case')
+
+
+class EmployeeDocumentIntegrationTestCase(TestCase):
+
+    def setUp(self):
+        self.fail(
+            'Create an integration test where an employee is created,\
+             and then documents are added to their model')
+
