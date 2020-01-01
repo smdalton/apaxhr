@@ -1278,7 +1278,7 @@ XRegExp = XRegExp || (function (undef) {
 
 /**
  * Adds support for the `\p{L}` or `\p{Letter}` Unicode category. Addon packages for other Unicode
- * categories, scripts, blocks, and properties are available separately. All Unicode tokens can be
+ * categories, envs, blocks, and properties are available separately. All Unicode tokens can be
  * inverted using `\P{..}` or `\p{^..}`. Token names are case insensitive, and any spaces, hyphens,
  * and underscores are ignored.
  * @requires XRegExp
@@ -1389,7 +1389,7 @@ XRegExp = XRegExp || (function (undef) {
         }
     };
 
-/* Adds data for the Unicode `Letter` category. Addon packages include other categories, scripts,
+/* Adds data for the Unicode `Letter` category. Addon packages include other categories, envs,
  * blocks, and properties.
  */
     XRegExp.addUnicodePackage({
@@ -1527,7 +1527,7 @@ XRegExp = XRegExp || (function (undef) {
 }(XRegExp));
 
 
-/***** unicode-scripts.js *****/
+/***** unicode-envs.js *****/
 
 /*!
  * XRegExp Unicode Scripts v1.2.0
@@ -1537,7 +1537,7 @@ XRegExp = XRegExp || (function (undef) {
  */
 
 /**
- * Adds support for all Unicode scripts in the Basic Multilingual Plane (U+0000-U+FFFF).
+ * Adds support for all Unicode envs in the Basic Multilingual Plane (U+0000-U+FFFF).
  * E.g., `\p{Latin}`. Token names are case insensitive, and any spaces, hyphens, and underscores
  * are ignored.
  * @requires XRegExp, XRegExp Unicode Base

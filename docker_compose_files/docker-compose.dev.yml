@@ -1,0 +1,14 @@
+version: "3.7"
+services:
+  web:
+    container_name: dev_app
+    build: ../app
+    stdin_open: true
+    tty: true
+    volumes:
+      - ./app:/code
+    env_file:
+      - .env.dev
+    ports:
+      - "8000:8000"
+    command: python3 .start_scripts/start_dev_server.py

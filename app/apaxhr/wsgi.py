@@ -1,5 +1,5 @@
 """
-WSGI config for apaxhr project.
+WSGI config for apaxhr docker_files.
 
 It exposes the WSGI callable as a module-level variable named ``application``.
 

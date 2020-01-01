@@ -1,5 +1,5 @@
 """
-ASGI config for apaxhr project.
+ASGI config for apaxhr docker_files.
 
 It exposes the ASGI callable as a module-level variable named ``application``.
 

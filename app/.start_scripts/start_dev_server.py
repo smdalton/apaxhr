@@ -3,7 +3,7 @@ import time
 
 def start_dev_server():
     # wipe and init the db
-
+    os.system('..')
     os.system('echo Starting dev server.')
     os.system('python3 manage.py dev_db')
     os.system('python3 manage.py makemigrations')
