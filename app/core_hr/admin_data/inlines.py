@@ -2,10 +2,10 @@ from core_hr import models
 from django.contrib import admin
 
 
-class PassportInline(admin.StackedInline):
+class PassportInline(admin.TabularInline):
     model = models.Passport
 
-class WorkPermitInline(admin.StackedInline):
+class WorkPermitInline(admin.TabularInline):
     model = models.WorkPermit
 
 class RegistryOfStayInline(admin.TabularInline):

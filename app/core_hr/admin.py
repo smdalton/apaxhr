@@ -21,8 +21,8 @@ class EmployeeAdmin(admin.ModelAdmin):
     search_fields = ['user__first_name','user__last_name','middle_name']
     inlines= [
         inlines.PassportInline,
-        inlines.WorkPermitInline,
-        inlines.RegistryOfStayInline
+        #inlines.WorkPermitInline,
+        #inlines.RegistryOfStayInline
     ]
 
 admin.site.register(models.Employee, EmployeeAdmin)

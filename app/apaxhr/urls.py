@@ -30,7 +30,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('core_hr.urls'))
 ]
-
-if settings.DEBUG:
-    urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
-    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+#
+# if os.environ.get('SERVE_STATIC'):
+#     urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+#     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

@@ -11,4 +11,4 @@ services:
       - .env.prod
     ports:
       - "80:8000"
-    command: python3 .start_scripts/start_prod_server.py
+    command: python3 start_server.py prod

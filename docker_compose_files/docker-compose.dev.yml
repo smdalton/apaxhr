@@ -11,4 +11,4 @@ services:
       - .env.dev
     ports:
       - "8000:8000"
-    command: python3 .start_scripts/start_dev_server.py
+    command: python3 start_server.py dev

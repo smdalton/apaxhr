@@ -1,5 +1,5 @@
 from django.core.management.base import BaseCommand, CommandError
-from core_hr.models import Employee, Passport, PublicImage, RegistryOfStayForm, User
+from core_hr.models import User, Employee
 from django.conf import settings
 import os
 
@@ -81,7 +81,7 @@ class Command(BaseCommand):
         self.create_five_users()
         self.create_super_user()
         self.collectstatic()
-        self.run_server()
+        #self.run_server()
 
 
 

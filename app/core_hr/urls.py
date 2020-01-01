@@ -5,7 +5,7 @@ from . import views
 
 
 
-app_name = 'apxhr_base'
+app_name = 'core_hr'
 
 urlpatterns = [
     path('', views.BaseView.as_view(), name='landing'),

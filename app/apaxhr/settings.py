@@ -16,52 +16,57 @@ import os
 # Build paths inside the docker_files like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 TEMPLATE_DIR = os.path.join(BASE_DIR, '/templates')
-
-
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.0/howto/deployment/checklist/
 
-# AWS Settings:
 
-STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
-MEDIA_URL = '/media/'
+STATIC_URL = '/static/'
+
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+MEDIA_URL = '/media/'
 STATICFILES_FINDERS = (
     'django.contrib.staticfiles.finders.FileSystemFinder',
     'django.contrib.staticfiles.finders.AppDirectoriesFinder',
 )
-
-
-
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = os.environ.get('SECRET_KEY','change me to a real key')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
-
-ALLOWED_HOSTS = ['*']
+if os.environ.get('DEV'):
+    DEBUG = True
+    ALLOWED_HOSTS = ['*']
+else:
+    ALLOWED_HOSTS=['*']
 
 # Application definition
 
 
+
+
 INSTALLED_APPS = [
+    'whitenoise.runserver_nostatic',
     'django.contrib.admin',
     #'livereload',
+
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    # Local
     'users.apps.UsersConfig',
+    # Local
+    # 'debug_toolbar'
+
     'core_hr',
     'django_countries',
     'django_nose',
     'storages',
 
 ]
+
 
 
 TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
@@ -74,6 +79,7 @@ NOSE_ARGS = [
 
 MIDDLEWARE = [
     #'livereload.middleware.LiveReloadScript',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -108,16 +114,24 @@ WSGI_APPLICATION = 'apaxhr.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/3.0/ref/settings/#databases
-DATABASES = {
-    "default": {
-        "ENGINE": os.environ.get("SQL_ENGINE", "django.db.backends.sqlite3"),
-        "NAME": os.environ.get("SQL_DATABASE", os.path.join(BASE_DIR, "devdb.sqlite3")),
-        "USER": os.environ.get("SQL_USER", "user"),
-        "PASSWORD": os.environ.get("SQL_PASSWORD", "password"),
-        "HOST": os.environ.get("SQL_HOST", "localhost"),
-        "PORT": os.environ.get("SQL_PORT", "5432"),
+if os.environ.get('PROD'):
+    DATABASES = {
+        "default": {
+            "ENGINE": os.environ.get("SQL_ENGINE"),
+            "NAME": os.environ.get("SQL_DATABASE"),
+            "USER": os.environ.get("SQL_USER", "user"),
+            "PASSWORD": os.environ.get("SQL_PASSWORD", "password"),
+            "HOST": os.environ.get("SQL_HOST", "localhost"),
+            "PORT": os.environ.get("SQL_PORT", "5432"),
+        }
     }
-}
+else:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': os.path.join(BASE_DIR, 'devdb.sqlite3'),
+        }
+    }
 
 # Password validation
 # https://docs.djangoproject.com/en/3.0/ref/settings/#auth-password-validators
@@ -155,4 +169,4 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.0/howto/static-files/
 
-STATIC_URL = '/static/'
+

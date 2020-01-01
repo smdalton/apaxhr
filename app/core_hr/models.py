@@ -10,7 +10,7 @@ from . import database_choices as db_choice
 import datetime as dt
 import django.utils.timezone as tz
 
-now = dt.datetime.now()
+
 
 
 class Employee(models.Model):
@@ -29,17 +29,17 @@ class Employee(models.Model):
 
     def __str__(self):
         return f"{self.user.first_name}"
-
-class EmployeeWorkHistory(models.Model):
-    employee = models.ForeignKey(Employee, on_delete=models.CASCADE)
-    join_date = models.DateTimeField()
+#
+# class EmployeeWorkHistory(models.Model):
+#     employee = models.ForeignKey(Employee, on_delete=models.CASCADE)
+#     join_date = models.DateTimeField()
 
 class Passport(models.Model):
     owner = models.OneToOneField(Employee, on_delete=models.CASCADE)
-    expiration_date = models.DateTimeField(blank=False, default=now)
-    issue_date = models.DateTimeField(blank=False, default=now)
-    image = models.ImageField()
-    pdf = models.FileField()
+    expiration_date = models.DateTimeField(blank=False)
+    issue_date = models.DateTimeField(blank=False)
+    image = models.ImageField(upload_to='media_images')
+    pdf = models.FileField(upload_to='document_images')
 
     def get_image(self):
         image = None
@@ -52,7 +52,7 @@ class Passport(models.Model):
     # profile_picture = models.ImageField(null=True, upload_to='media/profile_pictures', blank=False)
 
     def __str__(self):
-        return f"Employee: {self.fname}"
+        return f"Employee: {self.owner.first_name}"
 
 
 # store this image in the db with a thumbnail as well
@@ -71,7 +71,7 @@ class PublicImage(models.Model):
 
 class WorkPermit(models.Model):
     owner = models.OneToOneField(Employee, on_delete=models.CASCADE)
-    expiration = models.DateTimeField(blank=False, default=now)
+    expiration = models.DateTimeField(blank=False)
     pdf = models.FileField(upload_to='document_images',blank=False, null=True)
     image = models.ImageField(upload_to='work_permit_images', blank=True, null=True)
 
@@ -79,8 +79,8 @@ class WorkPermit(models.Model):
 # store this image in the db with a thumbnail as well
 class RegistryOfStayForm(models.Model):
     owner = models.OneToOneField(Employee, on_delete=models.CASCADE)
-    expiration = models.DateTimeField(blank=False, default=now)
-    issued = models.DateTimeField(blank=False, default=now)
+    expiration = models.DateTimeField(blank=False)
+    issued = models.DateTimeField(blank=False)
     pdf = models.FileField(upload_to='document_images',blank=False, null=True)
 
 
