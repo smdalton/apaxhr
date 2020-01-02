@@ -1,14 +1,8 @@
 from django.db import models
 from django.contrib.auth.models import User
-from django.db.models.signals import post_save
-from django.dispatch import receiver
-
-import uuid
-from django_countries.fields import CountryField
-# Create your models here.
 from . import database_choices as db_choice
-import datetime as dt
-import django.utils.timezone as tz
+from apaxhr.storage_backends import PrivateMediaStorage
+from apaxhr.storage_backends import PublicMediaStorage
 
 
 
@@ -30,16 +24,22 @@ class Employee(models.Model):
     def __str__(self):
         return f"{self.user.first_name}"
 #
-# class EmployeeWorkHistory(models.Model):
-#     employee = models.ForeignKey(Employee, on_delete=models.CASCADE)
-#     join_date = models.DateTimeField()
+# class EmployeeWorkHistory(hr_models.Model):
+#     employee = hr_models.ForeignKey(Employee, on_delete=hr_models.CASCADE)
+#     join_date = hr_models.DateTimeField()
+
+
+class Upload(models.Model):
+    uploaded_at = models.DateTimeField(auto_now_add=True)
+    file = models.FileField()
+
 
 class Passport(models.Model):
     owner = models.OneToOneField(Employee, on_delete=models.CASCADE)
     expiration_date = models.DateTimeField(blank=False)
     issue_date = models.DateTimeField(blank=False)
-    image = models.ImageField(upload_to='media_images')
-    pdf = models.FileField(upload_to='document_images')
+    image = models.ImageField(storage=PrivateMediaStorage(), upload_to='passports')
+    pdf = models.FileField(upload_to='passports')
 
     def get_image(self):
         image = None
@@ -49,7 +49,7 @@ class Passport(models.Model):
         result = True
         return result
 
-    # profile_picture = models.ImageField(null=True, upload_to='media/profile_pictures', blank=False)
+    # profile_picture = hr_models.ImageField(null=True, upload_to='media/profile_pictures', blank=False)
 
     def __str__(self):
         return f"Employee: {self.owner.first_name}"
@@ -66,14 +66,14 @@ class Passport(models.Model):
 class PublicImage(models.Model):
     owner = models.ForeignKey(Employee, on_delete=models.CASCADE)
     title = models.TextField(max_length=25, default='')
-    image = models.ImageField(upload_to='profile_pictures', blank=False, null=True)
+    image = models.ImageField(upload_to='social', blank=False, null=True)
 
 
 class WorkPermit(models.Model):
     owner = models.OneToOneField(Employee, on_delete=models.CASCADE)
     expiration = models.DateTimeField(blank=False)
-    pdf = models.FileField(upload_to='document_images',blank=False, null=True)
-    image = models.ImageField(upload_to='work_permit_images', blank=True, null=True)
+    pdf = models.FileField(upload_to='work_permits',blank=False, null=True)
+    image = models.ImageField(upload_to='work_permits', blank=True, null=True)
 
 
 # store this image in the db with a thumbnail as well

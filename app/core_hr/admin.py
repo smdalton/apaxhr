@@ -2,15 +2,15 @@ from django.contrib import admin
 from django.apps import apps
 from . import models
 from .admin_data import inlines
-# Register your models here.
+# Register your hr_models here.
 
 #
-# @admin.register(models.Employee)
+# @admin.register(hr_models.Employee)
 # class EmployeeAdmin(admin.ModelAdmin):
 #     search_fields = ('fname',)
 #     list_display = ['fname']
 #
-# @admin.register(models.Passport)
+# @admin.register(hr_models.Passport)
 # class PassportAdmin(admin.ModelAdmin):
 #     autocomplete_fields = ('owner',)
 
@@ -30,16 +30,16 @@ admin.site.register(models.Employee, EmployeeAdmin)
     #
 
 #
-# models.Passport
+# hr_models.Passport
 #
-# models.DocumentationInfo
+# hr_models.DocumentationInfo
 #
-# models.DocumentImage
+# hr_models.DocumentImage
 #
-# models.PublicImage
+# hr_models.PublicImage
 #
-# models.RegistryOfStayForm
+# hr_models.RegistryOfStayForm
 #
-# models.RegistryOfStayForm
+# hr_models.RegistryOfStayForm
 #
-# models.WorkPermit
+# hr_models.WorkPermit

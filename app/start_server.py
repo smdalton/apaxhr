@@ -2,61 +2,55 @@ import os
 import time
 import sys
 
+def postgres_message():
+    print("*" * 80)
+    print("*" +" "* 78 + "*\n")
+    print("*" +" "* 78 + "*\n")
+    print(' PostGres DB is currently dirty needs to be clean before deployment ')
+    print("*" +" "* 78 + "*\n")
+    print("*" +" "* 78 + "*\n")
+
 def start_dev_server():
-    # wipe and init the db
-    os.environ['SERVE_STATIC1']='True'
+    # set env's
+    os.environ['USE_S3'] = 'TRUE'
+    os.environ['AWS_ACCESS_KEY_ID'] = 'AKIATWWKT35LU5ED5FDY'
+    os.environ['AWS_SECRET_ACCESS_KEY'] = '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'
+    os.environ['AWS_STORAGE_BUCKET_NAME'] = 'apaxhr-test'
     os.environ['DEV']='True'
+    # wipe and init the db
     os.system('echo Starting dev server.')
-    print(os.getcwd())
     os.system('python3 manage.py dev_db')
+    os.system('python3 manage.py collectstatic --no-input')
     os.system('python3 -W ignore manage.py runserver 0.0.0.0:8000')
 
 
-# def start_demo_server():
-#     os.system('echo Starting test server.')
-#     os.system('python manage.py dev_db')
-#     os.system('python3 manage.py makemigrations')
-#     os.system('python3 manage.py migrate')
-#     # Execute tests here
-#     time.sleep(1)
-#     os.system('python3 -W ignore manage.py runserver 0.0.0.0:8000')
-
-
-
 def start_prod_server():
+    os.environ['USE_S3'] = 'TRUE'
+    os.environ['AWS_ACCESS_KEY_ID'] = 'AKIATWWKT35LU5ED5FDY'
+    os.environ['AWS_SECRET_ACCESS_KEY'] = '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'
+    os.environ['AWS_STORAGE_BUCKET_NAME'] = 'apaxhr-test'
     os.system('echo Starting Prod server.')
     os.system('python3 manage.py makemigrations')
     os.system('python3 manage.py migrate')
+    os.system('python3 manage.py collectstatic --no-input')
     time.sleep(1)
-    print("*"*100)
-    print('\n*\n*\n* PostGres DB is currently dirty need to clean before deployment *\n*\n*\n*')
+
     os.system('exec gunicorn apaxhr.wsgi:application \
         --bind 0.0.0.0:8000\
         --workers 3')
-    print("*" * 100)
-    #os.system('python3 -W ignore manage.py runserver 0.0.0.0:8000')
-    #os.system('pwd')
 
-def start_dev_redis():
+def start_dev_rabbit():
     os.environ['REDIS']='True'
     print('bring up redis container')
 
     start_dev_server()
     pass
 
-def start_dev_nginx():
-    pass
-
-def start_dev_redis_nginx():
-    pass
-
 func_dict = {
     'dev': start_dev_server,
-    'dev_redis': start_dev_redis,
-    'dev_nginx':start_dev_nginx,
-    'dev_redis_nginx': start_dev_nginx,
-    # 'demo': start_demo_server,
+    'dev_redis': start_dev_rabbit,
     'prod': start_prod_server,
+    'dev_rabbit': start_dev_rabbit,
 }
 
 
