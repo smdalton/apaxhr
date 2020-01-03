@@ -14,10 +14,10 @@ class DevHealthTest(unittest.TestCase):
         print(os.getcwd())
         cls.doc_comp_file = 'docker-compose.dev.yml'
         cls.app_name = 'web'
-        cls.network_address = "http://localhost:1337"
+        cls.network_address = "http://0.0.0.0:1337"
         os.system(f"docker-compose -f {cls.doc_comp_file} build")
         cls.container = subprocess.Popen(f"docker-compose -f {cls.doc_comp_file} up", shell=True)
-        time.sleep(4)
+        time.sleep(9)
 
     @classmethod
     def tearDownClass(cls) -> None:
@@ -26,15 +26,15 @@ class DevHealthTest(unittest.TestCase):
 
     def setUp(self) -> None:
         self.browser = webdriver.Firefox()
+        self.browser.implicitly_wait(2)
 
     def tearDown(self) -> None:
         self.browser.quit()
 
     def test_server_live(self):
         self.browser.get(self.network_address)
-        time.sleep(3)
         self.assertIn('APAX HRS', self.browser.title, self.browser.title)
-        self.browser.implicitly_wait(4)
+
 
 
 
@@ -44,10 +44,10 @@ class ProdHealthTest(unittest.TestCase):
     def setUpClass(cls) -> None:
         cls.doc_comp_file = 'docker-compose.prod.yml'
         cls.app_names = ['rabbitmq','ngx','web']
-        cls.network_address = 'http://localhost:80'
+        cls.network_address = 'http://0.0.0.0:80'
         os.system(f"docker-compose -f {cls.doc_comp_file} build")
         cls.container = subprocess.Popen(f"docker-compose -f {cls.doc_comp_file} up", shell=True)
-        time.sleep(7)
+        time.sleep(9)
 
     @classmethod
     def tearDownClass(cls) -> None:
@@ -57,6 +57,7 @@ class ProdHealthTest(unittest.TestCase):
                 os.system(f"docker kill {container}")
             finally:
                 print(f"Container {container} not killed, possibly not started")
+
 
     def setUp(self) -> None:
         self.browser = webdriver.Firefox()

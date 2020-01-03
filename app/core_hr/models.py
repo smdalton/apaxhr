@@ -23,15 +23,7 @@ class Employee(models.Model):
 
     def __str__(self):
         return f"{self.user.first_name}"
-#
-# class EmployeeWorkHistory(hr_models.Model):
-#     employee = hr_models.ForeignKey(Employee, on_delete=hr_models.CASCADE)
-#     join_date = hr_models.DateTimeField()
 
-
-class Upload(models.Model):
-    uploaded_at = models.DateTimeField(auto_now_add=True)
-    file = models.FileField()
 
 
 class Passport(models.Model):
@@ -39,7 +31,7 @@ class Passport(models.Model):
     expiration_date = models.DateTimeField(blank=False)
     issue_date = models.DateTimeField(blank=False)
     image = models.ImageField(storage=PrivateMediaStorage(), upload_to='passports')
-    pdf = models.FileField(upload_to='passports')
+    pdf = models.FileField(storage=PrivateMediaStorage(), upload_to='passports')
 
     def get_image(self):
         image = None
@@ -72,8 +64,8 @@ class PublicImage(models.Model):
 class WorkPermit(models.Model):
     owner = models.OneToOneField(Employee, on_delete=models.CASCADE)
     expiration = models.DateTimeField(blank=False)
-    pdf = models.FileField(upload_to='work_permits',blank=False, null=True)
-    image = models.ImageField(upload_to='work_permits', blank=True, null=True)
+    pdf = models.FileField(storage=PrivateMediaStorage(), upload_to='work_permits',blank=False, null=True)
+    image = models.ImageField(storage=PrivateMediaStorage(), upload_to='work_permits', blank=True, null=True)
 
 
 # store this image in the db with a thumbnail as well
