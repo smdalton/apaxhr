@@ -1,13 +1,30 @@
 version: "3.7"
 services:
+#  rabbitmq:
+#    container_name: rabbitmq
+#    hostname: rabbitmq
+#    image: rabbitmq:latest
+#    ports:
+#      - "15672:15672"
+#      - "5672:5672"
+#    expose:
+#      - "5672"
+#      - "15672"
+#  https://stackoverflow:
+#    com/questions/54911090/serve-django-media-files-via-server_nginx-django-react-server_nginx-docker-compose:
+
   web:
-    build: .
+    container_name: web
+    hostname: apaxhr
+    build: app
     stdin_open: true
-    #tty: true
+    tty: true
     volumes:
-      - .:/code
+      - ./app:/web_root
     env_file:
-      - scripts/.env.dev
+      - .env.dev
     ports:
-      - "8000:8000"
-    command: python3 start_dev_server.py
+      - 1337:8000
+#    depends_on:
+#      - rabbitmq
+    command: python3 start_server.py dev
