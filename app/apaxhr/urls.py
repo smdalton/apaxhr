@@ -19,6 +19,7 @@ from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib.auth import views as auth_views
 from . import views
+
 import os
 admin.site.site_header = "APAX Admin"
 admin.site.site_title = "APAX Admin Portal"
