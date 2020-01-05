@@ -1,10 +1,11 @@
+from django.contrib.auth import get_user_model
 from django.db import models
 from django.contrib.auth.models import User
 from . import database_choices as db_choice
 from apaxhr.storage_backends import PrivateMediaStorage
 from apaxhr.storage_backends import PublicMediaStorage
 
-
+User = get_user_model()
 
 
 class Employee(models.Model):
