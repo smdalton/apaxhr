@@ -36,6 +36,39 @@ class DevHealthTest(unittest.TestCase):
         self.assertIn('APAX HRS', self.browser.title, self.browser.title)
 
 
+class DemoHealthTest(unittest.TestCase):
+    # os.system(f"docker-compose -f {cls.docker_file_directory} down -v")
+    @classmethod
+    def setUpClass(cls) -> None:
+        cls.doc_comp_file = 'docker-compose.demo.yml'
+        cls.app_names = ['rabbitmq','ngx','web']
+        cls.network_address = 'http://0.0.0.0:80'
+        os.system(f"docker-compose -f {cls.doc_comp_file} build")
+        cls.container = subprocess.Popen(f"docker-compose -f {cls.doc_comp_file} up", shell=True)
+        time.sleep(9)
+
+    @classmethod
+    def tearDownClass(cls) -> None:
+        cls.container.kill()
+        for container in ['web']:
+            try:
+                os.system(f"docker kill {container}")
+            finally:
+                print(f"Container {container} not killed, possibly not started")
+
+
+    def setUp(self) -> None:
+        self.browser = webdriver.Firefox()
+        self.browser.implicitly_wait(2)
+
+    def tearDown(self) -> None:
+        self.browser.quit()
+
+    def test_server_live(self):
+        self.browser.get(self.network_address)
+        self.assertIn('APAX HRS', self.browser.title, self.browser.title)
+        self.browser.implicitly_wait(1)
+
 
 
 class ProdHealthTest(unittest.TestCase):
