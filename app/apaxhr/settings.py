@@ -31,7 +31,7 @@ TEMPLATE_DIR = os.path.join(BASE_DIR, '/templates')
 STATIC_URL = '/staticfiles/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 STATICFILES_DIRS = (os.path.join(BASE_DIR,'static'),)
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+
 STATICFILES_FINDERS = (
     'django.contrib.staticfiles.finders.FileSystemFinder',
     'django.contrib.staticfiles.finders.AppDirectoriesFinder',
@@ -92,11 +92,12 @@ INSTALLED_APPS = [
 
     # Local
     # 'debug_toolbar'
-
+    'users',
     'core_hr',
     'django_countries',
     'django_nose',
     'storages',
+    'django_extensions'
 
 ]
 
@@ -166,8 +167,14 @@ else:
         }
     }
 
+# CUSTOM USER MODEL
+AUTH_USER_MODEL = 'users.CustomUser'
+
+
 # Password validation
 # https://docs.djangoproject.com/en/3.0/ref/settings/#auth-password-validators
+
+
 
 AUTH_PASSWORD_VALIDATORS = [
     {
