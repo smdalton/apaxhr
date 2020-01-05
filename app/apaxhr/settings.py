@@ -68,6 +68,8 @@ else:
 SECRET_KEY = os.environ.get('SECRET_KEY','change me to a real key')
 
 # SECURITY WARNING: don't run with debug turned on in production!
+
+DEBUG=True
 if os.environ.get('DEV'):
     DEBUG = True
     ALLOWED_HOSTS = ['*']
@@ -168,7 +170,7 @@ else:
     }
 
 # CUSTOM USER MODEL
-AUTH_USER_MODEL = 'users.CustomUser'
+AUTH_USER_MODEL = 'users.Employee'
 
 
 # Password validation
