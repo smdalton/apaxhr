@@ -9,20 +9,24 @@ class CustomUserAdmin(UserAdmin):
     form = CustomUserChangeForm
     model = Employee
 
-    list_display = ('email', 'is_staff', 'is_active',)
+    list_display = ('email','first_name', 'is_staff', 'is_active',)
     list_filter = ('email', 'is_staff','is_active',)
 
     fieldsets = (
-        (None, {'fields': ('email', 'password')}),
-        ('Permissions', {'fields': ('is_staff', 'is_active')}),
+        ('Credentials', {'fields': (('email', 'password',),)}),
+        ('Permissions', {'fields': (('is_staff', 'is_active',),)}),
+        ('Name',{'fields':('first_name','middle_name','last_name',)}),
+        ('Bio',{'fields':('bio',)}),
     )
     add_fieldsets = (
-        (None, {
+        ('Unknown', {
             'classes': ('wide',),
-            'fields': ('email', 'password1', 'password2', 'is_staff', 'is_active')}
+            'fields': ('email', 'password1', 'password2', 'is_staff', 'is_active'),
+
+        }
          ),
     )
-    search_fields = ('email',)
+    search_fields = ('email','first_name','last_name')
     ordering = ('email',)
 
 

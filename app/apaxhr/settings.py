@@ -96,6 +96,7 @@ INSTALLED_APPS = [
     # 'debug_toolbar'
     'users',
     'core_hr',
+    'schedules',
     'django_countries',
     'django_nose',
     'storages',
