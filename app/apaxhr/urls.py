@@ -29,7 +29,9 @@ urlpatterns = [
     path('', views.HomePageView.as_view(),name='homepage'),
     path('login', auth_views.auth_login),
     path('admin/', admin.site.urls),
-    path('', include('core_hr.urls'))
+    path('core-hr', include('core_hr.urls')),
+    path('schedules', include('schedules.urls')),
+
 ]
 #
 # if os.environ.get('SERVE_STATIC'):

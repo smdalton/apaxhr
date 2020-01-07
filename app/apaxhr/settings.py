@@ -31,7 +31,7 @@ TEMPLATE_DIR = os.path.join(BASE_DIR, '/templates')
 STATIC_URL = '/staticfiles/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 STATICFILES_DIRS = (os.path.join(BASE_DIR,'static'),)
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+
 STATICFILES_FINDERS = (
     'django.contrib.staticfiles.finders.FileSystemFinder',
     'django.contrib.staticfiles.finders.AppDirectoriesFinder',
@@ -68,6 +68,8 @@ else:
 SECRET_KEY = os.environ.get('SECRET_KEY','change me to a real key')
 
 # SECURITY WARNING: don't run with debug turned on in production!
+
+DEBUG=True
 if os.environ.get('DEV'):
     DEBUG = True
     ALLOWED_HOSTS = ['*']
@@ -92,11 +94,13 @@ INSTALLED_APPS = [
 
     # Local
     # 'debug_toolbar'
-
+    'users',
     'core_hr',
+    'schedules',
     'django_countries',
     'django_nose',
     'storages',
+    'django_extensions'
 
 ]
 
@@ -166,8 +170,14 @@ else:
         }
     }
 
+# CUSTOM USER MODEL
+AUTH_USER_MODEL = 'users.Employee'
+
+
 # Password validation
 # https://docs.djangoproject.com/en/3.0/ref/settings/#auth-password-validators
+
+
 
 AUTH_PASSWORD_VALIDATORS = [
     {
