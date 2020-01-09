@@ -8,7 +8,6 @@ class CustomUserAdmin(UserAdmin):
     add_form = CustomUserCreationForm
     form = CustomUserChangeForm
     model = Employee
-
     list_display = ('email','first_name', 'is_staff', 'is_active',)
     list_filter = ('email', 'is_staff','is_active',)
 
@@ -26,6 +25,7 @@ class CustomUserAdmin(UserAdmin):
         }
          ),
     )
+
     search_fields = ('email','first_name','last_name')
     ordering = ('email',)
 
