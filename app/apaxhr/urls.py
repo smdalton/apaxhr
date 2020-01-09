@@ -26,7 +26,7 @@ admin.site.site_title = "APAX Admin Portal"
 admin.site.index_title = "APAX HR administrator Portal"
 
 urlpatterns = [
-    path('', views.HomePageView.as_view(),name='homepage'),
+    path('',include('core_hr.urls')),
     path('login', auth_views.auth_login),
     path('admin/', admin.site.urls),
     path('core-hr', include('core_hr.urls')),

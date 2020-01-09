@@ -8,10 +8,15 @@ import pytest
 import rt
 
 
+class LocalDevTest(unittest.TestCase):
+
+    def setUp(self) -> None:
+        self.app_instance = os.system('python3 rt.py dev')
+        
+
 class DevHealthTest(unittest.TestCase):
     @classmethod
     def setUpClass(cls) -> None:
-        print(os.getcwd())
         cls.doc_comp_file = 'docker-compose.dev.yml'
         cls.app_name = 'web'
         cls.network_address = "http://0.0.0.0:1337"
