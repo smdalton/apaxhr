@@ -2,7 +2,7 @@
 *.log
 *.pot
 *.pyc
-__pycache__
+__pycache__/
 *db.sqlite3
 media
 
@@ -77,6 +77,8 @@ celerybeat-schedule.*
 *.sage.py
 */static/admin*
 */staticfiles/*
+static*
+staticfiles*
 # Environments
 #.env*
 .venv

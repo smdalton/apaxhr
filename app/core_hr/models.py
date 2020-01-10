@@ -2,10 +2,11 @@ from django.contrib.auth import get_user_model
 from django.db import models
 from django.contrib.auth.models import User
 from . import database_choices as db_choice
+from users.models import Employee
 from apaxhr.storage_backends import PrivateMediaStorage
 from apaxhr.storage_backends import PublicMediaStorage
 
-Employee = get_user_model()
+# Employee = get_user_model()
 
 
 class Passport(models.Model):
