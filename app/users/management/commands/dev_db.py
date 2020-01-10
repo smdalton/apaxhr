@@ -4,9 +4,25 @@ import core_hr.models as hr_models
 from django.conf import settings
 import os
 from users.models import Employee
+from faker import Faker
+from . import fake_helper
 
-
-
+fake=Faker()
+Faker.seed(2323)
+fake.phone_number()
+fake.city()
+fake.building_number()
+fake.address()
+fake.date_between(start_date="-30y", end_date="today")
+fake.date_of_birth(tzinfo=None, minimum_age=0, maximum_age=115)
+fake.day_of_month()
+fake.month()
+fake.year()
+fake.bs()
+fake.latlng()
+fake.local_latlng(country_code="US", coords_only=False)
+fake.local_latlng(country_code='VN', coords_only=True)
+fake.date(pattern="%Y-%m-%d", end_datetime=None)
 
 class Command(BaseCommand):
     help = "Initializes users, clears db, makes and applies migrations, runs server"
@@ -61,11 +77,10 @@ class Command(BaseCommand):
         # employee.save()
         # pass
 
-    # def create_five_users(self):
-    #     from core_hr.database_choices import roles
-    #
-    #     for index in range(len(roles)):
-    #         self.create_user_employee(role=roles[index][0], number=index)
+    def create_five_users(self):
+        for i in len(range(6)):
+            Employee.objects.get_or_create(email=fake.email(),password='pass1234')
+
 
 
     def run_server(self):

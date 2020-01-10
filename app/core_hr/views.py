@@ -7,5 +7,5 @@ from django.core.files.storage import FileSystemStorage
 
 
 class ApaxHomePageView(TemplateView):
-    template_name = 'apaxhr/schedules-base.html'
+    template_name = 'apaxhr/base.html'
 
