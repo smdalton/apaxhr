@@ -6,7 +6,7 @@ from .managers import CustomUserManager
 from apaxhr.storage_backends import PublicMediaStorage, PrivateMediaStorage
 from django.core.validators import RegexValidator
 
-name_validator = RegexValidator(r'^[a-zA-Z]*$', 'Only Alphabetic characters allowed')
+name_validator = RegexValidator(r'^[a-z A-Z]*$', 'Only Alphabetic characters allowed')
 
 
 # Make Proxy models for different admin interfaces
@@ -14,22 +14,22 @@ name_validator = RegexValidator(r'^[a-zA-Z]*$', 'Only Alphabetic characters allo
 class Employee(AbstractBaseUser, PermissionsMixin):
 
     employment_statuses = (
+        ('ap','Applicant'),
         ('trial', 'Initial Training'),
         ('em', 'Employed'),
-        ('ps','pause')
+        ('ps','Pause')
     )
-    genders = (('m', 'male'),('f', 'female'))
+    genders = (('M', 'male'),('F', 'female'))
     # core information
-    full_name = models.CharField(_('Full name as on passport'), validators=[name_validator], max_length=25, blank=False, null=True)
+    full_name = models.CharField(_('Surname, Given Names as on passport'), validators=[name_validator], max_length=25, blank=False, null=True)
 
     #employment data
     gender = models.CharField(max_length=10, choices=genders)
-    employee_id_code = models.IntegerField(_('employee id number'), null=True)
+    employee_id_code = models.CharField(_('employee id number'),max_length=20, null=True)
 
     # activity Status
     employment_status = models.CharField(choices=employment_statuses, max_length=30)
     employment_status_note = models.TextField(max_length=500)
-
 
 
     # contact information
@@ -49,21 +49,22 @@ class Employee(AbstractBaseUser, PermissionsMixin):
 
     def first_name(self):
         try:
-            return str(self.full_name.split()[0])
+            return str(self.full_name.split()[1])
         except:
             pass
-    def first_name(self):
+    def middle_name(self):
+        try:
+            return str(self.full_name.split()[2])
+        except:
+            pass
+    def last_name(self):
         try:
             return str(self.full_name.split()[0])
         except:
             pass
-    def first_name(self):
-        try:
-            return str(self.full_name.split()[0])
-        except:
-            pass
+
     def __str__(self):
-        return self.email
+        return f"{self.full_name} {self.email}"
 
 class EmployeeProfile(models.Model):
     owner = models.ForeignKey(Employee, on_delete=models.CASCADE)

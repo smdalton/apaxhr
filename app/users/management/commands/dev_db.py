@@ -5,7 +5,6 @@ from django.conf import settings
 import os
 from users.models import Employee
 from faker import Faker
-from . import fake_helper
 
 fake=Faker()
 Faker.seed(2323)

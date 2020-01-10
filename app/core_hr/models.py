@@ -4,19 +4,22 @@ from django.contrib.auth.models import User
 from . import database_choices as db_choice
 from users.models import Employee
 from apaxhr.storage_backends import PrivateMediaStorage
+from django_countries.fields import CountryField
 from apaxhr.storage_backends import PublicMediaStorage
-
+from django.utils.translation import gettext_lazy as _
 # Employee = get_user_model()
 
 
 class Passport(models.Model):
     owner = models.OneToOneField(Employee, on_delete=models.CASCADE)
+
+    issue_date = models.DateField(blank=False)
     expiration_date = models.DateField(blank=False)
     dob = models.DateField()
-    issue_date = models.DateField(blank=False)
+    "https://pypi.org/project/django-countries/"
+    place_of_issue = CountryField()
+    #place_of_issue = models.CharField(_("Country code as displayed in passport"),max_length=5)
     image = models.ImageField(storage=PrivateMediaStorage(), upload_to='passports')
-
-    # profile_picture = hr_models.ImageField(null=True, upload_to='media/profile_pictures', blank=False)
 
     def __str__(self):
         return f"Employee: {self.owner.first_name}"
