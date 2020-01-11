@@ -6,6 +6,6 @@ from django.conf import settings
 from django.core.files.storage import FileSystemStorage
 
 
-class BaseView(TemplateView):
-    template_name = 'apaxhr/schedules-base.html'
+class ApaxHomePageView(TemplateView):
+    template_name = 'apaxhr/home.html'
 

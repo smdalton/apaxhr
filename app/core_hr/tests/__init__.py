@@ -1,38 +1,8 @@
-from django.contrib.auth.models import User
-from django.forms import SplitDateTimeField
 from django.test import TestCase
-from .models import Passport, Employee
-from. import views
-import datetime
-from django.utils import timezone
-# Create your tests here.
-
-
-class EmployeeTestCase(TestCase):
-
-    def setup(self):
-        self.fail('Make an employee test case')
-
-    def test_employee_has_photo_avatar(self):
-        self.fail('Implement photo checking')
 
 
 
-class PassportTestCase(TestCase):
 
-    def setUp(self):
-        self.fail('Make an employee test case')
-
-    def test_passport_exists(self):
-        self.fail('create and check for existence of a passport')
-
-    def test_passport_expired(self):
-        self.fail('create several passports and an expired passport and check for expired passports')
-
-    def test_user_exists(self):
-        self.fail('Make an employee test case')
-
-    # def test_employee_exists(self):
 
 
 class WorkPermitTestCase(TestCase):

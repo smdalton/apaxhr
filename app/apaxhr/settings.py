@@ -97,6 +97,8 @@ INSTALLED_APPS = [
     'users',
     'core_hr',
     'schedules',
+    'org',
+    # extensions
     'django_countries',
     'django_nose',
     'storages',
