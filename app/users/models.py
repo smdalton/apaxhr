@@ -11,6 +11,16 @@ name_validator = RegexValidator(r'^[a-z A-Z]*$', 'Only Alphabetic characters all
 
 # Make Proxy models for different admin interfaces
 
+"""Core Info:
+Employment Status: Applicant/Initial Training/Active/Pause **New Field Suggestion**
+Employment Status Note
+Full Name First, Middle, Last
+Gender
+Employee ID Code
+Apax email
+Personal Email	
+Phone Number
+"""
 class Employee(AbstractBaseUser, PermissionsMixin):
 
     employment_statuses = (
@@ -47,6 +57,13 @@ class Employee(AbstractBaseUser, PermissionsMixin):
 
     objects = CustomUserManager()
 
+
+    def get_contact_info(self):
+        try:
+            return f"{self.phone_number}, {self.email}, {self.personal_email}"
+        except:
+            return "Error during retrieval of contact info, perhaps it isn't complete"
+
     def first_name(self):
         try:
             return str(self.full_name.split()[1])
@@ -65,6 +82,7 @@ class Employee(AbstractBaseUser, PermissionsMixin):
 
     def __str__(self):
         return f"{self.full_name} {self.email}"
+
 
 class EmployeeProfile(models.Model):
     owner = models.ForeignKey(Employee, on_delete=models.CASCADE)
