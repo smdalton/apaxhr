@@ -7,6 +7,9 @@ from django.contrib.auth import get_user_model
 import random
 fake = faker.Faker()
 
+
+
+
 def get_mock_user():
     User = Employee
     full_name = f"{fake.first_name()} {fake.last_name()} {fake.last_name()}"
