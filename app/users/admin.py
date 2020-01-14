@@ -9,8 +9,8 @@ class CustomUserAdmin(UserAdmin):
     form = CustomUserChangeForm
     model = Employee
     search_fields = ('email','first_name','employee_id_number')
-    list_display = ('email','full_name', 'is_staff', 'is_active',)
-    list_filter = ('email', 'is_staff','is_active',)
+    list_display = ('email','full_name', 'is_active',)
+    list_filter = ('is_staff','is_active',)
 
     fieldsets = (
         ('Credentials', {'fields': (('email','personal_email', 'password',),)}),
@@ -27,7 +27,6 @@ class CustomUserAdmin(UserAdmin):
          ),
     )
 
-    search_fields = ('email','full_name','employee_id_number')
     ordering = ('email',)
 
 

@@ -21,7 +21,7 @@ def start_dev_server():
     os.system('echo Starting dev server.')
     os.system('python3 manage.py dev_db')
     os.system('python3 manage.py collectstatic --no-input')
-    os.system('python3 -W ignore manage.py runserver 0.0.0.0:8000')
+    os.system('python3 manage.py runserver 0.0.0.0:8000')
 
 
 def start_prod_server():

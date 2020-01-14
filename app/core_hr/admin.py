@@ -13,7 +13,10 @@ from core_hr.models import Employee, Passport
 
 @admin.register(Passport)
 class PassportAdmin(admin.ModelAdmin):
+    model = Passport
+    search_fields = ('owner__full_name', 'owner__employee_id_number')
     autocomplete_fields = ('owner',)
+    list_display = ['owners_name','data_complete','expired','employee_number',]
 
 
 

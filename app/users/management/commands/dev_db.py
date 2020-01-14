@@ -44,7 +44,7 @@ class Command(BaseCommand):
 
     def create_many_users(self):
         for x in range(25):
-            get_mock_user()
+            get_mock_passport(get_mock_user())
 
     def create_super_user(self):
         print(os.getcwd())

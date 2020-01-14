@@ -1,3 +1,4 @@
+from django.db.models import ImageField
 from django.test import TestCase
 import faker
 from core_hr.models import Passport
@@ -5,6 +6,10 @@ from users.models import Employee
 from django_countries.fields import CountryField
 from django.contrib.auth import get_user_model
 import random
+import mock
+from django.core.files.uploadedfile import SimpleUploadedFile
+import os
+
 fake = faker.Faker()
 
 
@@ -43,17 +48,20 @@ def get_mock_user():
 
 def get_mock_passport(employee):
     owner = Employee.objects.get(pk=employee.pk)
-    dob = fake.date_between(start_date="-9y", end_date="-1m")
-    date_of_expiration = fake.date_between(start_date="+3m", end_date="+9y")
+    dob = fake.date_between(start_date="-49y", end_date="-21y")
+    date_of_expiration = fake.date_between(start_date="-6m", end_date="+9y")
     place_of_issue = fake.country_code()
     date_of_issue = fake.date_between(start_date="-9y", end_date="-1m")
-
+    photo = None
 
     passport = Passport.objects.create(
         owner=owner,
         place_of_issue=place_of_issue,
         issue_date=date_of_issue,
         expiration_date=date_of_expiration,
-        dob=dob
+        dob=dob,
+        image=photo
+
     )
+
     return passport
