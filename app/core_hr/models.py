@@ -25,7 +25,7 @@ class Passport(models.Model):
     image = models.ImageField(storage=PrivateMediaStorage(), upload_to='passports')
 
     def __str__(self):
-        return f"Employee: {self.owner.first_name}"
+        return f"Employee: {self.owner.first_name()}"
 
 
 class WorkPermit(models.Model):

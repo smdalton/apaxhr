@@ -82,7 +82,7 @@ else:
 
 
 INSTALLED_APPS = [
-    'whitenoise.runserver_nostatic',
+    #'whitenoise.runserver_nostatic',
     'django.contrib.admin',
     #'livereload',
 
@@ -105,6 +105,7 @@ INSTALLED_APPS = [
     'django_extensions'
 
 ]
+
 
 
 

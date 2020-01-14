@@ -8,6 +8,7 @@ class CustomUserAdmin(UserAdmin):
     add_form = CustomUserCreationForm
     form = CustomUserChangeForm
     model = Employee
+    search_fields = ('email','first_name','employee_id_number')
     list_display = ('email','full_name', 'is_staff', 'is_active',)
     list_filter = ('email', 'is_staff','is_active',)
 
@@ -26,8 +27,9 @@ class CustomUserAdmin(UserAdmin):
          ),
     )
 
-    search_fields = ('email','full_name')
+    search_fields = ('email','full_name','employee_id_number')
     ordering = ('email',)
+
 
 
 admin.site.register(Employee, CustomUserAdmin)

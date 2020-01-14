@@ -5,6 +5,7 @@ from django.conf import settings
 import os
 from users.models import Employee
 from faker import Faker
+from core_hr.extras.core_hr_mock_factory import get_mock_passport, get_mock_user
 
 fake=Faker()
 Faker.seed(2323)
@@ -41,45 +42,14 @@ class Command(BaseCommand):
             self.stdout.write('Running on production postgresql wipe_db aborted')
             return
 
-    # def create_user_employee(self, role, number):
-    #     name = 'Test User#'+' '+str(number) + ' '+ role
-    #     bio = 'This is a bio for a Test User,  whose first name is Test and ' \
-    #           'last name is User, who has email address testuser@abc.com'
-    #     location = 'on'
-    #     username = name.replace(' ', '')
-    #     email = (username + '@abc.com').lower()
-    #     user = Employee.objects.create_user(email=email, password='pass1234')
-    #     user.is_superuser = False
-    #     user.is_staff = False
-    #     user.first_name = name.split(' ')[0]+str(number)
-    #     user.last_name = name.split(' ')[1]
-    #     user.email = email
-    #     user.save()
-    #     employee = hr_models.Employee(user=user, middle_name='please update', bio=bio, employee_role='')
-    #     employee.save()
-    #     pass
+    def create_many_users(self):
+        for x in range(25):
+            get_mock_user()
 
     def create_super_user(self):
         print(os.getcwd())
         user = Employee.objects.create_superuser(email='smd@gmail.com',password='pass1234')
         user.save()
-        #
-        # bio = 'This is a bio for the admin user,  whose first name is admin and ' \
-        #      'last name is istrator, who has no email address, and lives off campus.'
-        #
-        # user = Employee.objects.create_superuser('admin', password='pass1234')
-        # user.first_name = 'Shane'
-        # user.last_name = 'Dalton'
-        # user.email = 'shanemdalton@gmail.com'
-        # user.save()
-        # employee = hr_models.Employee(user=user, bio=bio, employee_role='sup')
-        # employee.save()
-        # pass
-
-    def create_five_users(self):
-        for i in len(range(6)):
-            Employee.objects.get_or_create(email=fake.email(),password='pass1234')
-
 
 
     def run_server(self):
@@ -93,8 +63,8 @@ class Command(BaseCommand):
     def handle(self, **args):
         os.system('export DJANGO_COLORS="light;error=yellow/blue,blink;notice=magenta"')
         self.reset_db_and_migrations()
-        #self.create_five_users()
         self.create_super_user()
+        self.create_many_users()
         #self.run_server()
 
 

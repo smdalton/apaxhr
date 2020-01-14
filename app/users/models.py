@@ -35,7 +35,7 @@ class Employee(AbstractBaseUser, PermissionsMixin):
 
     #employment data
     gender = models.CharField(max_length=10, choices=genders)
-    employee_id_code = models.CharField(_('employee id number'),max_length=20, null=True)
+    employee_id_number = models.CharField(_('employee id number'), max_length=20, null=True)
 
     # activity Status
     employment_status = models.CharField(choices=employment_statuses, max_length=30)

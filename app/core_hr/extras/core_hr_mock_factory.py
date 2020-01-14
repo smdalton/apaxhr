@@ -14,7 +14,7 @@ def get_mock_user():
     User = Employee
     full_name = f"{fake.first_name()} {fake.last_name()} {fake.last_name()}"
     gender = random.choice([x[0] for x in Employee.genders])
-    employee_id_code =f"G-{fake.ean8()}"
+    employee_id_number =f"G-{fake.ean8()}"
 
     employment_status = random.choice([x[0] for x in Employee.employment_statuses])
     employment_status_note = fake.bs()
@@ -28,7 +28,7 @@ def get_mock_user():
     user = User.objects.create_user(
         full_name=full_name,
         gender=gender,
-        employee_id_code=employee_id_code,
+        employee_id_number=employee_id_number,
         employment_status=employment_status,
         employment_status_note= employment_status_note,
         phone_number=phone_number,

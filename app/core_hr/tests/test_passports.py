@@ -1,12 +1,9 @@
 from django.test import TestCase
 import faker
 from core_hr.models import Passport
-from users.models import Employee
-from django_countries.fields import CountryField
-from django.contrib.auth import get_user_model
-import random
+
 fake = faker.Faker()
-from .mock_factory import get_mock_user, get_mock_passport
+from core_hr.extras.core_hr_mock_factory import get_mock_user, get_mock_passport
 
 
 class PassportTestCase(TestCase):
