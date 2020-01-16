@@ -3,6 +3,7 @@ import faker
 from core_hr.models import Passport
 from users.models import Employee
 from django.core.files.uploadedfile import SimpleUploadedFile
+import django_countries
 import os
 #http://giflib.sourceforge.net/whatsinagif/bits_and_bytes.html
 small_gif = (
@@ -12,6 +13,7 @@ small_gif = (
 )
 
 fake = faker.Faker()
+
 from core_hr.extras.core_hr_mock_factory import get_mock_user
 
 
@@ -20,7 +22,6 @@ def get_mock_passport(employee,expired=False,has_image=True):
     dob=fake.date_between(start_date="-49y", end_date="-21y")
     date_of_expiration = fake.date_between(start_date="-6m", end_date="+9y")
     place_of_issue = fake.country_code()
-
     date_of_issue = fake.date_between(start_date="-9y", end_date="-1m")
     if expired:
         date_of_expiration = fake.date_between(start_date="-1y", end_date='-1m')

@@ -37,17 +37,13 @@ class ExpirationDateMixin(models.Model):
 # TODO: Passport
 class Passport(ExpirationDateMixin, DataCompleteMixin, models.Model):
     owner = models.OneToOneField(Employee, on_delete=models.CASCADE)
-
     issue_date = models.DateField(blank=True, null=True)
     expiration_date = models.DateField(blank=True, null=True)
     dob = models.DateField(blank=True, null=True)
 
     "https://pypi.org/project/django-countries/"
     #place_of_issue = CountryField(blank=False,null=True)
-    place_of_issue = models.CharField(
-        _("Country code as displayed in passport"),
-        max_length=5, blank=True, null=True
-    )
+    place_of_issue = CountryField(blank_label="select country used in your passport",default='AQ')
 
     image = models.ImageField(
         storage=PrivateMediaStorage(),
@@ -78,7 +74,7 @@ def default_ros_expiration(expiration_period=680):
 
 # Todo ROS form
 
-class RegistryOfStayForm(ExpirationDateMixin, DataCompleteMixin, models.Model):
+class RegistryOfStay(ExpirationDateMixin, DataCompleteMixin, models.Model):
 
     """ Your Address;
         Your Vietnamese cell number;
@@ -89,8 +85,8 @@ class RegistryOfStayForm(ExpirationDateMixin, DataCompleteMixin, models.Model):
     # expiration is 6 months
     # if address is null then must be flagged
     employee = models.ForeignKey(Employee, on_delete=models.CASCADE)
-
     employee_address = models.CharField(max_length=100,blank=True, null=True)
+
     landlords_name = models.CharField(max_length=100,blank=True, null=False)
     landlords_cell_phone = models.CharField(max_length=25, blank=True, null=True)
     landlords_email = models.EmailField(max_length=25, blank=True, null=True)

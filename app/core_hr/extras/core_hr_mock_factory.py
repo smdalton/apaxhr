@@ -3,7 +3,7 @@ from datetime import datetime, timedelta
 from django.db.models import ImageField
 from django.test import TestCase
 import faker
-from core_hr.models import Passport, RegistryOfStayForm
+from core_hr.models import Passport, RegistryOfStay
 from users.models import Employee
 from django_countries.fields import CountryField
 from django.contrib.auth import get_user_model
@@ -47,29 +47,6 @@ def get_mock_user():
 
     return user
 
-
-def get_mock_ros_form(employee):
-
-    employee_address = fake.address()
-    landlords_name = fake.name()
-    landlords_cell_phone = fake.phone_number()
-    landlords_email = fake.email()
-    issued = fake.date_between(start_date="-15d", end_date="-1d")
-    expiration=datetime.now().date() + timedelta(days=180)
-    image = None
-
-    form = RegistryOfStayForm.objects.create(
-        employee=employee,
-        employee_address=employee_address,
-        landlords_name=landlords_name,
-        landlords_cell_phone=landlords_cell_phone,
-        landlords_email=landlords_email,
-        issued = issued,
-        expiration=expiration,
-        image=image
-
-    )
-    return form
 
 def get_mock_work_permit(employee):
     pass

@@ -11,5 +11,5 @@ class WorkPermitInline(admin.TabularInline):
     max_num = 1
 
 class RegistryOfStayInline(admin.TabularInline):
-    model = models.RegistryOfStayForm
+    model = models.RegistryOfStay
     max_num = 1
