@@ -36,7 +36,7 @@ STATICFILES_FINDERS = (
     'django.contrib.staticfiles.finders.FileSystemFinder',
     'django.contrib.staticfiles.finders.AppDirectoriesFinder',
 )
-
+AWS_DEFAULT_ACL = 'public-read'
 USE_S3 = os.getenv('USE_S3') == 'TRUE'
 
 if USE_S3:
@@ -83,17 +83,17 @@ else:
 
 INSTALLED_APPS = [
     #'whitenoise.runserver_nostatic',
-    'django.contrib.admin',
-    #'livereload',
-
-    'django.contrib.auth',
+#'livereload',
     'django.contrib.contenttypes',
+    'django.contrib.admin',
+    'django.contrib.auth',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
     # Local
     # 'debug_toolbar'
+    'apaxhr',
     'users',
     'core_hr',
     'schedules',

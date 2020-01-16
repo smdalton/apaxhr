@@ -6,7 +6,7 @@ import core_hr.models
 # https://www.argpar.se/posts/programming/testing-django-admin/
 
 class MockSuperUser:
-    def has_perm(selfself, perm):
+    def has_perm(self, perm):
         return True
 
 request_factory = RequestFactory()

@@ -88,3 +88,4 @@ class EmployeeProfile(models.Model):
     owner = models.ForeignKey(Employee, on_delete=models.CASCADE)
     img = models.ImageField(_('Upload Profile Image'), storage=PublicMediaStorage(), upload_to='profile_images')
     bio = models.TextField(_('Personal Biography'), max_length=500, blank=True, null=True)
+

@@ -48,26 +48,6 @@ def get_mock_user():
     return user
 
 
-def get_mock_passport(employee):
-
-    dob=fake.date_between(start_date="-49y", end_date="-21y")
-    date_of_expiration = fake.date_between(start_date="-6m", end_date="+9y")
-    place_of_issue = fake.country_code()
-    date_of_issue = fake.date_between(start_date="-9y", end_date="-1m")
-    photo = None
-    owner=Employee.objects.get(pk=employee.pk)
-    passport = Passport.objects.create(
-        owner=owner,
-        place_of_issue=place_of_issue,
-        issue_date=date_of_issue,
-        expiration_date=date_of_expiration,
-        dob=dob,
-        image=photo
-
-    )
-
-    return passport
-
 def get_mock_ros_form(employee):
 
     employee_address = fake.address()
@@ -87,6 +67,24 @@ def get_mock_ros_form(employee):
         issued = issued,
         expiration=expiration,
         image=image
-        # employee_address=
+
     )
     return form
+
+def get_mock_work_permit(employee):
+    pass
+
+def get_mock_resume(employee):
+    pass
+
+
+def get_mock_achievement_certificate(employee):
+    pass
+
+
+def get_mock_tefl_form(employee):
+    pass
+
+
+def get_mock_degree(employee):
+    pass

@@ -4,10 +4,10 @@ from django.contrib.auth import get_user_model
 from django.db import models
 from django.contrib.auth.models import User
 from . import database_choices as db_choice
-from users.models import Employee
-from apaxhr.storage_backends import PrivateMediaStorage
 from django_countries.fields import CountryField
 from apaxhr.storage_backends import PublicMediaStorage
+from users.models import Employee
+from apaxhr.storage_backends import PrivateMediaStorage
 from django.utils.translation import gettext_lazy as _
 from django.utils.timezone import timezone, timedelta
 import datetime as dt
@@ -21,7 +21,7 @@ class DataCompleteMixin(models.Model):
     @property
     def data_complete(self):
         all_fields_filled = all((getattr(self, field.name) for field in self._meta.fields))
-        return str(all_fields_filled)
+        return all_fields_filled
 
 
 class ExpirationDateMixin(models.Model):
@@ -35,7 +35,7 @@ class ExpirationDateMixin(models.Model):
 
 
 # TODO: Passport
-class Passport(ExpirationDateMixin, DataCompleteMixin,models.Model):
+class Passport(ExpirationDateMixin, DataCompleteMixin, models.Model):
     owner = models.OneToOneField(Employee, on_delete=models.CASCADE)
 
     issue_date = models.DateField(blank=True, null=True)
@@ -61,7 +61,7 @@ class Passport(ExpirationDateMixin, DataCompleteMixin,models.Model):
     #     return str(all_fields_filled)
 
     def __str__(self):
-        return f"Employee: {self.owner.full_name}"
+        return f"{self.owner.full_name}"
 
     @property
     def owners_name(self):
@@ -72,17 +72,13 @@ class Passport(ExpirationDateMixin, DataCompleteMixin,models.Model):
         return self.owner.employee_id_number
 
 
-
-
-
-
 def default_ros_expiration(expiration_period=680):
     now = dt.datetime.now()
     return now + timedelta(days=expiration_period)
 
 # Todo ROS form
 
-class RegistryOfStayForm(models.Model):
+class RegistryOfStayForm(ExpirationDateMixin, DataCompleteMixin, models.Model):
 
     """ Your Address;
         Your Vietnamese cell number;
@@ -107,23 +103,24 @@ class RegistryOfStayForm(models.Model):
     def phone_number(self):
         return self.employee.phone_number
 
-    @property
-    def expired(self):
-        return dt.datetime.now().date() > self.expiration_date
+    # @property
+    # def expired(self):
+    #     return dt.datetime.now().date() > self.expiration_date
 
-    @property
-    def data_complete(self):
-        all_fields_filled = all((getattr(self, field.name) for field in self._meta.fields))
-        return str(all_fields_filled)
+    # @property
+    # def data_complete(self):
+    #     all_fields_filled = all((getattr(self, field.name) for field in self._meta.fields))
+    #     return str(all_fields_filled)
 
-    @property
-    def compute_default_expiration(self):
-        return
 
+#Default work permit issue time is 2 years
 def default_work_permit_expiration(expiration_period=680):
     return dt.datetime.now().date()+timedelta(days=expiration_period)
 
-class WorkPermit(models.Model):
+
+
+class WorkPermit(ExpirationDateMixin, DataCompleteMixin, models.Model):
+    kinds = (('wp','Work Permit'),('vs','visa'))
     owner = models.ForeignKey(Employee, on_delete=models.CASCADE)
     expiration_date = models.DateField(default=default_work_permit_expiration, blank=False)
     image = models.ImageField(storage=PrivateMediaStorage(), upload_to='work_permit_images', blank=True, null=True)
@@ -132,28 +129,36 @@ class WorkPermit(models.Model):
     def expired(self):
         return dt.datetime.now().date() > self.expiration_date
 
-    @property
-    def data_complete(self):
-        all_fields_filled = all((getattr(self, field.name) for field in self._meta.fields))
-        return str(all_fields_filled)
+    # @property
+    # def data_complete(self):
+    #     all_fields_filled = all((getattr(self, field.name) for field in self._meta.fields))
+    #     return str(all_fields_filled)
 
 
-#
-#
-# class Resume(models.Model):
-#     owner = models.ForeignKey(Employee, on_delete=models.CASCADE)
-#     image = models.ImageField(storage=PrivateMediaStorage(), upload_to='resumes', blank=True, null=True)
-#     added = models.DateField(auto_now_add=True)
-# # # #TODO delete this test stub
-#
-# class AchievementCertificate(models.Model):
-#
-#     owner = models.ForeignKey(Employee, on_delete=models.CASCADE)
-#     #TODO type =
-#     image = models.ImageField(storage=PrivateMediaStorage(), upload_to='kpi_certificates', blank=False)
-#     message_text = models.TextField(_('Enter award message for email here'), max_length=1000, blank=False)
-#
-# class TeflTeachingCertificate(models.Model):
-#     owner = models.ForeignKey(Employee, on_delete=models.CASCADE)
-#     image = models.ImageField(storage=PrivateMediaStorage(), upload_to='tefl_certs', blank=False)
-#     added = models.DateField(auto_now_add=True)
+class Resume(DataCompleteMixin, models.Model):
+    owner = models.ForeignKey(Employee, on_delete=models.CASCADE)
+    type =  models.CharField(max_length=20,choices=(('rs','Resume'),('cv','Curriculum Vitae')))
+    image = models.ImageField(storage=PrivateMediaStorage(), upload_to='resumes', blank=True, null=True)
+    added = models.DateField(auto_now_add=True)
+# # #TODO delete this test stub
+
+
+class AchievementCertificate(DataCompleteMixin, models.Model):
+    help = "Store information for KPI and FAS certificates of achievement"
+    owner = models.ForeignKey(Employee, on_delete=models.CASCADE)
+    image = models.ImageField(storage=PrivateMediaStorage(), upload_to='kpi_certificates', blank=False)
+    message_text = models.TextField(_('Enter award message for email here'), max_length=1000, blank=False)
+
+
+class TeachingCertificate(DataCompleteMixin, models.Model):
+    certificate_choices = (('c', 'CELTA'), ('ts', 'TESOL'), ('tf', 'TEFL'), ('ot', 'other'))
+    owner = models.ForeignKey(Employee, on_delete=models.CASCADE)
+    id_number = models.CharField(max_length=100)
+    type  = models.CharField(max_length=15, choices=certificate_choices, blank=True, null=True)
+    image = models.ImageField(storage=PrivateMediaStorage(), upload_to='tefl_certs', blank=False)
+    added = models.DateField(auto_now_add=True)
+
+class DegreeDocument(DataCompleteMixin, models.Model):
+    owner = models.ForeignKey(Employee, on_delete=models.CASCADE)
+    pass
+
