@@ -16,6 +16,9 @@ class PassportTestCase(TestCase):
         retrieved_passport = Passport.objects.get(id=self.passport.pk)
         self.assertEqual(self.passport, retrieved_passport)
 
+    def test_passport_expiration_function(self):
+        self.fail("add passport expiration function")
+
     #
     #
     # def test_passport_expiring_soon(self):

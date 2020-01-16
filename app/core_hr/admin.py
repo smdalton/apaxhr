@@ -5,18 +5,13 @@ from . import models
 from .admin_data import inlines
 from core_hr.models import Employee, Passport
 
-#
-# @admin.register(Employee)
-# class EmployeeAdmin(admin.ModelAdmin):
-#     search_fields = ('fname',)
-#     list_display = ['fname']
 
 @admin.register(Passport)
 class PassportAdmin(admin.ModelAdmin):
     model = Passport
     search_fields = ('owner__full_name', 'owner__employee_id_number')
     autocomplete_fields = ('owner',)
-    list_display = ['owners_name','data_complete','expired','employee_number',]
+    list_display = ['issue_date','owners_name','data_complete','expired','employee_number',]
 
 
 

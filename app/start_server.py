@@ -20,8 +20,12 @@ def start_dev_server():
     # wipe and init the db
     os.system('echo Starting dev server.')
     os.system('python3 manage.py dev_db')
-    os.system('python3 manage.py collectstatic --no-input')
-    os.system('python3 manage.py runserver 0.0.0.0:8000')
+    # os.system('exec gunicorn apaxhr.wsgi:application \
+    #         --bind 0.0.0.0:8000\
+    #         --workers 3')
+    os.system('python3 -m cProfile manage.py collectstatic --no-input > profiled_collectstatic')
+    os.system(' python3 -m cProfile manage.py runserver > profiled_runserver')
+    # os.system('python3 -v manage.py runserver 0.0.0.0:8000')
 
 
 def start_prod_server():
