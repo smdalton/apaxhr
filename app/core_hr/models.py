@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from django.contrib.auth import get_user_model
+
 from django.db import models
 from django.contrib.auth.models import User
 from . import database_choices as db_choice
@@ -12,7 +12,7 @@ from django.utils.translation import gettext_lazy as _
 from django.utils.timezone import timezone, timedelta
 import datetime as dt
 
-# Employee = get_user_model()
+
 
 class DataCompleteMixin(models.Model):
     class Meta:
@@ -51,11 +51,6 @@ class Passport(ExpirationDateMixin, DataCompleteMixin, models.Model):
         blank=True, null=True
                               )
 
-    # @property
-    # def data_complete(self):
-    #     all_fields_filled = all((getattr(self, field.name) for field in self._meta.fields))
-    #     return str(all_fields_filled)
-
     def __str__(self):
         return f"{self.owner.full_name}"
 
@@ -68,7 +63,8 @@ class Passport(ExpirationDateMixin, DataCompleteMixin, models.Model):
         return self.owner.employee_id_number
 
 
-def default_ros_expiration(expiration_period=680):
+# actual default is 180 days, 170 is for a 10 day warning reminder
+def default_ros_expiration(expiration_period=170):
     now = dt.datetime.now()
     return now + timedelta(days=expiration_period)
 
@@ -99,17 +95,8 @@ class RegistryOfStay(ExpirationDateMixin, DataCompleteMixin, models.Model):
     def phone_number(self):
         return self.employee.phone_number
 
-    # @property
-    # def expired(self):
-    #     return dt.datetime.now().date() > self.expiration_date
 
-    # @property
-    # def data_complete(self):
-    #     all_fields_filled = all((getattr(self, field.name) for field in self._meta.fields))
-    #     return str(all_fields_filled)
-
-
-#Default work permit issue time is 2 years
+#Default work permit issue time is 2 years or 730 days, I have set
 def default_work_permit_expiration(expiration_period=680):
     return dt.datetime.now().date()+timedelta(days=expiration_period)
 
@@ -125,15 +112,11 @@ class WorkPermit(ExpirationDateMixin, DataCompleteMixin, models.Model):
     def expired(self):
         return dt.datetime.now().date() > self.expiration_date
 
-    # @property
-    # def data_complete(self):
-    #     all_fields_filled = all((getattr(self, field.name) for field in self._meta.fields))
-    #     return str(all_fields_filled)
-
 
 class Resume(DataCompleteMixin, models.Model):
+    choices = (('rs','Resume'),('cv','Curriculum Vitae'))
     owner = models.ForeignKey(Employee, on_delete=models.CASCADE)
-    type =  models.CharField(max_length=20,choices=(('rs','Resume'),('cv','Curriculum Vitae')))
+    type =  models.CharField(max_length=20,choices=choices)
     image = models.ImageField(storage=PrivateMediaStorage(), upload_to='resumes', blank=True, null=True)
     added = models.DateField(auto_now_add=True)
 # # #TODO delete this test stub

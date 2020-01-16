@@ -4,15 +4,10 @@ from django.core.files.uploadedfile import SimpleUploadedFile
 from core_hr.models import RegistryOfStay
 from django.test import TestCase
 from datetime import datetime
-from core_hr.extras.core_hr_mock_factory import get_mock_user
+from core_hr.extras.core_hr_mock_factory import get_mock_user, get_mock_photo
 from django.utils.timezone import  timedelta
 
 #http://giflib.sourceforge.net/whatsinagif/bits_and_bytes.html
-small_gif = (
-    b'\x47\x49\x46\x38\x39\x61\x01\x00\x01\x00\x00\x00\x00\x21\xf9\x04'
-    b'\x01\x0a\x00\x01\x00\x2c\x00\x00\x00\x00\x01\x00\x01\x00\x00\x02'
-    b'\x02\x4c\x01\x00\x3b'
-)
 
 fake = faker.Faker()
 
@@ -29,7 +24,7 @@ def get_mock_ros_form(employee,expired=False, has_image=True):
     if expired:
         expiration_date = fake.date_between(start_date="-6m", end_date='-1d')
     if has_image:
-        photo = SimpleUploadedFile('small.gif', small_gif, 'content_type=image/gif')
+        photo = get_mock_photo()
     else:
         photo = None
 
