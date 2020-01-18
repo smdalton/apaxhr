@@ -1,16 +1,16 @@
 from datetime import datetime
-
+import datetime as dt
 
 from django.db import models
 from django.contrib.auth.models import User
-from . import database_choices as db_choice
 from django_countries.fields import CountryField
+from django.utils.translation import gettext_lazy as _
+from django.utils.timezone import timezone, timedelta
+
 from apaxhr.storage_backends import PublicMediaStorage
 from users.models import Employee
 from apaxhr.storage_backends import PrivateMediaStorage
-from django.utils.translation import gettext_lazy as _
-from django.utils.timezone import timezone, timedelta
-import datetime as dt
+
 
 
 
@@ -37,9 +37,9 @@ class ExpirationDateMixin(models.Model):
 # TODO: Passport
 class Passport(ExpirationDateMixin, DataCompleteMixin, models.Model):
     owner = models.OneToOneField(Employee, on_delete=models.CASCADE)
-    issue_date = models.DateField(blank=True, null=True)
-    expiration_date = models.DateField(blank=True, null=True)
-    dob = models.DateField(blank=True, null=True)
+    issue_date = models.DateField(blank=True, null=False)
+    expiration_date = models.DateField(blank=False, null=False)
+    dob = models.DateField(blank=False, null=False)
 
     "https://pypi.org/project/django-countries/"
     #place_of_issue = CountryField(blank=False,null=True)
@@ -48,7 +48,7 @@ class Passport(ExpirationDateMixin, DataCompleteMixin, models.Model):
     image = models.ImageField(
         storage=PrivateMediaStorage(),
         upload_to='passports',
-        blank=True, null=True
+        blank=False, null=False
                               )
 
     def __str__(self):
@@ -68,7 +68,7 @@ def default_ros_expiration(expiration_period=170):
     now = dt.datetime.now()
     return now + timedelta(days=expiration_period)
 
-# Todo ROS form
+
 
 class RegistryOfStay(ExpirationDateMixin, DataCompleteMixin, models.Model):
 
@@ -80,13 +80,14 @@ class RegistryOfStay(ExpirationDateMixin, DataCompleteMixin, models.Model):
     """
     # expiration is 6 months
     # if address is null then must be flagged
-    employee = models.ForeignKey(Employee, on_delete=models.CASCADE)
-    employee_address = models.CharField(max_length=100,blank=True, null=True)
 
-    landlords_name = models.CharField(max_length=100,blank=True, null=False)
-    landlords_cell_phone = models.CharField(max_length=25, blank=True, null=True)
-    landlords_email = models.EmailField(max_length=25, blank=True, null=True)
-    expiration_date = models.DateField(default=default_ros_expiration, blank=True, null=True)
+    owner = models.OneToOneField(Employee, on_delete=models.CASCADE)
+    employee_address = models.CharField(max_length=100,blank=False)
+
+    landlords_name = models.CharField(max_length=100,blank=False)
+    landlords_cell_phone = models.CharField(max_length=25, blank=False)
+    landlords_email = models.EmailField(max_length=25, blank=False)
+    expiration_date = models.DateField(default=default_ros_expiration, blank=False)
 
     issued = models.DateField(blank=False, auto_now_add=True)
     image = models.ImageField(storage=PrivateMediaStorage(), upload_to='ros_images',blank=False)
@@ -104,22 +105,24 @@ def default_work_permit_expiration(expiration_period=680):
 
 class WorkPermit(ExpirationDateMixin, DataCompleteMixin, models.Model):
     kinds = (('wp','Work Permit'),('vs','visa'))
-    owner = models.ForeignKey(Employee, on_delete=models.CASCADE)
+    owner = models.OneToOneField(Employee, on_delete=models.CASCADE)
     expiration_date = models.DateField(default=default_work_permit_expiration, blank=False)
-    image = models.ImageField(storage=PrivateMediaStorage(), upload_to='work_permit_images', blank=True, null=True)
+    image = models.ImageField(storage=PrivateMediaStorage(), upload_to='work_permit_images', blank=False, null=False)
 
     @property
     def expired(self):
         return dt.datetime.now().date() > self.expiration_date
 
 
+
 class Resume(DataCompleteMixin, models.Model):
     choices = (('rs','Resume'),('cv','Curriculum Vitae'))
-    owner = models.ForeignKey(Employee, on_delete=models.CASCADE)
+    owner = models.OneToOneField(Employee, on_delete=models.CASCADE)
     type =  models.CharField(max_length=20,choices=choices)
-    image = models.ImageField(storage=PrivateMediaStorage(), upload_to='resumes', blank=True, null=True)
+    image = models.ImageField(storage=PrivateMediaStorage(), upload_to='resumes', blank=False, null=False)
     added = models.DateField(auto_now_add=True)
 # # #TODO delete this test stub
+
 
 
 class AchievementCertificate(DataCompleteMixin, models.Model):
@@ -128,16 +131,15 @@ class AchievementCertificate(DataCompleteMixin, models.Model):
     image = models.ImageField(storage=PrivateMediaStorage(), upload_to='kpi_certificates', blank=False)
     message_text = models.TextField(_('Enter award message for email here'), max_length=1000, blank=False)
 
-
 class TeachingCertificate(DataCompleteMixin, models.Model):
     certificate_choices = (('c', 'CELTA'), ('ts', 'TESOL'), ('tf', 'TEFL'), ('ot', 'other'))
-    owner = models.ForeignKey(Employee, on_delete=models.CASCADE)
+    owner = models.OneToOneField(Employee, on_delete=models.CASCADE)
     id_number = models.CharField(max_length=100)
-    type  = models.CharField(max_length=15, choices=certificate_choices, blank=True, null=True)
+    type  = models.CharField(max_length=15, choices=certificate_choices, blank=False, null=False)
     image = models.ImageField(storage=PrivateMediaStorage(), upload_to='tefl_certs', blank=False)
     added = models.DateField(auto_now_add=True)
 
 class DegreeDocument(DataCompleteMixin, models.Model):
-    owner = models.ForeignKey(Employee, on_delete=models.CASCADE)
+    owner = models.OneToOneField(Employee, on_delete=models.CASCADE)
     pass
 

@@ -32,7 +32,6 @@ urlpatterns = [
     path('org', include('org.urls')),
     path('core-hr', include('core_hr.urls')),
     path('schedules', include('schedules.urls')),
-
 ]
 #
 # if os.environ.get('SERVE_STATIC'):

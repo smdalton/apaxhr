@@ -1,7 +1,10 @@
+from django.core.exceptions import ObjectDoesNotExist
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
 from django.utils.translation import gettext_lazy as _
 from django.utils import timezone
+
+# from core_hr.models import Passport, RegistryOfStay
 from .managers import CustomUserManager
 from apaxhr.storage_backends import PublicMediaStorage, PrivateMediaStorage
 from django.core.validators import RegexValidator
@@ -21,6 +24,8 @@ Apax email
 Personal Email	
 Phone Number
 """
+
+
 class Employee(AbstractBaseUser, PermissionsMixin):
 
     employment_statuses = (
@@ -57,12 +62,43 @@ class Employee(AbstractBaseUser, PermissionsMixin):
 
     objects = CustomUserManager()
 
+    def test_passports(self):
+        from core_hr.models import Passport
+        owners_passport = Passport.objects.get(owner__pk=self.id)
+        if owners_passport.image == None:
+            print('image is none')
 
     def get_contact_info(self):
         try:
             return f"{self.phone_number}, {self.email}, {self.personal_email}"
         except:
             return "Error during retrieval of contact info, perhaps it isn't complete"
+
+    @property
+    def passport_complete(self):
+        from core_hr.models import Passport
+        try:
+            passport = self.passport
+            return passport.data_complete
+        except ObjectDoesNotExist:
+            return ["Couldn't query passport, perhaps it was not created?", False]
+
+    @property
+    def ros_form_complete(self):
+        from core_hr.models import RegistryOfStay
+        try:
+            ros_form = RegistryOfStay.objects.get(owner=self)
+            return ros_form.data_complete
+        except ObjectDoesNotExist:
+            return ["Couldn't query Registry of stay, perhaps it was not created", False]
+        pass
+
+
+    @property
+    def documents_complete(self):
+        completion_statuses = [self.passport_complete, self.ros_form_complete]
+        return  False if False in completion_statuses else True
+
 
     def first_name(self):
         try:

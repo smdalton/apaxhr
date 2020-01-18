@@ -84,6 +84,7 @@ else:
 INSTALLED_APPS = [
     #'whitenoise.runserver_nostatic',
 #'livereload',
+    'users',
     'django.contrib.contenttypes',
     'django.contrib.admin',
     'django.contrib.auth',
@@ -94,7 +95,6 @@ INSTALLED_APPS = [
     # Local
     # 'debug_toolbar'
     'apaxhr',
-    'users',
     'core_hr',
     'schedules',
     'org',

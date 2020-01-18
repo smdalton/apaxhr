@@ -1,6 +1,8 @@
 from django.contrib.auth.base_user import BaseUserManager
 from django.utils.translation import ugettext_lazy as _
 
+
+
 """
 https://testdriven.io/blog/django-custom-user-model/
 """
@@ -35,3 +37,20 @@ class CustomUserManager(BaseUserManager):
         if extra_fields.get('is_superuser') is not True:
             raise ValueError(_('Superuser must have is_superuser=True.'))
         return self.create_user(email, password, **extra_fields)
+
+    def employees_with_passports(self):
+
+        from core_hr.models import Passport
+        from users.models import Employee
+        # Todo: Expand this method into the django admin filter bars for completeness
+        # Employee.objects.filter(pk__in=Subquery(Passport.objects.all().values('owner__pk')))
+        passports = Passport.objects.values_list('owner__pk',flat=True).count()
+        not_passports = Employee.objects.count() - passports
+        return passports
+
+
+
+    # from core_hr.models import Passport, RegistryOfStay, WorkPermit
+    # ros_forms = RegistryOfStay.objects.all()
+    # work_permit = WorkPermit.objects.all()
+    # passport_id_set = passports.distinct()

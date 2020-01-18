@@ -23,7 +23,7 @@ small_gif = (
 def get_mock_photo():
     return SimpleUploadedFile('small.gif', small_gif, 'content_type=image/gif')
 
-def get_mock_user():
+def create_mock_user():
     User = Employee
     full_name = f"{fake.first_name()} {fake.last_name()} {fake.last_name()}"
     gender = random.choice([x[0] for x in Employee.genders])

@@ -3,7 +3,7 @@ from random import random
 import faker
 from django.test import TestCase
 
-from core_hr.extras.core_hr_mock_factory import get_mock_user, get_mock_photo
+from core_hr.extras.core_hr_mock_factory import create_mock_user, get_mock_photo
 from core_hr.models import Resume
 
 fake = faker.Faker()
@@ -28,6 +28,6 @@ def get_mock_resume(employee, has_image=True):
 class ResumeFormTestCase(TestCase):
 
     def setUp(self):
-        self.employee = get_mock_user()
+        self.employee = create_mock_user()
         self.valid_resume = get_mock_resume(self.employee)
 

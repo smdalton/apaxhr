@@ -5,7 +5,9 @@ from django.conf import settings
 import os
 from users.models import Employee
 
-from core_hr.extras.core_hr_mock_factory import get_mock_passport, get_mock_user
+from core_hr.extras.core_hr_mock_factory import  create_mock_user
+from core_hr.tests.test_passports import create_mock_passport
+
 #
 # fake=Faker()
 # Faker.seed(2323)
@@ -43,8 +45,9 @@ class Command(BaseCommand):
             return
 
     def create_many_users(self):
-        for x in range(25):
-            get_mock_passport(get_mock_user())
+        for x in range(250):
+            if x % 5 == 0:print(x)
+            create_mock_passport(create_mock_user())
 
     def create_super_user(self):
         print(os.getcwd())
