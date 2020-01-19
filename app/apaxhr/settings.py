@@ -73,6 +73,10 @@ DEBUG=True
 if os.environ.get('DEV'):
     DEBUG = True
     ALLOWED_HOSTS = ['*']
+    INTERNAL_IPS = [
+        'localhost',
+        '127.0.0.1',
+    ]
 else:
     ALLOWED_HOSTS=['*']
 
@@ -84,16 +88,17 @@ else:
 INSTALLED_APPS = [
     #'whitenoise.runserver_nostatic',
 #'livereload',
+    'django.contrib.staticfiles',
     'users',
     'django.contrib.contenttypes',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.sessions',
     'django.contrib.messages',
-    'django.contrib.staticfiles',
+
 
     # Local
-    # 'debug_toolbar'
+    'debug_toolbar',
     'apaxhr',
     'core_hr',
     'schedules',
@@ -120,6 +125,7 @@ NOSE_ARGS = [
 MIDDLEWARE = [
     #'livereload.middleware.LiveReloadScript',
     #'whitenoise.middleware.WhiteNoiseMiddleware',
+
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -127,6 +133,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'debug_toolbar.middleware.DebugToolbarMiddleware',
 
 ]
 
@@ -207,7 +214,9 @@ TIME_ZONE = 'UTC'
 
 USE_I18N = True
 
-USE_L10N = True
+USE_L10N = False
+DATE_FORMAT = 'd/m/Y'
+DATE_INPUT_FORMATS = ( '%d/%m/%Y', '%d/%m/%y', '%d %b %Y',)
 
 USE_TZ = True
 

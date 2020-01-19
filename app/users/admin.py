@@ -3,7 +3,7 @@ from django.contrib.admin import ModelAdmin, SimpleListFilter
 from django.contrib.auth.admin import UserAdmin
 from django.db.models import Subquery
 
-from core_hr.models import Passport
+from core_hr.models import Passport, RegistryOfStay, WorkPermit
 from .forms import CustomUserCreationForm, CustomUserChangeForm
 from .models import Employee
 from core_hr.admin_data import inlines
@@ -21,12 +21,31 @@ class PassportStatusFilter(SimpleListFilter):
         ]
 
     def queryset(self, request, queryset):
-        Employee.objects.filter(pk__in=Subquery(Passport.objects.all().values('owner__pk')))
+        # Employee.objects.filter(pk__in=Subquery(Passport.objects.all().values('owner__pk')))
 
         if self.value() == 'complete':
             return queryset.filter(pk__in=Subquery(Passport.objects.all().values('owner__pk')))
         else:
-            return None
+            return queryset.exclude(pk__in=Subquery(Passport.objects.all().values('owner__pk')))
+
+class RegistryOfStayStatusFilter(SimpleListFilter):
+    title='Passport Complete'
+    parameter_name = 'documents'
+
+    def lookups(self, request, model_admin):
+        return[
+            ('complete','ROS documentation Complete'),
+            ('not_complete', 'ROS documentation Not Complete'),
+            ('expiring_soon', 'ROS documentation expiring soon')
+        ]
+
+    def queryset(self, request, queryset):
+
+
+        if self.value() == 'complete':
+            return queryset.filter(pk__in=Subquery(RegistryOfStay.objects.all().values('owner__pk')))
+        else:
+            return queryset.exclude(pk__in=Subquery(RegistryOfStay.objects.all().values('owner__pk')))
 
 # one to one exists filter https://djangosnippets.org/snippets/2591/
 

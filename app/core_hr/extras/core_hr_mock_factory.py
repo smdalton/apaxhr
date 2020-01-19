@@ -55,6 +55,8 @@ def create_mock_user():
 
 
 def get_mock_work_permit(employee):
+
+
     pass
 
 def get_mock_resume(employee):

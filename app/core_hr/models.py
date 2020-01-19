@@ -24,6 +24,7 @@ class DataCompleteMixin(models.Model):
         return all_fields_filled
 
 
+
 class ExpirationDateMixin(models.Model):
     class Meta:
         abstract = True
@@ -94,10 +95,14 @@ class RegistryOfStay(ExpirationDateMixin, DataCompleteMixin, models.Model):
 
     @property
     def phone_number(self):
-        return self.employee.phone_number
+        return self.owner.phone_number
+
+    def __str__(self):
+        return f"Expires {self.expiration_date}"
 
 
-#Default work permit issue time is 2 years or 730 days, I have set
+
+#Default work permit expiration time is 2 years or 730 days, I have set
 def default_work_permit_expiration(expiration_period=680):
     return dt.datetime.now().date()+timedelta(days=expiration_period)
 
@@ -131,6 +136,8 @@ class AchievementCertificate(DataCompleteMixin, models.Model):
     image = models.ImageField(storage=PrivateMediaStorage(), upload_to='kpi_certificates', blank=False)
     message_text = models.TextField(_('Enter award message for email here'), max_length=1000, blank=False)
 
+
+
 class TeachingCertificate(DataCompleteMixin, models.Model):
     certificate_choices = (('c', 'CELTA'), ('ts', 'TESOL'), ('tf', 'TEFL'), ('ot', 'other'))
     owner = models.OneToOneField(Employee, on_delete=models.CASCADE)
@@ -138,6 +145,8 @@ class TeachingCertificate(DataCompleteMixin, models.Model):
     type  = models.CharField(max_length=15, choices=certificate_choices, blank=False, null=False)
     image = models.ImageField(storage=PrivateMediaStorage(), upload_to='tefl_certs', blank=False)
     added = models.DateField(auto_now_add=True)
+
+
 
 class DegreeDocument(DataCompleteMixin, models.Model):
     owner = models.OneToOneField(Employee, on_delete=models.CASCADE)
