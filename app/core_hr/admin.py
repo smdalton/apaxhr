@@ -3,7 +3,7 @@ from django.contrib import admin
 from django.apps import apps
 from . import models
 from .admin_data import inlines
-from core_hr.models import Employee, Passport
+from core_hr.models import Employee, Passport, RegistryOfStay
 
 
 @admin.register(Passport)
@@ -14,7 +14,9 @@ class PassportAdmin(admin.ModelAdmin):
     list_display = ['issue_date','owners_name','data_complete','expired','employee_number',]
 
 
-
+class RegistryOfStayAdmin(admin.ModelAdmin):
+    model = RegistryOfStay
+    search_fields = ('owner__full_name', 'owner__employee_id_number')
 
 #
 # class EmployeeAdmin(ModelAdmin):

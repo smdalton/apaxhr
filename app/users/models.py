@@ -36,7 +36,7 @@ class Employee(AbstractBaseUser, PermissionsMixin):
     )
     genders = (('M', 'male'),('F', 'female'))
     # core information
-    full_name = models.CharField(_('Surname, Given Names as on passport'), validators=[name_validator], max_length=25, blank=False, null=True)
+    full_name = models.CharField(_('Name as on Passport'), validators=[name_validator], max_length=25, blank=False, null=True)
 
     #employment data
     gender = models.CharField(max_length=10, choices=genders)
@@ -122,6 +122,6 @@ class Employee(AbstractBaseUser, PermissionsMixin):
 
 class EmployeeProfile(models.Model):
     owner = models.ForeignKey(Employee, on_delete=models.CASCADE)
-    img = models.ImageField(_('Upload Profile Image'), storage=PublicMediaStorage(), upload_to='profile_images')
+    img = models.ImageField(_('Upload Profile Image'), upload_to='profile_images')
     bio = models.TextField(_('Personal Biography'), max_length=500, blank=True, null=True)
 

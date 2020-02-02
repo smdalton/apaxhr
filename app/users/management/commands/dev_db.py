@@ -1,12 +1,15 @@
-
+from django.core.management import call_command
 from django.core.management.base import BaseCommand, CommandError
 
 from django.conf import settings
 import os
+import random
+
+
 from users.models import Employee
 
-from core_hr.extras.core_hr_mock_factory import  create_mock_user
-from core_hr.tests.test_passports import create_mock_passport
+from core_hr.extras.core_hr_mock_factory import  \
+    create_mock_user, create_mock_work_permit, create_mock_passport, create_mock_ros_form
 
 #
 # fake=Faker()
@@ -44,15 +47,29 @@ class Command(BaseCommand):
             self.stdout.write('Running on production postgresql wipe_db aborted')
             return
 
-    def create_many_users(self):
-        for x in range(250):
+    def create_many_users_and_documents(self):
+        for x in range(15):
+            user = create_mock_user()
             if x % 5 == 0:print(x)
-            create_mock_passport(create_mock_user())
+            create_mock_passport(user)
+            create_mock_ros_form(user, expired=random.choice([True, False, False, False]))
+            create_mock_work_permit(user, expired=random.choice([True, False, False, False]))
 
     def create_super_user(self):
         print(os.getcwd())
         user = Employee.objects.create_superuser(email='smd@gmail.com',password='pass1234')
         user.save()
+
+    def load_admin_themes(self):
+        themes =  [
+            'admin_interface_theme_foundation.json',
+            'admin_interface_theme_django.json',
+            'admin_interface_theme_bootstrap.json',
+            'admin_interface_theme_uswds.json',
+                      ]
+        for theme in themes:
+            call_command('loaddata', theme)
+
 
 
     def run_server(self):
@@ -65,9 +82,11 @@ class Command(BaseCommand):
 
     def handle(self, **args):
         os.system('export DJANGO_COLORS="light;error=yellow/blue,blink;notice=magenta"')
+
         self.reset_db_and_migrations()
         self.create_super_user()
-        self.create_many_users()
+        self.create_many_users_and_documents()
+        self.load_admin_themes()
         #self.run_server()
 
 

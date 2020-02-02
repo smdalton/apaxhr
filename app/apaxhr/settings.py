@@ -14,6 +14,8 @@ https://docs.djangoproject.com/en/3.0/ref/settings/
 import os
 
 # Build paths inside the docker_files like this: os.path.join(BASE_DIR, ...)
+from django.core.files.storage import FileSystemStorage
+
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 TEMPLATE_DIR = os.path.join(BASE_DIR, '/templates')
 # Quick-start development settings - unsuitable for production
@@ -53,12 +55,13 @@ if USE_S3:
     # s3 media settings
     PUBLIC_MEDIA_LOCATION = 'media'
     MEDIA_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/{PUBLIC_MEDIA_LOCATION}/'
-    DEFAULT_FILE_STORAGE = 'apaxhr.storage_backends.PublicMediaStorage'
+    DEFAULT_FILE_STORAGE = 'apaxhr.storage_backends.PrivateMediaStorage'
 
     PRIVATE_MEDIA_LOCATION = 'private'
     PRIVATE_FILE_STORAGE = 'apaxhr.storage_backends.PrivateMediaStorage'
 
 else:
+    DEFAULT_FILESYSTEM_STORAGE = 'django.core.files.storage.FileSystemStorage'
     MEDIA_URL = '/media/'
     MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
@@ -79,6 +82,10 @@ if os.environ.get('DEV'):
     ]
 else:
     ALLOWED_HOSTS=['*']
+    INTERNAL_IPS = [
+        'localhost',
+        '127.0.0.1',
+    ]
 
 # Application definition
 
@@ -89,7 +96,9 @@ INSTALLED_APPS = [
     #'whitenoise.runserver_nostatic',
 #'livereload',
     'django.contrib.staticfiles',
-    'users',
+
+    'admin_interface',
+    'colorfield',
     'django.contrib.contenttypes',
     'django.contrib.admin',
     'django.contrib.auth',
@@ -98,12 +107,13 @@ INSTALLED_APPS = [
 
 
     # Local
-    'debug_toolbar',
+    'users',
     'apaxhr',
     'core_hr',
     'schedules',
     'org',
     # extensions
+    'debug_toolbar',
     'django_countries',
     'django_nose',
     'storages',
@@ -142,8 +152,8 @@ ROOT_URLCONF = 'apaxhr.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [os.path.join(BASE_DIR, 'templates'),]
-        ,
+        'DIRS': [os.path.join(BASE_DIR, 'templates'),],
+        # 'DIRS':[],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [

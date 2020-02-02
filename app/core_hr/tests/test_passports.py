@@ -1,50 +1,15 @@
+from datetime import datetime
+
 from django.test import TestCase
 import faker
 from core_hr.models import Passport
-from users.models import Employee
-from django.core.files.uploadedfile import SimpleUploadedFile
-import django_countries
-import os
+from core_hr.extras.core_hr_mock_factory import create_mock_passport
+
 #http://giflib.sourceforge.net/whatsinagif/bits_and_bytes.html
-
-
 fake = faker.Faker()
-
 from core_hr.extras.core_hr_mock_factory import create_mock_user, get_mock_photo
 
 
-def create_mock_passport(employee, expired=False, has_image=False):
-
-    dob=fake.date_between(start_date="-49y", end_date="-21y")
-    date_of_expiration = fake.date_between(start_date="-6m", end_date="+9y")
-    place_of_issue = fake.country_code()
-    date_of_issue = fake.date_between(start_date="-9y", end_date="-1m")
-    owner = Employee.objects.get(pk=employee.pk)
-
-    if expired:
-        date_of_expiration = fake.date_between(start_date="-1y", end_date='-1m')
-    if has_image:
-        photo = get_mock_photo()
-        owner = Employee.objects.get(pk=employee.pk)
-        passport = Passport.objects.create(
-            owner=owner,
-            place_of_issue=place_of_issue,
-            issue_date=date_of_issue,
-            expiration_date=date_of_expiration,
-            dob=dob,
-            image=photo
-        )
-
-    else:
-        passport = Passport.objects.create(
-        owner=owner,
-        place_of_issue=place_of_issue,
-        issue_date=date_of_issue,
-        expiration_date=date_of_expiration,
-        dob=dob,
-    )
-
-    return passport
 
 
 
@@ -59,13 +24,15 @@ class PassportTestCase(TestCase):
         retrieved_passport = Passport.objects.get(id=self.passport.pk)
         self.assertEqual(self.passport, retrieved_passport)
 
-    def test_passport_is_not_expired(self):
+    def test_valid_passport_is_not_expired(self):
         valid_passport = create_mock_passport(create_mock_user())
         self.assertEqual(valid_passport.expired, False)
+        self.assertTrue(valid_passport.expiration_date > datetime.now().date())
 
-    def test_passport_is_expired(self):
+    def test_expired_passport_is_expired(self):
         expired_passport = create_mock_passport(create_mock_user(), expired=True)
         self.assertEqual(expired_passport.expired, True)
+        self.assertTrue(expired_passport.expiration_date < datetime.now().date())
 
     def test_passport_data_complete(self):
         complete_passport = create_mock_passport(create_mock_user(), has_image=True)

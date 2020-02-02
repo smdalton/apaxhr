@@ -3,7 +3,7 @@ from datetime import datetime, timedelta
 from django.db.models import ImageField
 from django.test import TestCase
 import faker
-from core_hr.models import Passport, RegistryOfStay
+from core_hr.models import Passport, RegistryOfStay, WorkPermit
 from users.models import Employee
 from django_countries.fields import CountryField
 from django.contrib.auth import get_user_model
@@ -54,10 +54,105 @@ def create_mock_user():
     return user
 
 
-def get_mock_work_permit(employee):
+def create_mock_passport(employee, expired=False, has_image=False):
+
+    dob=fake.date_between(start_date="-49y", end_date="-21y")
+    date_of_expiration = fake.date_between(start_date="-6m", end_date="+9y")
+    place_of_issue = fake.country_code()
+    date_of_issue = fake.date_between(start_date="-9y", end_date="-1m")
+    owner = Employee.objects.get(pk=employee.pk)
+    passport = ''
+    if expired:
+        date_of_expiration = fake.date_between(start_date="-1y", end_date='-1d')
+    if has_image:
+        photo = get_mock_photo()
+        owner = Employee.objects.get(pk=employee.pk)
+        passport = Passport.objects.create(
+            owner=owner,
+            place_of_issue=place_of_issue,
+            issue_date=date_of_issue,
+            expiration_date=date_of_expiration,
+            dob=dob,
+            image=photo
+        )
+
+    else:
+        passport = Passport.objects.create(
+        owner=owner,
+        place_of_issue=place_of_issue,
+        issue_date=date_of_issue,
+        expiration_date=date_of_expiration,
+        dob=dob,
+    )
+
+    return passport
 
 
-    pass
+def create_mock_ros_form(employee, expired=False, has_image=False):
+
+    employee_address = fake.address()
+    landlords_name = fake.name()
+    landlords_cell_phone = fake.phone_number()
+    landlords_email = fake.email()
+    issued = fake.date_between(start_date="-15d", end_date="-1d")
+    expiration_date = datetime.now().date() + timedelta(days=180)
+    form = ''
+    if expired:
+        expiration_date = fake.date_between(start_date="-6m", end_date='-1d')
+    # Had to split the two save methods only because terribly slow internet connection in vietnam
+    # was significantly delaying test and mock object creation
+    if has_image:
+        photo = get_mock_photo()
+        form = RegistryOfStay.objects.create(
+            owner=employee,
+            employee_address=employee_address,
+            landlords_name=landlords_name,
+            landlords_cell_phone=landlords_cell_phone,
+            landlords_email=landlords_email,
+            issue_date=issued,
+            expiration_date=expiration_date,
+            image=photo
+        )
+    else:
+        form = RegistryOfStay.objects.create(
+            owner=employee,
+            employee_address=employee_address,
+            landlords_name=landlords_name,
+            landlords_cell_phone=landlords_cell_phone,
+            landlords_email=landlords_email,
+            issue_date=issued,
+            expiration_date=expiration_date,
+        )
+
+    return form
+
+
+def create_mock_work_permit(employee, type='visa', expired=False, has_image=False):
+
+    date_of_expiration = ''
+    if expired == False:
+        date_of_expiration = fake.date_between(start_date="+6m", end_date="+2y")
+    date_of_issue = fake.date_between(start_date="-9y", end_date="-1m")
+    owner = Employee.objects.get(pk=employee.pk)
+    if expired == True:
+        date_of_expiration = fake.date_between(start_date="-1y", end_date='-1m')
+    if has_image:
+        photo = get_mock_photo()
+        work_permit = WorkPermit.objects.create(
+            owner=owner,
+            type=random.choice(['wp', 'wp', 'wp', 'vs']),
+            issue_date=date_of_issue,
+            expiration_date=date_of_expiration,
+            image=photo,
+        )
+    else:
+        work_permit = WorkPermit.objects.create(
+            owner=owner,
+            type=random.choice(['wp', 'wp', 'wp', 'vs']),
+            issue_date=date_of_issue,
+            expiration_date=date_of_expiration,
+        )
+    return work_permit
 
 def get_mock_resume(employee):
     pass
@@ -69,7 +164,6 @@ def get_mock_achievement_certificate(employee):
 
 def get_mock_tefl_form(employee):
     pass
-
 
 def get_mock_degree(employee):
     pass
