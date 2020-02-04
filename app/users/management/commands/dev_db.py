@@ -97,7 +97,7 @@ class Command(BaseCommand):
 
         self.reset_db_and_migrations()
         self.create_super_user()
-        self.create_many_users_and_documents()
+        self.create_many_users_and_documents(75)
         self.load_admin_themes()
         #self.run_server()
 
