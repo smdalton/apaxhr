@@ -13,6 +13,7 @@ class CustomUserManager(BaseUserManager):
     for authentication
     instead of default username
     """
+    use_for_related_fields = True
 
     def create_user(self, email, password, **extra_fields):
 
@@ -38,15 +39,58 @@ class CustomUserManager(BaseUserManager):
             raise ValueError(_('Superuser must have is_superuser=True.'))
         return self.create_user(email, password, **extra_fields)
 
-    def employees_with_passports(self):
 
-        from core_hr.models import Passport
-        from users.models import Employee
-        # Todo: Expand this method into the django admin filter bars for completeness
-        # Employee.objects.filter(pk__in=Subquery(Passport.objects.all().values('owner__pk')))
-        passports = Passport.objects.values_list('owner__pk',flat=True).count()
-        not_passports = Employee.objects.count() - passports
-        return passports
+    def has_passport(self, **kwargs):
+        try:
+            print(arg for arg in kwargs.keys())
+        except:
+            print('nothing in employee has passport manager args')
+
+        return self.all()
+
+
+    def has_valid_ros(self, **kwargs):
+        try:
+            print(arg for arg in kwargs.keys())
+        except:
+            print('nothing in employee has passport manager args')
+
+        return self.all()
+
+    def has_valid_work_permit(self, **kwargs):
+        try:
+            print(arg for arg in kwargs.keys())
+        except:
+            print('nothing in employee work permit manager args')
+
+        return self.all()
+
+
+    def has_resume(self, **kwargs):
+        try:
+            print(arg for arg in kwargs.keys())
+        except:
+            print('nothing in employee has passport manager args')
+
+        return self.all()
+
+
+    def has_teaching_certificate(self, **kwargs):
+        try:
+            print(arg for arg in kwargs.keys())
+        except:
+            print('nothing in employee has passport manager args')
+
+        return self.all()
+
+
+    def has_degree(self, **kwargs):
+        try:
+            print(arg for arg in kwargs.keys())
+        except:
+            print('nothing in employee has passport manager args')
+
+        return self.all()
 
 
 

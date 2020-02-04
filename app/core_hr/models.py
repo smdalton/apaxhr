@@ -20,7 +20,6 @@ def default_ros_expiration(expiration_period=170):
     now = dt.datetime.now()
     return now + timedelta(days=expiration_period)
 
-
 class DataCompleteMixin(models.Model):
     class Meta:
         abstract = True
@@ -51,7 +50,7 @@ class Passport(ExpirationDateMixin, DataCompleteMixin, models.Model):
     place_of_issue = CountryField(blank_label="select country used in your passport",default='AQ')
 
     image = models.ImageField(
-        # storage=PrivateMediaStorage(),
+        storage=PrivateMediaStorage(),
         upload_to='passports',
         blank=False, null=False
         )
@@ -94,7 +93,7 @@ class RegistryOfStay(ExpirationDateMixin, DataCompleteMixin, models.Model):
 
     issue_date = models.DateField(blank=False, auto_now_add=True)
     image = models.ImageField(
-        # storage=PrivateMediaStorage(),
+            storage=PrivateMediaStorage(),
             upload_to='ros_images',
             blank=False
     )
@@ -107,6 +106,7 @@ class RegistryOfStay(ExpirationDateMixin, DataCompleteMixin, models.Model):
         expiration_data = 'Expired' if self.expired else 'Valid'
         return f"{expiration_data}, Expires: {self.expiration_date}"
 
+
 class WorkPermit(ExpirationDateMixin, DataCompleteMixin, models.Model):
     kinds = (('wp','Work Permit'),('vs','visa'))
     owner = models.OneToOneField(Employee, on_delete=models.CASCADE)
@@ -114,20 +114,25 @@ class WorkPermit(ExpirationDateMixin, DataCompleteMixin, models.Model):
     issue_date = models.DateField(_('Issue date on visa stamp or work permit'),blank=False)
     expiration_date = models.DateField(_('Date of work Permit or visa expiration'),default=default_work_permit_expiration, blank=False)
     # storage=PrivateMediaStorage(),
-    image = models.ImageField(upload_to='work_permit_images', blank=False, null=False)
+    image = models.ImageField(storage=PrivateMediaStorage(),upload_to='work_permit_images', blank=False, null=False)
 
+    def owners_name(self):
+        return self.owner.full_name
+    def owners_id(self):
+        return self.owner.employee_id_number
     def __str__(self):
         expiration_data =  'Expired' if self.expired else 'Valid'
-        return f"{expiration_data}, Expires: {self.expiration_date}"
+        return f"{self.owner.first_name()}'s document is {expiration_data}"
 
 
 
 class Resume(DataCompleteMixin, models.Model):
+    help = "Stores a resume or CV document"
     choices = (('rs','Resume'),('cv','Curriculum Vitae'))
     owner = models.OneToOneField(Employee, on_delete=models.CASCADE)
     type =  models.CharField(max_length=20,choices=choices)
     image = models.ImageField(
-        #storage=PrivateMediaStorage(),
+        storage=PrivateMediaStorage(),
         upload_to='resumes', blank=False, null=False)
     added = models.DateField(auto_now_add=True, blank=False)
 # # #TODO delete this test stub
@@ -137,25 +142,26 @@ class Resume(DataCompleteMixin, models.Model):
 class AchievementCertificate(DataCompleteMixin, models.Model):
     help = "Store information for KPI and FAS certificates of achievement"
     owner = models.ForeignKey(Employee, on_delete=models.CASCADE)
-    # storage=PrivateMediaStorage(),
-    image = models.ImageField(upload_to='kpi_certificates', blank=False)
+    image = models.ImageField(storage=PrivateMediaStorage(),upload_to='kpi_certificates', blank=False)
     message_text = models.TextField(_('Enter award message for email here'), max_length=1000, blank=False)
 
 
 
 class TeachingCertificate(DataCompleteMixin, models.Model):
+    help = "Stores a teaching certificate"
     certificate_choices = (('c', 'CELTA'), ('ts', 'TESOL'), ('tf', 'TEFL'), ('ot', 'other'))
     owner = models.OneToOneField(Employee, on_delete=models.CASCADE)
     id_number = models.CharField(max_length=100)
     type  = models.CharField(max_length=15, choices=certificate_choices, blank=False, null=False)
     image = models.ImageField(
-        # storage=PrivateMediaStorage(),
+        storage=PrivateMediaStorage(),
         upload_to='tefl_certs', blank=False)
     added = models.DateField(auto_now_add=True)
 
 
 
 class DegreeDocument(DataCompleteMixin, models.Model):
+    help = "Stores a College diplima document"
     owner = models.OneToOneField(Employee, on_delete=models.CASCADE)
     pass
 

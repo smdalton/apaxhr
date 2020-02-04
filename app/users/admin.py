@@ -18,7 +18,7 @@ class PassportStatusFilter(SimpleListFilter):
         return[
             ('complete','Passport Complete'),
             ('not_complete', 'Not Complete'),
-            ('expiring', 'Passport Expiring Soon')
+            ('expiring', 'Expires w/in 3mo')
         ]
 
     def queryset(self, request, queryset):
@@ -27,6 +27,11 @@ class PassportStatusFilter(SimpleListFilter):
             return queryset.filter(pk__in=Subquery(Passport.objects.all().values('owner__pk')))
         elif self.value() == 'not_complete':
             return queryset.exclude(pk__in=Subquery(Passport.objects.all().values('owner__pk')))
+        elif self.value() == 'expiring':
+            # get all passports that are expiring in the next 3 months
+            # get datetime.day for 3 months from now:
+
+            return queryset.filter('expiration_date')
         else:
             return queryset
 

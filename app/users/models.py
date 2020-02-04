@@ -26,6 +26,7 @@ Phone Number
 """
 
 
+
 class Employee(AbstractBaseUser, PermissionsMixin):
 
     employment_statuses = (

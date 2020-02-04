@@ -27,4 +27,4 @@ services:
       - 80:8000
 #    depends_on:
 #      - rabbitmq
-    command: python3 start_server.py dev
+    command: python3 start_server.py prod_demo

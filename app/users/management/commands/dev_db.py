@@ -47,13 +47,25 @@ class Command(BaseCommand):
             self.stdout.write('Running on production postgresql wipe_db aborted')
             return
 
-    def create_many_users_and_documents(self):
-        for x in range(15):
+    def create_many_users_and_documents(self, num_users=15):
+        for x in range(num_users):
             user = create_mock_user()
             if x % 5 == 0:print(x)
-            create_mock_passport(user)
-            create_mock_ros_form(user, expired=random.choice([True, False, False, False]))
-            create_mock_work_permit(user, expired=random.choice([True, False, False, False]))
+            create_mock_passport(
+                user,
+                has_image=random.choice([True, True, False]),
+                expired=random.choice([False, False,True])
+            )
+            create_mock_ros_form(
+                user,
+                has_image=random.choice([True, True, False]),
+                expired=random.choice([True, False, False, False])
+            )
+            create_mock_work_permit(
+                user,
+                has_image=random.choice([True, True, False]),
+                expired=random.choice([True, False, False, False])
+            )
 
     def create_super_user(self):
         print(os.getcwd())
