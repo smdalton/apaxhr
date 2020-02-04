@@ -1,7 +1,11 @@
+from _testcapi import datetime_check_delta
+from datetime import datetime, timedelta
+import datedelta
+
 from django.contrib import admin
 from django.contrib.admin import ModelAdmin, SimpleListFilter
 from django.contrib.auth.admin import UserAdmin
-from django.db.models import Subquery
+from django.db.models import Subquery, Q
 
 from core_hr.models import Passport, RegistryOfStay, WorkPermit
 from .forms import CustomUserCreationForm, CustomUserChangeForm
@@ -10,70 +14,75 @@ from core_hr.admin_data import inlines
 
 
 # https://timonweb.com/tutorials/adding-custom-filters-to-django-admin-is-easy/
-class PassportStatusFilter(SimpleListFilter):
-    title='Passport Status'
-    parameter_name = 'documents'
 
-    def lookups(self, request, model_admin):
-        return[
-            ('complete','Passport Complete'),
-            ('not_complete', 'Not Complete'),
-            ('expiring', 'Expires w/in 3mo')
-        ]
-
-    def queryset(self, request, queryset):
-        # Employee.objects.filter(pk__in=Subquery(Passport.objects.all().values('owner__pk')))
-        if self.value() == 'complete':
-            return queryset.filter(pk__in=Subquery(Passport.objects.all().values('owner__pk')))
-        elif self.value() == 'not_complete':
-            return queryset.exclude(pk__in=Subquery(Passport.objects.all().values('owner__pk')))
-        elif self.value() == 'expiring':
-            # get all passports that are expiring in the next 3 months
-            # get datetime.day for 3 months from now:
-
-            return queryset.filter('expiration_date')
-        else:
-            return queryset
-
-class RegistryOfStayStatusFilter(SimpleListFilter):
-    title='ROS Status'
-    parameter_name = 'ros-status'
-
-    def lookups(self, request, model_admin):
-        return[
-            ('complete','ROS Complete'),
-            ('not_complete', 'ROS Not Complete'),
-            ('expiring_soon', 'ROS expiring soon')
-        ]
-
-    def queryset(self, request, queryset):
-
-        if self.value() == 'complete':
-            return queryset.filter(pk__in=Subquery(RegistryOfStay.objects.all().values('owner__pk')))
-        else:
-            return queryset.exclude(pk__in=Subquery(RegistryOfStay.objects.all().values('owner__pk')))
-
-
-class WorkPermitStatusFilter(SimpleListFilter):
-    title='Work Permit Status'
-    parameter_name = 'documents'
-
-    def lookups(self, request, model_admin):
-        return[
-            ('complete','Work Permit Complete'),
-            ('not_complete', 'Work Permit not complete'),
-            ('expiring_soon', 'Work Permit expiring soon')
-        ]
-
-    def queryset(self, request, queryset):
-
-
-        if self.value() == 'complete':
-            return queryset.filter(pk__in=Subquery(WorkPermit.objects.all().values('owner__pk')))
-        else:
-            return queryset.exclude(pk__in=Subquery(WorkPermit.objects.all().values('owner__pk')))
 
 # one to one exists filter https://djangosnippets.org/snippets/2591/
+
+
+class DocumentCompletionStatusFilter(SimpleListFilter):
+    title = 'Document Completion Filter'
+    parameter_name = 'completion-info'
+
+    def lookups(self, request, model_admin):
+        return [
+            ('complete', 'Complete'),
+            ('incomplete', 'Incomplete')
+        ]
+
+    def queryset(self, request, queryset):
+        complex_query = \
+            Q(pk__in=Subquery(Passport.objects.all().values('owner__pk')))\
+            &Q(pk__in=Subquery(RegistryOfStay.objects.all().values('owner__pk')))\
+            &Q(pk__in=Subquery(WorkPermit.objects.all().values('owner__pk')))
+        all_complete = queryset.filter(complex_query)
+
+        # Subquery(Passport.objects.all().values('owner__pk')
+        if self.value() == 'complete':
+            return all_complete
+        elif self.value() == 'incomplete':
+            return queryset.exclude(complex_query)
+        # get all passports that are expiring in the next 3 months
+        # get datetime.day for 3 months from now:
+
+
+class DocumentExpirationStatusFilter(SimpleListFilter):
+    title = 'Document Expiration Filters'
+    parameter_name = 'expiration-info'
+
+    def lookups(self, request, model_admin):
+        return [
+            ('expired', 'Documents are expired'),
+            ('expiring_very_soon', 'Documents are expiring w/in 2 weeks'),
+            ('expiring_soon', 'Documents are expiring w/in 2 months')
+        ]
+
+    def queryset(self, request, queryset):
+
+        if self.value() == 'expired':
+            now = datetime.now()+timedelta(days=1)
+            expiration_start = datetime.now() - timedelta(days=45000)
+            passports = Q(passport__expiration_date__range=[expiration_start, now])
+            ros_forms = Q(registryofstay__expiration_date__range=[expiration_start, now])
+            work_permits = Q(workpermit__expiration_date__range=[expiration_start, now])
+            return queryset.filter(passports|ros_forms|work_permits)
+
+        elif self.value() == 'expiring_very_soon':
+            # check, passports, ROS forms, and work Permits
+            now = datetime.now() +timedelta(days=1)
+            expiration = now + timedelta(days=15)
+            passports = Q(passport__expiration_date__range=[now, expiration])
+            ros_forms = Q(registryofstay__expiration_date__range=[now, expiration])
+            work_permits = Q(workpermit__expiration_date__range=[now, expiration])
+
+            return queryset.filter(passports|ros_forms|work_permits)
+        elif self.value() == 'expiring_soon':
+            now = datetime.now()
+            expiration = now + datedelta.datedelta(months=2)
+            passports = Q(passport__expiration_date__range=[now, expiration])
+            ros_forms = Q(registryofstay__expiration_date__range=[now, expiration])
+            work_permits = Q(workpermit__expiration_date__range=[now, expiration])
+            return queryset.filter(passports|ros_forms|work_permits)
+
 
 class CustomUserAdmin(UserAdmin):
     class Meta:
@@ -86,7 +95,7 @@ class CustomUserAdmin(UserAdmin):
     search_fields = ('email','full_name','employee_id_number')
     list_display = ('full_name', 'registryofstay', 'workpermit', 'passport',)
 
-    list_filter = (PassportStatusFilter, 'employment_status', 'is_active')
+    list_filter = (DocumentExpirationStatusFilter, DocumentCompletionStatusFilter, 'employment_status', 'is_active')
     #list_filter = ('employment_status','is_staff', 'is_active')
 
     fieldsets = (

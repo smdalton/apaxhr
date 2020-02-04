@@ -20,14 +20,18 @@ def default_ros_expiration(expiration_period=170):
     now = dt.datetime.now()
     return now + timedelta(days=expiration_period)
 
-class DataCompleteMixin(models.Model):
+class TrackingUtilitiesMixin(models.Model):
     class Meta:
         abstract = True
 
+    verified = models.BooleanField(default=False)
+    date_added = models.DateTimeField(auto_now_add=True)
+    active = models.BooleanField(default=True)
     @property
     def data_complete(self):
         all_fields_filled = all((getattr(self, field.name) for field in self._meta.fields))
         return all_fields_filled
+
 
 class ExpirationDateMixin(models.Model):
     class Meta:
@@ -40,7 +44,9 @@ class ExpirationDateMixin(models.Model):
 
 
 # TODO: Passport
-class Passport(ExpirationDateMixin, DataCompleteMixin, models.Model):
+class Passport(
+    ExpirationDateMixin, TrackingUtilitiesMixin,  models.Model
+):
     owner = models.OneToOneField(Employee, on_delete=models.CASCADE)
     dob = models.DateField(blank=False, null=False)
     issue_date = models.DateField(blank=True, null=False)
@@ -56,8 +62,9 @@ class Passport(ExpirationDateMixin, DataCompleteMixin, models.Model):
         )
 
     def __str__(self):
-        expiration_data =  'Expired' if self.expired else 'Valid'
-        return f"{expiration_data}, Expires: {self.expiration_date}"
+        expiration_data = 'Expired' if self.expired else 'Valid'
+        formatted_date = self.expiration_date.strftime("%d-%m-%Y")
+        return f"{expiration_data}, exp. date: {formatted_date}"
 
     @property
     def owners_name(self):
@@ -72,7 +79,9 @@ class Passport(ExpirationDateMixin, DataCompleteMixin, models.Model):
 
 
 
-class RegistryOfStay(ExpirationDateMixin, DataCompleteMixin, models.Model):
+class RegistryOfStay(
+    ExpirationDateMixin, TrackingUtilitiesMixin,  models.Model
+):
 
     """ Your Address;
         Your Vietnamese cell number;
@@ -104,10 +113,13 @@ class RegistryOfStay(ExpirationDateMixin, DataCompleteMixin, models.Model):
 
     def __str__(self):
         expiration_data = 'Expired' if self.expired else 'Valid'
-        return f"{expiration_data}, Expires: {self.expiration_date}"
+        formatted_date = self.expiration_date.strftime("%d-%m-%Y")
+        return f"{expiration_data}, exp. date: {formatted_date}"
 
 
-class WorkPermit(ExpirationDateMixin, DataCompleteMixin, models.Model):
+class WorkPermit(
+    ExpirationDateMixin, TrackingUtilitiesMixin, models.Model
+):
     kinds = (('wp','Work Permit'),('vs','visa'))
     owner = models.OneToOneField(Employee, on_delete=models.CASCADE)
     type = models.CharField(choices=kinds, blank=False, max_length=2)
@@ -120,34 +132,40 @@ class WorkPermit(ExpirationDateMixin, DataCompleteMixin, models.Model):
         return self.owner.full_name
     def owners_id(self):
         return self.owner.employee_id_number
+
     def __str__(self):
-        expiration_data =  'Expired' if self.expired else 'Valid'
-        return f"{self.owner.first_name()}'s document is {expiration_data}"
+        expiration_data = 'Expired' if self.expired else 'Valid'
+        formatted_date = self.expiration_date.strftime("%d-%m-%Y")
+        return f"{expiration_data}, exp. date: {formatted_date}"
 
 
-
-class Resume(DataCompleteMixin, models.Model):
+class Resume(TrackingUtilitiesMixin, models.Model):
     help = "Stores a resume or CV document"
     choices = (('rs','Resume'),('cv','Curriculum Vitae'))
     owner = models.OneToOneField(Employee, on_delete=models.CASCADE)
     type =  models.CharField(max_length=20,choices=choices)
     image = models.ImageField(
         storage=PrivateMediaStorage(),
-        upload_to='resumes', blank=False, null=False)
+        upload_to='resumes_cvs', blank=False, null=False)
     added = models.DateField(auto_now_add=True, blank=False)
 # # #TODO delete this test stub
 
 
 
-class AchievementCertificate(DataCompleteMixin, models.Model):
+class AchievementCertificate(TrackingUtilitiesMixin, models.Model):
     help = "Store information for KPI and FAS certificates of achievement"
     owner = models.ForeignKey(Employee, on_delete=models.CASCADE)
-    image = models.ImageField(storage=PrivateMediaStorage(),upload_to='kpi_certificates', blank=False)
+    image = models.ImageField(
+        storage=PrivateMediaStorage(),
+        upload_to='kpi_certificates',
+        blank=False,
+        null=False
+    )
     message_text = models.TextField(_('Enter award message for email here'), max_length=1000, blank=False)
 
 
 
-class TeachingCertificate(DataCompleteMixin, models.Model):
+class TeachingCertificate(TrackingUtilitiesMixin, models.Model):
     help = "Stores a teaching certificate"
     certificate_choices = (('c', 'CELTA'), ('ts', 'TESOL'), ('tf', 'TEFL'), ('ot', 'other'))
     owner = models.OneToOneField(Employee, on_delete=models.CASCADE)
@@ -155,13 +173,21 @@ class TeachingCertificate(DataCompleteMixin, models.Model):
     type  = models.CharField(max_length=15, choices=certificate_choices, blank=False, null=False)
     image = models.ImageField(
         storage=PrivateMediaStorage(),
-        upload_to='tefl_certs', blank=False)
-    added = models.DateField(auto_now_add=True)
+        upload_to='tefl_certs',
+        blank=False,
+        null=False
+    )
 
 
 
-class DegreeDocument(DataCompleteMixin, models.Model):
-    help = "Stores a College diplima document"
+class DegreeDocument(TrackingUtilitiesMixin, models.Model):
+    help = "Stores a College diploma document"
     owner = models.OneToOneField(Employee, on_delete=models.CASCADE)
-    pass
+    image = models.ImageField(
+        storage=PrivateMediaStorage(),
+        upload_to='degree_certs',
+        blank=False,
+        null=False
+    )
+
 

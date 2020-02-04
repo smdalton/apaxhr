@@ -17,13 +17,15 @@ def start_dev_server():
     os.environ['AWS_SECRET_ACCESS_KEY'] = 'GpBPgt2cFYbdIC0FGr4KaOLduA1nZ47b3KxX73Nw'
     os.environ['AWS_STORAGE_BUCKET_NAME'] = 'apaxhr-test'
     os.environ['DEV']='True'
-    # wipe and init the db
-    # load
+    # wipe and init the db, then load mock data
     os.system('echo Starting dev server.')
     os.system('python3 manage.py dev_db')
+
+
     # os.system('exec gunicorn apaxhr.wsgi:application \
     #         --bind 0.0.0.0:8000\
     #         --workers 3')
+    # Profiling
     # os.system('python3 -m cProfile manage.py collectstatic --no-input > profiled_collectstatic')
     # os.system(' python3 -m cProfile manage.py runserver > profiled_runserver')
     os.system('python3 manage.py runserver 0.0.0.0:8000')
@@ -51,6 +53,7 @@ def start_prod_demo_server():
     os.system('echo Starting Prod server.')
     # os.system('python3 manage.py makemigrations')
     # os.system('python3 manage.py migrate')
+    # for demo deployment,
     os.system('python3 manage.py dev_db')
 
     #os.system('python3 manage.py collectstatic --no-input')
