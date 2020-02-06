@@ -11,60 +11,9 @@ from django.utils.safestring import mark_safe
 import datedelta
 from . import models
 from .admin_data import inlines
-from core_hr.models import Employee, Passport, RegistryOfStay, WorkPermit
+from core_hr.models import Employee, Passport, RegistryOfStay, WorkPermit, DegreeDocument, AchievementCertificate, \
+    TeachingCertificate, Resume
 
-class PassportStatusFilter(SimpleListFilter):
-    title='Passport Status'
-    parameter_name = 'documents'
-
-    def lookups(self, request, model_admin):
-        return[
-
-            ('expiring', 'Expires w/in 2mo'),
-            ('expired', 'Passport is Expired'),
-        ]
-
-    def queryset(self, request, queryset):
-        # Employee.objects.filter(pk__in=Subquery(Passport.objects.all().values('owner__pk')))
-        if self.value() == 'complete':
-            return queryset.filter(pk__in=Subquery(Passport.objects.all().values('owner__pk')))
-        elif self.value() == 'not_complete':
-            return queryset.exclude(pk__in=Subquery(Passport.objects.all().values('owner__pk')))
-        elif self.value() == 'expiring':
-            # get all passports that are expiring in the next 3 months
-            # get datetime.day for 3 months from now:
-
-            now = datetime.now().date()
-            expiring_in_two_months = now + datedelta.datedelta(months=2)
-            return queryset.filter(passport__expiration_date__range=[now, expiring_in_two_months])
-        elif self.value() == 'expired':
-            now = datetime.now().date() - timedelta(days=1)
-            past= now - timedelta(days=30000)
-            return queryset.filter(passport__expiration_date__range=[past,now])
-        else:
-            return queryset
-
-class RegistryOfStayStatusFilter(SimpleListFilter):
-    title='ROS Status'
-    parameter_name = 'ros-status'
-
-    def lookups(self, request, model_admin):
-        return[
-            ('complete','ROS Complete'),
-            ('not_complete', 'ROS Not Complete'),
-            ('expiring_soon', 'ROS expiring w/in 2 weeks')
-        ]
-
-    def queryset(self, request, queryset):
-
-        if self.value() == 'complete':
-            return queryset.filter(pk__in=Subquery(RegistryOfStay.objects.all().values('owner__pk')))
-        elif self.value() == 'not_complete':
-            return queryset.exclude(pk__in=Subquery(RegistryOfStay.objects.all().values('owner__pk')))
-        elif self.value() == 'expiring_soon':
-            now = datetime.now().date()
-            expiring_in_two_weeks = now + datedelta.datedelta(days=14)
-            return queryset.filter(expiration_date__range=[now, expiring_in_two_weeks])
 
 class WorkPermitStatusFilter(SimpleListFilter):
     title='Work Permit Status'
@@ -72,76 +21,35 @@ class WorkPermitStatusFilter(SimpleListFilter):
 
     def lookups(self, request, model_admin):
         return[
-            ('complete','Work Permit Input Complete'),
             ('not_complete', 'Work Permit Input not complete'),
-            ('expiring_soon', 'Work Permit/Visa exp. w/in 1 month')
+            ('expiring_soon', 'Work Permit/Visa exp. w/in 1 month'),
+            ('expired', 'Work Permit/Visa expired')
         ]
 
     def queryset(self, request, queryset):
 
 
-        if self.value() == 'complete':
-            return queryset.filter(pk__in=Subquery(WorkPermit.objects.all().values('owner__pk')))
-        elif self.value() == 'not_complete':
+
+        if self.value() == 'not_complete':
             return queryset.exclude(pk__in=Subquery(WorkPermit.objects.all().values('owner__pk')))
         elif self.value() == 'expiring_soon':
             now = datetime.now().date()
             expiring_in_one_month = now + datedelta.datedelta(days=14)
             return queryset.filter(expiration_date__range=[now, expiring_in_one_month])
+        # elif self.value() =='expiring_soon':
 
-
-@admin.register(WorkPermit)
-class WorkPermitAdmin(admin.ModelAdmin):
-    verbose_name_plural = 'Work Permits'
-    model = WorkPermit
-    list_display = ('owners_name', 'type', 'expiration_date', 'owners_id', '__str__')
-    list_filter = ('expiration_date',)
-
-    search_fields = ('owner__full_name', 'owner__employee_id_number')
+class LegalDocumentAdminMixin(object):
+    class Meta:
+        abstract = True
     ordering = ('expiration_date',)
+    list_filter = ('expiration_date',)
+    list_display = ('owner', 'expiration_date', 'valid', )
+    search_fields = ('owner__full_name', 'owner__employee_id_number')
+    readonly_fields = ('owner', 'document_image',)
 
-    readonly_fields = ['owner', 'document_image']
-    def expired(self, obj):
+    def valid(self, obj):
         return obj.expiration_date > datetime.now().date()
 
-    def document_image(self, obj):
-        return mark_safe(
-            '<img src="{url}" width="{width}" height={height} />'.format(
-                url=obj.image.url,
-                width=obj.image.width / 4,
-                height=obj.image.height / 4,
-            )
-        )
-
-
-@admin.register(RegistryOfStay)
-class RegistryOfStayAdmin(admin.ModelAdmin):
-    verbose_name_plural = 'Registry of Stay Forms'
-    model = RegistryOfStay
-    search_fields = ('owner__full_name', 'owner__employee_id_number')
-    ordering = ('expiration_date',)
-    readonly_fields = ['owner', 'document_image']
-    list_filter = (RegistryOfStayStatusFilter,'expiration_date',)
-    def document_image(self, obj):
-        return mark_safe(
-            '<img src="{url}" width="{width}" height={height} />'.format(
-                url=obj.image.url,
-                width=obj.image.width / 4,
-                height=obj.image.height / 4,
-            )
-        )
-
-
-@admin.register(Passport)
-class PassportAdmin(admin.ModelAdmin):
-    model = Passport
-    search_fields = ('owner__full_name', 'owner__employee_id_number')
-    autocomplete_fields = ('owner',)
-    list_display = [ 'owners_name', 'expiration_date', 'expired',  'data_complete', 'employee_number', ]
-    ordering = ('expiration_date',)
-
-    readonly_fields = ['owner', 'document_image']
-    list_filter = (PassportStatusFilter,'expiration_date')
 
     def document_image(self, obj):
         try:
@@ -155,6 +63,98 @@ class PassportAdmin(admin.ModelAdmin):
         except EndpointConnectionError as e:
             return mark_safe(f"'<h4>{e}</h4>")
 
+@admin.register(WorkPermit)
+class WorkPermitAdmin(LegalDocumentAdminMixin, admin.ModelAdmin):
+    verbose_name_plural = 'Work Permits'
+    model = WorkPermit
+
+class RegistryOfStayStatusFilter(SimpleListFilter):
+    title='ROS Status'
+    parameter_name = 'ros-status'
+
+    def lookups(self, request, model_admin):
+        return[
+
+            ('not_complete', 'Not Complete'),
+            ('expiring_soon', 'expiring w/in 2 weeks'),
+            ('expired', 'expired')
+        ]
+
+    def queryset(self, request, queryset):
+
+        if self.value() == 'not_complete':
+            return queryset.exclude(pk__in=Subquery(RegistryOfStay.objects.all().values('owner__pk')))
+        elif self.value() == 'expiring_soon':
+            now = datetime.now().date()
+            expiring_in_two_weeks = now + datedelta.datedelta(days=14)
+            return queryset.filter(expiration_date__range=[now, expiring_in_two_weeks])
+        elif self.value() == 'expired':
+            return queryset.filter(expiration_date__lte=datetime.now().date())
+
+@admin.register(RegistryOfStay)
+class RegistryOfStayAdmin(LegalDocumentAdminMixin, admin.ModelAdmin):
+    model = RegistryOfStay
+
+
+class PassportStatusFilter(SimpleListFilter):
+    title='Passport Status'
+    parameter_name = 'documents'
+
+    def lookups(self, request, model_admin):
+        return[
+            ('expired', 'Expiring'),
+            ('expiring', 'Expires w/in 2mo'),
+            ('expired', 'Passport is Expired'),
+        ]
+
+    def queryset(self, request, queryset):
+        # Employee.objects.filter(pk__in=Subquery(Passport.objects.all().values('owner__pk')))
+        if self.value() == 'expiring':
+            return queryset.filter(pk__in=Subquery(Passport.objects.all().values('owner__pk')))
+        elif self.value() == 'expired':
+            return queryset.exclude(pk__in=Subquery(Passport.objects.all().values('owner__pk')))
+        elif self.value() == 'expiring_soon':
+            now = datetime.now().date()
+            expiring_in_two_weeks = now + datedelta.datedelta(days=14)
+            return queryset.filter(expiration_date__range=[now,expiring_in_two_weeks])
+        else:
+            return queryset
+
+@admin.register(Passport)
+class PassportAdmin(LegalDocumentAdminMixin, admin.ModelAdmin):
+    model = Passport
+    autocomplete_fields = ('owner',)
+
+class BaseDocumentAdminMixin(object):
+    class Meta:
+        abstract = True
+    list_display = ('owner','date_added')
+    search_fields = ('owner__full_name', 'owner__employee_id_number')
+    autocomplete_fields = ('owner',)
+
+
+@admin.register(Resume)
+class ResumeAdmin(BaseDocumentAdminMixin, admin.ModelAdmin):
+    model = Resume
+    verbose_name_plural =  u"\u200B" + 'Resumes'
+
+
+@admin.register(AchievementCertificate)
+class AchievementCertificateAdmin(BaseDocumentAdminMixin, admin.ModelAdmin):
+    model= AchievementCertificate
+    verbose_name=  u"\u200B" + 'FAS/KPI Achievement Certs'
+
+
+@admin.register(TeachingCertificate)
+class TeachingCertificateAdmin(BaseDocumentAdminMixin, admin.ModelAdmin):
+    model = TeachingCertificate
+    verbose_name_plural =  u"\u200B" + 'TEFL/CELTA/TESOL etc. Certs.'
+
+
+
+@admin.register(DegreeDocument)
+class DegreeDocumentAdmin(BaseDocumentAdminMixin, admin.ModelAdmin):
+    model = DegreeDocument
 
 #
 # class EmployeeAdmin(ModelAdmin):

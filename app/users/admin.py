@@ -1,6 +1,7 @@
 from _testcapi import datetime_check_delta
 from datetime import datetime, timedelta
 import datedelta
+from datedelta import datedelta
 
 from django.contrib import admin
 from django.contrib.admin import ModelAdmin, SimpleListFilter
@@ -20,13 +21,13 @@ from core_hr.admin_data import inlines
 
 
 class DocumentCompletionStatusFilter(SimpleListFilter):
-    title = 'Document Completion Filter'
+    title = 'Document Creation Filter'
     parameter_name = 'completion-info'
 
     def lookups(self, request, model_admin):
         return [
-            ('complete', 'Complete'),
-            ('incomplete', 'Incomplete')
+            ('created', 'Documents created'),
+            ('incomplete', 'Documents Incomplete')
         ]
 
     def queryset(self, request, queryset):
@@ -34,11 +35,11 @@ class DocumentCompletionStatusFilter(SimpleListFilter):
             Q(pk__in=Subquery(Passport.objects.all().values('owner__pk')))\
             &Q(pk__in=Subquery(RegistryOfStay.objects.all().values('owner__pk')))\
             &Q(pk__in=Subquery(WorkPermit.objects.all().values('owner__pk')))
-        all_complete = queryset.filter(complex_query)
+        all_created = queryset.filter(complex_query)
 
         # Subquery(Passport.objects.all().values('owner__pk')
-        if self.value() == 'complete':
-            return all_complete
+        if self.value() == 'created':
+            return all_created
         elif self.value() == 'incomplete':
             return queryset.exclude(complex_query)
         # get all passports that are expiring in the next 3 months
@@ -46,42 +47,30 @@ class DocumentCompletionStatusFilter(SimpleListFilter):
 
 
 class DocumentExpirationStatusFilter(SimpleListFilter):
-    title = 'Document Expiration Filters'
+    title = 'Document Expiration Urgency'
     parameter_name = 'expiration-info'
 
     def lookups(self, request, model_admin):
         return [
             ('expired', 'Documents are expired'),
             ('expiring_very_soon', 'Documents are expiring w/in 2 weeks'),
-            ('expiring_soon', 'Documents are expiring w/in 2 months')
+            ('expiring_soon', 'Documents are expiring w/in 2 months'),
+            ('inactive_users', 'Inactive Users with expired Documents')
         ]
 
     def queryset(self, request, queryset):
 
         if self.value() == 'expired':
-            now = datetime.now()+timedelta(days=1)
-            expiration_start = datetime.now() - timedelta(days=45000)
-            passports = Q(passport__expiration_date__range=[expiration_start, now])
-            ros_forms = Q(registryofstay__expiration_date__range=[expiration_start, now])
-            work_permits = Q(workpermit__expiration_date__range=[expiration_start, now])
-            return queryset.filter(passports|ros_forms|work_permits)
-
+            return Employee.objects.has_expired_documents()
         elif self.value() == 'expiring_very_soon':
-            # check, passports, ROS forms, and work Permits
-            now = datetime.now() +timedelta(days=1)
-            expiration = now + timedelta(days=15)
-            passports = Q(passport__expiration_date__range=[now, expiration])
-            ros_forms = Q(registryofstay__expiration_date__range=[now, expiration])
-            work_permits = Q(workpermit__expiration_date__range=[now, expiration])
 
-            return queryset.filter(passports|ros_forms|work_permits)
+            return Employee.objects.has_documents_expiring_very_soon()
         elif self.value() == 'expiring_soon':
-            now = datetime.now()
-            expiration = now + datedelta.datedelta(months=2)
-            passports = Q(passport__expiration_date__range=[now, expiration])
-            ros_forms = Q(registryofstay__expiration_date__range=[now, expiration])
-            work_permits = Q(workpermit__expiration_date__range=[now, expiration])
-            return queryset.filter(passports|ros_forms|work_permits)
+            return Employee.objects.has_documents_expiring_soon()
+        elif self.value() == 'inactive_users':
+            return Employee.objects.has_expired_documents_inactive()
+        else:
+            return queryset
 
 
 class CustomUserAdmin(UserAdmin):

@@ -28,7 +28,7 @@ def start_dev_server():
     # Profiling
     # os.system('python3 -m cProfile manage.py collectstatic --no-input > profiled_collectstatic')
     # os.system(' python3 -m cProfile manage.py runserver > profiled_runserver')
-    os.system('python3 manage.py runserver 0.0.0.0:8000')
+    os.system('python3 manage.py runserver 127.0.0.1:8000')
 
 def start_prod_server():
     os.environ['USE_S3'] = 'TRUE'

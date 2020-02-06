@@ -3,6 +3,27 @@ from django.contrib.auth import get_user_model
 
 
 
+class UserModelManagersTests(TestCase):
+
+    def test_passport_exists(self):
+        pass
+
+    def test_work_permit_exists(self):
+        pass
+
+    def test_ros_exists(self):
+        pass
+
+    def test_tefl_exists(self):
+        pass
+
+    def test_degree_query(self):
+        pass
+
+    def test_achievement_certificate_query(self):
+        pass
+
+
 class UsersManagersTests(TestCase):
 
     def test_create_user(self):

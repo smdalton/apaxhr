@@ -37,7 +37,7 @@ class Employee(AbstractBaseUser, PermissionsMixin):
     )
     genders = (('M', 'male'),('F', 'female'))
     # core information
-    full_name = models.CharField(_('Name as on Passport'), validators=[name_validator], max_length=25, blank=False, null=True)
+    full_name = models.CharField(_('Name as on Passport'), validators=[name_validator], max_length=45, blank=False)
 
     #employment data
     gender = models.CharField(max_length=10, choices=genders)
@@ -74,6 +74,7 @@ class Employee(AbstractBaseUser, PermissionsMixin):
             return f"{self.phone_number}, {self.email}, {self.personal_email}"
         except:
             return "Error during retrieval of contact info, perhaps it isn't complete"
+
 
     @property
     def passport_complete(self):
