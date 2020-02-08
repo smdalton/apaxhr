@@ -14,6 +14,8 @@ https://docs.djangoproject.com/en/3.0/ref/settings/
 import os
 
 # Build paths inside the docker_files like this: os.path.join(BASE_DIR, ...)
+from django.core.files.storage import FileSystemStorage
+
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 TEMPLATE_DIR = os.path.join(BASE_DIR, '/templates')
 # Quick-start development settings - unsuitable for production
@@ -31,12 +33,12 @@ TEMPLATE_DIR = os.path.join(BASE_DIR, '/templates')
 STATIC_URL = '/staticfiles/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 STATICFILES_DIRS = (os.path.join(BASE_DIR,'static'),)
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+
 STATICFILES_FINDERS = (
     'django.contrib.staticfiles.finders.FileSystemFinder',
     'django.contrib.staticfiles.finders.AppDirectoriesFinder',
 )
-
+AWS_DEFAULT_ACL = 'public-read'
 USE_S3 = os.getenv('USE_S3') == 'TRUE'
 
 if USE_S3:
@@ -48,17 +50,19 @@ if USE_S3:
     AWS_S3_OBJECT_PARAMETERS = {'CacheControl': 'max-age=86400'}
     # s3 static settings
     AWS_LOCATION = 'static'
-    # STATIC_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/{AWS_LOCATION}/'
-    # STATICFILES_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+
+    STATIC_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/{AWS_LOCATION}/'
+    STATICFILES_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
     # s3 media settings
     PUBLIC_MEDIA_LOCATION = 'media'
     MEDIA_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/{PUBLIC_MEDIA_LOCATION}/'
-    DEFAULT_FILE_STORAGE = 'apaxhr.storage_backends.PublicMediaStorage'
+    DEFAULT_FILE_STORAGE = 'apaxhr.storage_backends.PrivateMediaStorage'
 
     PRIVATE_MEDIA_LOCATION = 'private'
     PRIVATE_FILE_STORAGE = 'apaxhr.storage_backends.PrivateMediaStorage'
 
 else:
+    DEFAULT_FILESYSTEM_STORAGE = 'django.core.files.storage.FileSystemStorage'
     MEDIA_URL = '/media/'
     MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
@@ -68,9 +72,15 @@ else:
 SECRET_KEY = os.environ.get('SECRET_KEY','change me to a real key')
 
 # SECURITY WARNING: don't run with debug turned on in production!
+
+DEBUG=True
 if os.environ.get('DEV'):
     DEBUG = True
     ALLOWED_HOSTS = ['*']
+    INTERNAL_IPS = [
+        'localhost',
+        '127.0.0.1',
+    ]
 else:
     ALLOWED_HOSTS=['*']
 
@@ -80,25 +90,34 @@ else:
 
 
 INSTALLED_APPS = [
-    'whitenoise.runserver_nostatic',
-    'django.contrib.admin',
-    #'livereload',
-
-    'django.contrib.auth',
-    'django.contrib.contenttypes',
-    'django.contrib.sessions',
-    'django.contrib.messages',
+    #'whitenoise.runserver_nostatic',
+#'livereload',
     'django.contrib.staticfiles',
 
-    # Local
-    # 'debug_toolbar'
+    'admin_interface',
+    'colorfield',
+    'django.contrib.contenttypes',
+    'django.contrib.admin',
+    'django.contrib.auth',
+    'django.contrib.sessions',
+    'django.contrib.messages',
 
+
+    # Local
+    'users',
+    'apaxhr',
     'core_hr',
+    'schedules',
+    'org',
+    # extensions
+    'debug_toolbar',
     'django_countries',
     'django_nose',
     'storages',
+    'django_extensions'
 
 ]
+
 
 
 
@@ -112,7 +131,8 @@ NOSE_ARGS = [
 
 MIDDLEWARE = [
     #'livereload.middleware.LiveReloadScript',
-    'whitenoise.middleware.WhiteNoiseMiddleware',
+    #'whitenoise.middleware.WhiteNoiseMiddleware',
+
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -120,6 +140,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'debug_toolbar.middleware.DebugToolbarMiddleware',
 
 ]
 
@@ -128,8 +149,8 @@ ROOT_URLCONF = 'apaxhr.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [os.path.join(BASE_DIR, 'templates'),]
-        ,
+        'DIRS': [os.path.join(BASE_DIR, 'templates'),],
+        # 'DIRS':[],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -166,8 +187,14 @@ else:
         }
     }
 
+# CUSTOM USER MODEL
+AUTH_USER_MODEL = 'users.Employee'
+
+
 # Password validation
 # https://docs.djangoproject.com/en/3.0/ref/settings/#auth-password-validators
+
+
 
 AUTH_PASSWORD_VALIDATORS = [
     {
@@ -194,7 +221,9 @@ TIME_ZONE = 'UTC'
 
 USE_I18N = True
 
-USE_L10N = True
+USE_L10N = False
+DATE_FORMAT = 'd/m/Y'
+DATE_INPUT_FORMATS = ( '%d/%m/%Y', '%d/%m/%y', '%d %b %Y',)
 
 USE_TZ = True
 

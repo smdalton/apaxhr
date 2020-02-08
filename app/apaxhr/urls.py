@@ -26,11 +26,26 @@ admin.site.site_title = "APAX Admin Portal"
 admin.site.index_title = "APAX HR administrator Portal"
 
 urlpatterns = [
-    path('', views.HomePageView.as_view(),name='homepage'),
+    path('',views.HomePageView.as_view()),
     path('login', auth_views.auth_login),
-    path('admin/', admin.site.urls),
-    path('', include('core_hr.urls'))
+    path('admin', admin.site.urls),
+    path('org', include('org.urls')),
+    path('core-hr', include('core_hr.urls')),
+    path('schedules', include('schedules.urls')),
 ]
+
+
+if settings.DEBUG:
+    import debug_toolbar
+    urlpatterns = [
+        path('', views.HomePageView.as_view()),
+        path('login', auth_views.auth_login),
+        path('admin', admin.site.urls),
+        path('org', include('org.urls')),
+        path('core-hr', include('core_hr.urls')),
+        path('schedules', include('schedules.urls')),
+        path('__debug__/', include(debug_toolbar.urls)),
+    ]
 #
 # if os.environ.get('SERVE_STATIC'):
 #     urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

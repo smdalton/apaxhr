@@ -17,12 +17,18 @@ def start_dev_server():
     os.environ['AWS_SECRET_ACCESS_KEY'] = 'GpBPgt2cFYbdIC0FGr4KaOLduA1nZ47b3KxX73Nw'
     os.environ['AWS_STORAGE_BUCKET_NAME'] = 'apaxhr-test'
     os.environ['DEV']='True'
-    # wipe and init the db
+    # wipe and init the db, then load mock data
     os.system('echo Starting dev server.')
     os.system('python3 manage.py dev_db')
-    os.system('python3 manage.py collectstatic --no-input')
-    os.system('python3 -W ignore manage.py runserver 0.0.0.0:8000')
 
+
+    # os.system('exec gunicorn apaxhr.wsgi:application \
+    #         --bind 0.0.0.0:8000\
+    #         --workers 3')
+    # Profiling
+    # os.system('python3 -m cProfile manage.py collectstatic --no-input > profiled_collectstatic')
+    # os.system(' python3 -m cProfile manage.py runserver > profiled_runserver')
+    os.system('python3 manage.py runserver 127.0.0.1:8000')
 
 def start_prod_server():
     os.environ['USE_S3'] = 'TRUE'
@@ -33,6 +39,24 @@ def start_prod_server():
     os.system('python3 manage.py makemigrations')
     os.system('python3 manage.py migrate')
     os.system('python3 manage.py collectstatic --no-input')
+    time.sleep(1)
+
+    os.system('exec gunicorn apaxhr.wsgi:application \
+        --bind 0.0.0.0:8000\
+        --workers 3')
+
+def start_prod_demo_server():
+    os.environ['USE_S3'] = 'TRUE'
+    os.environ['AWS_ACCESS_KEY_ID'] = 'AKIATWWKT35LU5ED5FDY'
+    os.environ['AWS_SECRET_ACCESS_KEY'] = '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'
+    os.environ['AWS_STORAGE_BUCKET_NAME'] = 'apaxhr-test'
+    os.system('echo Starting Prod server.')
+    # os.system('python3 manage.py makemigrations')
+    # os.system('python3 manage.py migrate')
+    # for demo deployment,
+    os.system('python3 manage.py dev_db')
+
+    #os.system('python3 manage.py collectstatic --no-input')
     time.sleep(1)
 
     os.system('exec gunicorn apaxhr.wsgi:application \
@@ -51,6 +75,7 @@ func_dict = {
     'dev_redis': start_dev_rabbit,
     'prod': start_prod_server,
     'dev_rabbit': start_dev_rabbit,
+    'prod_demo': start_prod_demo_server,
 }
 
 

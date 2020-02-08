@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 import os, sys
 """
 Run tools help
@@ -24,18 +26,17 @@ def dev_on_docker():
 
 # set envs
 
-# TODO: Run server with DEV sqlite db and server_nginx
-def dev_nginx():
-    clear_envs()
-
+def prod():
+    print( 'Not implemented yet')
+    pass
 # TODO: Run server with DEV sqlite db and redis
+
 def dev_redis():
     clear_envs()
-    #Todo bring up a system redis container
-# TODO: Run server with DEV sqlite db redis, and server_nginx
 
-
-def prod():
+def prod_demo():
+    os.system('docker-compose -f docker-compose.demo.yml build')
+    os.system('docker-compose -f docker-compose.demo.yml up')
     print("running prod no services")
 
 # TODO:
@@ -46,7 +47,8 @@ function_dict ={
     'dev': dev_no_services,
     'dev_on_docker': dev_on_docker,
     'dev_redis': dev_redis,
-    'prod_no_services': prod
+    'prod_demo': prod_demo,
+    'prod': prod,
 }
 
 try:

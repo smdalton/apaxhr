@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en">
+<head>
+
+    <meta charset="UTF-8">
+    <title>APAX Schedules</title>
+    {% block header_block %}
+    {% endblock %}
+</head>
+<body>
+
+
+  <!-- Navigation -->
+{% block nav_block %}
+    {% include "header-footer/nav.html" %}
+{% endblock %}
+  <!-- Page Content -->
+  <div class="container">
+    <div class="row">
+      <div class="col-lg-12 text-center">
+        <h1 class="mt-5">APAX Center Scheduling Tools</h1>
+          <p class="lead"> <a href="{% url 'admin:index' %}">link to admin panel</a>.</p>
+
+      </div>
+    </div>
+  </div>
+
+  {% block content%}
+
+  {%  endblock %}
+  <!-- Bootstrap core JavaScript -->
+
+
+
+
+</body>
+
+{% block footer_block %}
+    {%  include 'header-footer/footer.html' %}
+{% endblock %}
+
+</html>

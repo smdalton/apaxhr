@@ -8,5 +8,5 @@ from . import views
 app_name = 'core_hr'
 
 urlpatterns = [
-    path('', views.BaseView.as_view(), name='landing'),
+    path('', views.ApaxHomePageView.as_view(), name='landing'),
 ]
