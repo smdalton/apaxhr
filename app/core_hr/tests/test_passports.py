@@ -36,6 +36,7 @@ class PassportTestCase(TestCase):
 
     def test_passport_data_complete(self):
         complete_passport = create_mock_passport(create_mock_user(), has_image=True)
+
         self.assertEqual(complete_passport.data_complete, True)
 
     def test_passport_data_not_complete(self):

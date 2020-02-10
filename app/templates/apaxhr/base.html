@@ -2,7 +2,24 @@
 {% load static %}
 <html lang="en">
 <head>
+    <head>
+        <!-- Required meta tags -->
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
+        <!-- Bootstrap CSS -->
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+              integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T"
+              crossorigin="anonymous">
+
+{#        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/material-kit/2.0.6/js/material-kit.js">#}
+{#        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/material-kit/2.0.6/js/material-kit.js.map">#}
+{#        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/material-kit/2.0.6/js/material-kit.min.js">#}
+{#        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/material-kit/2.0.6/css/material-kit.css">#}
+{#        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/material-kit/2.0.6/css/material-kit.css.map">#}
+{#        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/material-kit/2.0.6/css/material-kit.min.css">#}
+
+    </head>
     <meta charset="UTF-8">
     <title>APAX HRS</title>
     {% block header_block %}
@@ -11,33 +28,23 @@
 <body>
 
 
-  <!-- Navigation -->
+<!-- Navigation -->
 {% block nav_block %}
     {% include "header-footer/nav.html" %}
 {% endblock %}
-  <!-- Page Content -->
-  <div class="container">
-    <div class="row">
-      <div class="col-lg-12 text-center">
-        <h1 class="mt-5">APAX HR Tools</h1>
-          <p class="lead"> <a class="btn btn-success btn-lg" href="{% url 'admin:index' %}">Manage Information Here</a></p>
-{#test#}
-      </div>
-    </div>
-  </div>
+<!-- Page Content -->
 
-  {% block content%}
-
-  {%  endblock %}
-  <!-- Bootstrap core JavaScript -->
+{% block content %}
 
 
+{% endblock %}
+<!-- Bootstrap core JavaScript -->
 
 
 </body>
 
 {% block footer_block %}
-    {%  include 'header-footer/footer.html' %}
+    {% include 'header-footer/footer.html' %}
 {% endblock %}
 
 </html>

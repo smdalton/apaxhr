@@ -1,3 +1,5 @@
+import time
+
 from django.core.management import call_command
 from django.core.management.base import BaseCommand, CommandError
 
@@ -34,17 +36,25 @@ class Command(BaseCommand):
 
     def reset_db_and_migrations(self):
         self.stdout.write(os.getcwd())
-        os.system('rm devdb.sqlite3')
+        # print("deleting db")
+        # os.system('rm devdb.sqlite3')
+        # time.sleep(1)
+        # os.system('touch devdb.sqlite3')
+        # os.system('chmod 777 devdb.sqlite3')
         # safeguard for production database
 
-        if settings.DATABASES['default']['NAME'].split('/')[-1] == "devdb.sqlite3":
-            self.stdout.write('Deleting: '+ settings.DATABASES['default']['NAME'])
+        if os.environ.get("DEV_POSTGRES")=='TRUE':
+
+            self.stdout.write('Running dev postgres')
             os.system('find . -path "*/migrations/*.py" -not -name "__init__.py" -delete')
             os.system('find . -path "*/migrations/*.pyc"  -delete')
+            os.system('python3 manage.py flush')
             os.system('python3 manage.py makemigrations --no-input')
+
             os.system('python3 manage.py migrate')
+
         else:
-            self.stdout.write('Running on production postgresql wipe_db aborted')
+            self.stdout.write('Running on development postgresql wipe_db aborted')
             return
 
     def create_many_users_and_documents(self, num_users=15):
@@ -68,9 +78,9 @@ class Command(BaseCommand):
             )
 
     def create_super_user(self):
-        print(os.getcwd())
+        # print(os.getcwd())
         user = Employee.objects.create_superuser(email='smd@gmail.com',password='pass1234')
-        user.save()
+        #user.save()
 
     def load_admin_themes(self):
         themes =  [
@@ -94,7 +104,7 @@ class Command(BaseCommand):
 
     def handle(self, **args):
         os.system('export DJANGO_COLORS="light;error=yellow/blue,blink;notice=magenta"')
-
+        import time
         self.reset_db_and_migrations()
         self.create_super_user()
         self.create_many_users_and_documents()

@@ -1,27 +1,37 @@
 {% load static %}
-<nav class="navbar navbar-expand-lg bg-danger  static-top">
+<nav class="navbar navbar-light navbar-expand-lg bg-danger sticky-top ">
     <div class="container">
-      <a class="navbar-brand text-white" href="#">APAX HR</a>
-      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
-        <span class="navbar-toggler-icon"></span>
-      </button>
-      <div class="collapse navbar-collapse" id="navbarResponsive">
-        <ul class="navbar-nav ml-auto">
-          <li class="nav-item active">
-            <a class="nav-link text-white" href="#">Home
-              <span class="sr-only">(current)</span>
-            </a>
-          </li>
-{#          <li class="nav-item">#}
-{#            <a class="nav-link" href="#">Employee Database</a>#}
-{#          </li>#}
-{#          <li class="nav-item">#}
-{#            <a class="nav-link" href="#">Signup</a>#}
-{#          </li>#}
-{#          <li class="nav-item">#}
-{#            <a class="nav-link" href="#">Payroll</a>#}
-{#          </li>#}
-        </ul>
-      </div>
+        <a class="navbar-brand text-white" href="#">APAX HR</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarResponsive"
+                aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"> </span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarResponsive" >
+            <ul class="navbar-nav ml-auto text-white">
+                <li class="nav-item active">
+                    <a class="nav-link "></a>
+
+                </li>
+                <li class="">
+                        <a href="{% url 'core_hr:self_service' %}" class="  btn btn-primary rounded ">Employee Portal</a>
+                </li>
+                <li class="nav-item ">
+                    <a class="nav-link text-white" href="{% url 'users:registration' %}">Signup</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link text-white" href="#">Center Tools</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link text-white" href="#">Teacher Management</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link text-white" href="#">HR Tools</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link text-white" href="#">Payroll</a>
+                </li>
+            </ul>
+        </div>
     </div>
-  </nav>
+</nav>

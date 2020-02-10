@@ -1,3 +1,4 @@
+import csv
 from datetime import datetime, timedelta
 
 from botocore.exceptions import EndpointConnectionError
@@ -6,6 +7,7 @@ from django.contrib import admin
 from django.apps import apps
 from django.contrib.admin import SimpleListFilter
 from django.db.models import Subquery
+from django.http import HttpResponse
 from django.utils.safestring import mark_safe
 
 import datedelta
@@ -46,6 +48,24 @@ class LegalDocumentAdminMixin(object):
     list_display = ('owner', 'expiration_date', 'valid', )
     search_fields = ('owner__full_name', 'owner__employee_id_number')
     readonly_fields = ('owner', 'document_image',)
+    actions=["export_as_csv"]
+
+    def export_as_csv(self, request, queryset):
+        meta = self.model._meta
+        field_names = [field.name for field in meta.fields]
+
+        response = HttpResponse(content_type='text/csv')
+        response['Content-Disposition'] = 'attachment; filename={}.csv'.format(meta)
+        writer = csv.writer(response)
+
+        writer.writerow(field_names)
+        for obj in queryset:
+            row = writer.writerow([getattr(obj, field) for field in field_names])
+
+        return response
+
+
+    export_as_csv.short_description = "Export Selected"
 
     def valid(self, obj):
         return obj.expiration_date > datetime.now().date()

@@ -4,7 +4,9 @@ from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
 from django.utils.translation import gettext_lazy as _
 from django.utils import timezone
 
-# from core_hr.models import Passport, RegistryOfStay
+# from core-hr.models import Passport, RegistryOfStay
+from core_hr.models import Passport, RegistryOfStay, WorkPermit, Resume, TeachingCertificate, DegreeDocument, \
+    AchievementCertificate
 from .managers import CustomUserManager
 from apaxhr.storage_backends import PublicMediaStorage, PrivateMediaStorage
 from django.core.validators import RegexValidator
@@ -37,10 +39,12 @@ class Employee(AbstractBaseUser, PermissionsMixin):
     )
     genders = (('M', 'male'),('F', 'female'))
     # core information
+
     full_name = models.CharField(_('Name as on Passport'), validators=[name_validator], max_length=45, blank=False)
 
     #employment data
-    gender = models.CharField(max_length=10, choices=genders)
+
+    gender = models.CharField(max_length=1, choices=genders)
     employee_id_number = models.CharField(_('employee id number'), max_length=20, null=True)
 
     # activity Status
@@ -49,7 +53,7 @@ class Employee(AbstractBaseUser, PermissionsMixin):
 
 
     # contact information
-    phone_number = models.CharField(max_length=14, unique=True)
+    phone_number = models.CharField(max_length=25, unique=False)
     email = models.EmailField(_('APAX email address'), unique=True)
     personal_email = models.EmailField(_('Personal Email Address'), unique=True)
 
@@ -63,6 +67,40 @@ class Employee(AbstractBaseUser, PermissionsMixin):
 
     objects = CustomUserManager()
 
+
+    def get_document_set(self):
+        docs = {}
+
+        try:
+            docs['passport']=(Passport.objects.get(id=self.pk))
+        except:
+            docs['passport']=('empty')
+        try:
+            docs['ros']=(RegistryOfStay.objects.get(id=self.pk))
+        except:
+            docs['ros']=('ROS not found')
+        try:
+            docs['work permit']=(WorkPermit.objects.get(id=self.pk))
+        except:
+            docs['work permit']=('Workpermit not found')
+        try:
+            docs['resume']=(Resume.objects.get(id=self.pk))
+        except:
+            docs['resume']=('Resume not found')
+        try:
+            docs['resume']=(TeachingCertificate.objects.get(id=self.pk))
+        except:
+            docs['certificate']=('Teaching certificate not found')
+        try:
+            docs['certificate']=(DegreeDocument.objects.get(id=self.pk))
+        except:
+            docs['degree']=('Degree not found')
+        try:
+            docs['achievment'] = AchievementCertificate.objects.get(id=self.pk)
+        except:
+            docs['achievement'] = ('achievement certs not found')
+        return docs
+        
     def test_passports(self):
         from core_hr.models import Passport
         owners_passport = Passport.objects.get(owner__pk=self.id)
@@ -94,6 +132,7 @@ class Employee(AbstractBaseUser, PermissionsMixin):
         except ObjectDoesNotExist:
             return ["Couldn't query Registry of stay, perhaps it was not created", False]
         pass
+
 
 
     @property

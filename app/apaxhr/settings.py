@@ -91,7 +91,7 @@ else:
 
 INSTALLED_APPS = [
     #'whitenoise.runserver_nostatic',
-#'livereload',
+    # 'livereload',
     'django.contrib.staticfiles',
 
     'admin_interface',
@@ -107,9 +107,8 @@ INSTALLED_APPS = [
     'users',
     'apaxhr',
     'core_hr',
-    'schedules',
-    'org',
     # extensions
+    'crispy_forms',
     'debug_toolbar',
     'django_countries',
     'django_nose',
@@ -118,13 +117,14 @@ INSTALLED_APPS = [
 
 ]
 
+CRISPY_TEMPLATE_PACK = 'bootstrap4'
 
 
 
 TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
 NOSE_ARGS = [
     '--with-cover',
-    '--cover-package=core_hr',
+    '--cover-package=core-hr',
     '--cover-package=apaxhr',
     # Change `MY_APP` to your `app` name
 ]
@@ -179,11 +179,15 @@ if os.environ.get('PROD'):
             "PORT": os.environ.get("SQL_PORT", "5432"),
         }
     }
-else:
+else :
     DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': os.path.join(BASE_DIR, 'devdb.sqlite3'),
+        "default": {
+            "ENGINE": 'django.db.backends.postgresql_psycopg2',
+            "NAME": 'postgres',
+            "USER": "postgres-dev",
+            "PASSWORD": os.environ.get("SQL_PASSWORD", "pass1234"),
+            "HOST": os.environ.get("SQL_HOST", "localhost"),
+            "PORT": os.environ.get("SQL_PORT", "5432"),
         }
     }
 

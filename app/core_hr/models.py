@@ -30,9 +30,18 @@ class TrackingUtilitiesMixin(models.Model):
     #email_active = models.BooleanField(default=True)
     @property
     def data_complete(self):
-        self.__dict__
-        all_fields_filled = all((getattr(self, field.name) for field in self._meta.fields))
-        return all([getattr(self, field.name) for field in self._meta.fields])
+        ''' Checks if all the fields have been filled '''
+        fields_names = [f.name for f in self._meta.get_fields()]
+        for field_name in fields_names:
+            if field_name == 'fully_filled':
+                continue  # avoid recursive calls to is_fully_filled
+            value = getattr(self, field_name)
+            if value is None or value == '':
+                return False
+
+        return True
+
+        # return all((getattr(self, field.name) for field in self._meta.get_fields()))
 
 
 class ExpirationDateMixin(models.Model):
@@ -52,6 +61,8 @@ class LegalDocument(models.Model):
     image_dir = 'default_images'
     image = models.ImageField(storage=PrivateMediaStorage(), upload_to=image_dir, blank=False, null=False)
 
+    def meta(self):
+        return self._meta
 
 # TODO: Passport
 class Passport(ExpirationDateMixin, TrackingUtilitiesMixin, LegalDocument):
@@ -82,31 +93,21 @@ class Passport(ExpirationDateMixin, TrackingUtilitiesMixin, LegalDocument):
 
 class RegistryOfStay(ExpirationDateMixin, TrackingUtilitiesMixin,  LegalDocument):
 
-    """ Your Address;
-        Your Vietnamese cell number;
-        Land Owners Name;
-        Land Owners Cell number;
-        Land Owners email address;
-    """
-    # expiration is 6 months
-    # if address is null then must be flagged
     class Meta:
         verbose_name = 'Registry of Stay Form'
     employee_address = models.CharField(max_length=100,blank=False)
     landlords_name = models.CharField(max_length=100,blank=False)
     landlords_cell_phone = models.CharField(max_length=25, blank=False)
-    landlords_email = models.EmailField(max_length=25, blank=False)
+    landlords_email = models.EmailField(max_length=40, blank=False)
     image_dir='ros_images'
     image = models.ImageField(
             storage=PrivateMediaStorage(),
             upload_to='ros_images',
             blank=False
     )
-
     @property
     def phone_number(self):
         return self.owner.phone_number
-
     def __str__(self):
         expiration_data = 'Expired' if self.expired else 'Valid'
         formatted_date = self.expiration_date.strftime("%d-%m-%Y")
@@ -135,10 +136,13 @@ class BaseDocument(TrackingUtilitiesMixin, models.Model):
     class Meta:
 
         abstract = True
+
     owner = models.OneToOneField(Employee, on_delete=models.CASCADE)
     image = models.ImageField(
         storage=PrivateMediaStorage(),
         upload_to='base_documents', blank=False, null=False)
+    def meta(self):
+        return self._meta
 
 
 class Resume(BaseDocument):
@@ -148,6 +152,10 @@ class Resume(BaseDocument):
     help = "Stores a resume or CV document"
     document_choices = (('rs','Resume'),('cv','Curriculum Vitae'))
     type =  models.CharField(max_length=20,choices=document_choices)
+    image = models.ImageField(
+        storage=PrivateMediaStorage(),
+        upload_to='resumes_cvs', blank=False, null=False
+    )
 
 # # #TODO delete this test stub
 
