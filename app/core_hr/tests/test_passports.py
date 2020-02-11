@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from django.test import TestCase
+from django.test import TestCase, LiveServerTestCase
 import faker
 from core_hr.models import Passport
 from core_hr.extras.core_hr_mock_factory import create_mock_passport

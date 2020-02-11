@@ -7,6 +7,7 @@ from django.conf import settings
 import os
 import random
 
+from django.db import connection
 
 from users.models import Employee
 
@@ -46,9 +47,19 @@ class Command(BaseCommand):
         if os.environ.get("DEV_POSTGRES")=='TRUE':
 
             self.stdout.write('Running dev postgres')
+            # print('Wiping Database')
+            # dbinfo = settings.DATABASES['default']
+            # print('Dropping DB: ',dbinfo)
+            # cursor = connection.cursor()
+            # cursor.execute("DROP DATABASE " + dbinfo["NAME"])
+            # cursor.execute("CREATE DATABASE " + dbinfo["NAME"])
+            # cursor.execute("USE " + dbinfo["NAME"])
             os.system('find . -path "*/migrations/*.py" -not -name "__init__.py" -delete')
             os.system('find . -path "*/migrations/*.pyc"  -delete')
-            os.system('python3 manage.py flush')
+            print("Waiting for db")
+            for x in range(5):
+                time.sleep(1)
+                print(str(x) + "...")
             os.system('python3 manage.py makemigrations --no-input')
 
             os.system('python3 manage.py migrate')

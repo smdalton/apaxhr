@@ -33,6 +33,7 @@ urlpatterns = [
     path('logout/', auth_views.auth_logout),
     path('admin/', admin.site.urls),
     path('core_hr/', include('core_hr.urls')),
+    path('management/', include('management.urls')),
     path('users/', include('users.urls')),
 ]
 
@@ -43,10 +44,10 @@ if settings.DEBUG:
         path('', views.HomePageView.as_view()),
         path('login/', auth_views.auth_login),
         path('admin/', admin.site.urls),
+        path('logout/', auth_views.auth_logout),
         path('core_hr/', include('core_hr.urls')),
         path('users/', include('users.urls')),
-
-
+        path('management/', include('management.urls')),
         path('__debug__/', include(debug_toolbar.urls)),
     ]
 #

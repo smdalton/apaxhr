@@ -10,7 +10,7 @@ from django.contrib import messages
 
 
 class EmployeePortal(TemplateView):
-    template_name = 'core-hr/employee-self-service.html'
+    template_name = 'core-hr/employee_self_service.html'
     try:
         dummy_user = Employee.objects.get(id=4)
     except:
@@ -18,6 +18,9 @@ class EmployeePortal(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super(EmployeePortal, self).get_context_data()
+
+        # TODO: Stub that needs replacement when user system is in place
+
         try:
             context['documents'] = self.dummy_user.get_document_set()
         except:
@@ -26,7 +29,7 @@ class EmployeePortal(TemplateView):
         return context
 
 class DocumentCenter(TemplateView):
-    template_name = 'core-hr/employee-documents.html'
+    template_name = 'core-hr/employee_documents.html'
     try:
         dummy_user = Employee.objects.get(id=4)
     except:

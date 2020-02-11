@@ -4,7 +4,7 @@ from django.db.models import ImageField
 from django.test import TestCase
 import faker
 from core_hr.models import Passport, RegistryOfStay, WorkPermit
-from users.models import Employee
+from users.models import Employee, EmployeePermissions
 from django_countries.fields import CountryField
 from django.contrib.auth import get_user_model
 import random
@@ -29,7 +29,7 @@ def create_mock_user():
     gender = random.choice([x[0] for x in Employee.genders])
     employee_id_number = f"G-{fake.ean8()}"
     employment_status = random.choice(
-        [x[0] for x in Employee.employment_statuses])
+        [x[0] for x in Employee.lifecycle_statuses])
     employment_status_note = fake.bs()
 
     phone_number = fake.phone_number()
@@ -49,6 +49,17 @@ def create_mock_user():
         date_joined=date_joined,
         email=email,
         password='foo'
+    )
+
+    list = [False,False,False]
+    list[random.choice([0,0,0,1,1,1,1,1,1,1,1,1,1,2])] = True
+
+
+    permissions = EmployeePermissions.objects.create(
+        owner=user,
+        is_applicant=list[0],
+        is_teacher=list[1],
+        is_head_teacher=list[2],
     )
 
     return user

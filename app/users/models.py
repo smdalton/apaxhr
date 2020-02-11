@@ -31,7 +31,7 @@ Phone Number
 
 class Employee(AbstractBaseUser, PermissionsMixin):
 
-    employment_statuses = (
+    lifecycle_statuses = (
         ('ap','Applicant'),
         ('trial', 'Initial Training'),
         ('em', 'Employed'),
@@ -48,7 +48,7 @@ class Employee(AbstractBaseUser, PermissionsMixin):
     employee_id_number = models.CharField(_('employee id number'), max_length=20, null=True)
 
     # activity Status
-    employment_status = models.CharField(choices=employment_statuses, max_length=30)
+    employment_status = models.CharField(choices=lifecycle_statuses, max_length=30)
     employment_status_note = models.TextField(max_length=500)
 
 
@@ -61,6 +61,10 @@ class Employee(AbstractBaseUser, PermissionsMixin):
     is_staff = models.BooleanField(default=False)
     is_active = models.BooleanField(default=True)
     date_joined = models.DateTimeField(_('date joined'), auto_now_add=True)
+
+
+    # Permissions
+
 
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = []
@@ -159,6 +163,64 @@ class Employee(AbstractBaseUser, PermissionsMixin):
 
     def __str__(self):
         return f"{self.full_name} {self.email}"
+
+
+class EmployeePermissions(models.Model):
+    owner = models.OneToOneField(Employee, on_delete=models.CASCADE)
+    # 12 total permissions
+
+    # document access only
+    # James:
+    """
+    Applicants, Trainees, Teachers, Head teachers,
+    Faculty managers, Area managers, HR manager, HR director,
+    Teacher management Director,
+    Training director & Recruiting director.
+    """
+    is_applicant = models.BooleanField(default=True)
+    is_trainee = models.BooleanField(default=False)
+
+    # + schedule access
+    is_teacher = models.BooleanField(default=False)
+    # management
+    is_head_teacher = models.BooleanField(default=False)
+    is_faculty_manager = models.BooleanField(default=False)
+    is_area_manager = models.BooleanField(default=False)
+    is_hr_manager = models.BooleanField(default=False)
+
+
+    # full access
+    is_hr_director = models.BooleanField(default=False)
+    is_teacher_management_director = models.BooleanField(default=False)
+    is_training_director = models.BooleanField(default=False)
+    is_recruiting_director = models.BooleanField(default=False)
+    is_head_office = models.BooleanField(default=False)
+
+    def current_perms(self):
+        fields_names = [f.name for f in self._meta.get_fields()]
+        results = []
+        excluded_fields = ['id','owner']
+        for field_name  in fields_names:
+            if field_name not in excluded_fields:
+                value = getattr(self, field_name)
+
+                if value is None or value == '':
+                    continue
+                results.append(( field_name, value))
+        return results
+
+    def active_perm(self):
+        if [value for label,value in self.current_perms()].count(True) > 1:
+            return False
+        for label, value in self.current_perms():
+            if value == True:
+                return label
+
+
+    def __str__(self):
+        permissions =[field for field in self._meta.fields if field is True]
+
+        return self.owner.full_name + str(permissions)
 
 
 class EmployeeProfile(models.Model):

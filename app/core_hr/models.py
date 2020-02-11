@@ -64,7 +64,7 @@ class LegalDocument(models.Model):
     def meta(self):
         return self._meta
 
-# TODO: Passport
+
 class Passport(ExpirationDateMixin, TrackingUtilitiesMixin, LegalDocument):
     "https://pypi.org/project/django-countries/"
     #place_of_issue = CountryField(blank=False,null=True)
@@ -157,7 +157,6 @@ class Resume(BaseDocument):
         upload_to='resumes_cvs', blank=False, null=False
     )
 
-# # #TODO delete this test stub
 
 
 

@@ -22,13 +22,18 @@ TEMPLATE_DIR = os.path.join(BASE_DIR, '/templates')
 # See https://docs.djangoproject.com/en/3.0/howto/deployment/checklist/
 
 
-#
-# STATIC_URL = '/static/'
-# STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+# EMAIL SETTINGS
 
-#
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_USE_TLS = True
+EMAIL_PORT = 587
+EMAIL_HOST_USER = 'apaxhremails@gmail.com'
+EMAIL_HOST_PASSWORD = 'trashcanflight'
+
 
 # static files settings
+
 
 STATIC_URL = '/staticfiles/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
@@ -40,6 +45,8 @@ STATICFILES_FINDERS = (
 )
 AWS_DEFAULT_ACL = 'public-read'
 USE_S3 = os.getenv('USE_S3') == 'TRUE'
+
+
 
 if USE_S3:
     AWS_ACCESS_KEY_ID = os.getenv('AWS_ACCESS_KEY_ID')
@@ -90,10 +97,11 @@ else:
 
 
 INSTALLED_APPS = [
-    #'whitenoise.runserver_nostatic',
+
+    # packages
+    # 'whitenoise.runserver_nostatic',
     # 'livereload',
     'django.contrib.staticfiles',
-
     'admin_interface',
     'colorfield',
     'django.contrib.contenttypes',
@@ -103,10 +111,13 @@ INSTALLED_APPS = [
     'django.contrib.messages',
 
 
-    # Local
+    # Applications
     'users',
     'apaxhr',
     'core_hr',
+    'management',
+
+
     # extensions
     'crispy_forms',
     'debug_toolbar',
@@ -124,7 +135,7 @@ CRISPY_TEMPLATE_PACK = 'bootstrap4'
 TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
 NOSE_ARGS = [
     '--with-cover',
-    '--cover-package=core-hr',
+    '--cover-package=core_hr',
     '--cover-package=apaxhr',
     # Change `MY_APP` to your `app` name
 ]
@@ -183,7 +194,7 @@ else :
     DATABASES = {
         "default": {
             "ENGINE": 'django.db.backends.postgresql_psycopg2',
-            "NAME": 'postgres',
+            "NAME": 'postgres-dev',
             "USER": "postgres-dev",
             "PASSWORD": os.environ.get("SQL_PASSWORD", "pass1234"),
             "HOST": os.environ.get("SQL_HOST", "localhost"),

@@ -84,7 +84,7 @@ class CustomUserAdmin(UserAdmin):
     search_fields = ('email','full_name','employee_id_number')
     list_display = ('full_name', 'registryofstay', 'workpermit', 'passport',)
 
-    list_filter = (DocumentExpirationStatusFilter, DocumentCompletionStatusFilter, 'employment_status', 'is_active')
+    list_filter = (DocumentExpirationStatusFilter, DocumentCompletionStatusFilter, 'is_active')
     #list_filter = ('employment_status','is_staff', 'is_active')
 
     fieldsets = (
