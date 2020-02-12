@@ -4,5 +4,5 @@ from django.shortcuts import render
 from django.views.generic import TemplateView
 
 
-class EmployeeManagementHomePage(TemplateView):
+class EmployeeManagementHome(TemplateView):
     template_name = 'employee_mgmt/employee_mgmt_home.html'

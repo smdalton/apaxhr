@@ -174,7 +174,7 @@ class EmployeePermissions(models.Model):
     """
     Applicants, Trainees, Teachers, Head teachers,
     Faculty managers, Area managers, HR manager, HR director,
-    Teacher management Director,
+    Teacher employee_management Director,
     Training director & Recruiting director.
     """
     is_applicant = models.BooleanField(default=True)
@@ -182,7 +182,7 @@ class EmployeePermissions(models.Model):
 
     # + schedule access
     is_teacher = models.BooleanField(default=False)
-    # management
+    # employee_management
     is_head_teacher = models.BooleanField(default=False)
     is_faculty_manager = models.BooleanField(default=False)
     is_area_manager = models.BooleanField(default=False)

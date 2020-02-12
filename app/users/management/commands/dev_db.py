@@ -1,16 +1,11 @@
 import time
+import os
+import random
 
 from django.core.management import call_command
 from django.core.management.base import BaseCommand, CommandError
 
-from django.conf import settings
-import os
-import random
-
-from django.db import connection
-
 from users.models import Employee
-
 from core_hr.extras.core_hr_mock_factory import  \
     create_mock_user, create_mock_work_permit, create_mock_passport, create_mock_ros_form
 

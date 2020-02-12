@@ -115,7 +115,7 @@ INSTALLED_APPS = [
     'users',
     'apaxhr',
     'core_hr',
-    'management',
+    'employee_mgmt',
 
 
     # extensions

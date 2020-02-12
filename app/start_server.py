@@ -21,7 +21,7 @@ def start_dev_server():
     os.environ['AWS_STORAGE_BUCKET_NAME'] = 'apaxhr-test'
     os.environ['DEV']='TRUE'
 
-    os.system('echo Starting Prod server.')
+    os.system('echo Starting Dev server.')
     os.system('python3 manage.py dev_db')
 
     # os.system('exec gunicorn apaxhr.wsgi:application \

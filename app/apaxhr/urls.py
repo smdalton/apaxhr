@@ -26,28 +26,25 @@ admin.site.site_title = "APAX Admin Portal"
 admin.site.index_title = "APAX HR administrator Portal"
 
 app_name='apaxhr'
-
+# path('employee_management/', include('employee_management.urls')),
 urlpatterns = [
-    path('',views.HomePageView.as_view()),
+    path('', views.HomePage.as_view()),
+    path('core_hr/', include('core_hr.urls')),
+    path('users/', include('users.urls')),
+    path('employee_mgmt/', include('employee_mgmt.urls')),
+    path('lifecycle/', include('lifecycle.urls')),
+    # auth routes
     path('login/', auth_views.auth_login),
     path('logout/', auth_views.auth_logout),
     path('admin/', admin.site.urls),
-    path('core_hr/', include('core_hr.urls')),
-    path('management/', include('management.urls')),
-    path('users/', include('users.urls')),
+
 ]
 
+# path('employee_management/', include('employee_management.urls')),
 
 if settings.DEBUG:
     import debug_toolbar
-    urlpatterns = [
-        path('', views.HomePageView.as_view()),
-        path('login/', auth_views.auth_login),
-        path('admin/', admin.site.urls),
-        path('logout/', auth_views.auth_logout),
-        path('core_hr/', include('core_hr.urls')),
-        path('users/', include('users.urls')),
-        path('management/', include('management.urls')),
+    urlpatterns += [
         path('__debug__/', include(debug_toolbar.urls)),
     ]
 #

@@ -2,33 +2,36 @@ from django.test import SimpleTestCase, RequestFactory
 from django.contrib.auth.models import AnonymousUser, User
 from django.urls import resolve
 
-import core_hr.views
 
+import apaxhr.views
+import core_hr.views
+import employee_mgmt.views
+import lifecycle.views
 import users.views
-from . import views
+
 
 
 class LandingUrlsResolve(SimpleTestCase):
 
     def test_root_url_resolves_to_home_page_view(self):
         found = resolve('/')
-        self.assertEqual(found.func.view_class, views.HomePage)
+        self.assertEqual(found.func.view_class, apaxhr.views.HomePage)
 
     def test_core_hr_landing_resolves_to_view(self):
-        found = resolve('/core_hr')
+        found = resolve('/core_hr/')
         self.assertEqual(found.func.view_class, core_hr.views.CoreHrEmployeeHomepage)
 
-    def test_lifecycle_landing_resolves_to_view(self):
-        found = resolve('/employee_mgmt')
-        self.assertEqual(found.func.view_class, employee_mgmt.views.EmployeeManagementHomePage)
+    def test_employee_mgmt_resolves_to_view(self):
+        found = resolve('/employee_mgmt/')
+        self.assertEqual(found.func.view_class, employee_mgmt.views.EmployeeManagementHome)
 
     def test_lifecycle_landing_resolves_to_view(self):
-        found = resolve('/employee_mgmt')
-        self.assertEqual(found.func.view_class, employee_mgmt.views.EmployeeManagementHomePage)
+        found = resolve('/lifecycle/')
+        self.assertEqual(found.func.view_class, lifecycle.views.LifeCycleHome)
 
     def test_users_resolves_to_view(self):
-        found = resolve('/users')
-        self.assertEqual(found.func.view_class, users.views.UsersHomePage)
+        found = resolve('/users/')
+        self.assertEqual(found.func.view_class, users.views.UsersHome)
 
 #
 # class CoreHRUrlsResolve(TestCase):

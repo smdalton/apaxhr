@@ -2,12 +2,17 @@
 from django.contrib import messages
 from django.contrib.auth.views import LoginView
 from django.shortcuts import render, redirect, get_object_or_404
-from django.views.generic import CreateView, UpdateView, ListView
+from django.views.generic import CreateView, UpdateView, ListView, TemplateView
 from django.urls import reverse
 from users.forms import EmployeeCreationForm
 
 # Create your views here.
 from users.models import Employee
+
+
+
+class UsersHome(TemplateView):
+    template_name = 'users/users_home.html'
 
 
 
@@ -23,6 +28,8 @@ class UserCreateView(CreateView):
 
     def get_success_url(self):
         return reverse('core_hr:self_service')
+
+
 
 
 class UserUpdateView(UpdateView):
@@ -59,10 +66,6 @@ class UserUpdateView(UpdateView):
 
     def get_success_url(self):
         return reverse('core_hr:self_service')
-
-
-class UserList(ListView):
-    model = Employee
 
 
 class UserLoginView(LoginView):

@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 
 import os, sys
+import time
+
 """
 Run tools help
 """
@@ -13,9 +15,41 @@ def clear_envs():
      except:
          print(env, "Not set")
 
+def start_postgres():
+    print('Starting Postgres')
+    for x in range(2):
+        time.sleep(1)
+        print(str(x) + "...")
+    postgres_start = 'docker run -d -p 5432:5432 --name postgres-dev' \
+                     ' -e POSTGRES_PASSWORD=pass1234' \
+                     ' -e POSTGRES_USER=postgres-dev ' \
+                     'postgres'
+    os.system(postgres_start)
+
+def stop_postgres():
+    print('Stopping Postgres')
+    postgres_stop = 'docker kill postgres-dev'
+    os.system(postgres_stop)
+
+def delete_postgres():
+    print('Deleting Postgres')
+    postgres_delete = 'docker container rm postgres-dev'
+    os.system(postgres_delete)
+
+
+
+def kill_services():
+    print("killing services")
+    stop_postgres()
+    time.sleep(1)
+    delete_postgres()
+
+
 # TODO: Run server with DEV sqlite db and no server_nginx or redis
-def dev_no_services():
+def dev_postgres():
+    kill_services()
     clear_envs()
+    start_postgres()
     os.chdir('app')
     os.system('python3 start_server.py dev')
 
@@ -24,15 +58,6 @@ def dev_on_docker():
     os.system('docker-compose -f docker-compose.dev.yml build')
     os.system('docker-compose -f docker-compose.dev.yml up')
 
-# set envs
-
-def prod():
-    print( 'Not implemented yet')
-    pass
-# TODO: Run server with DEV sqlite db and redis
-
-def dev_redis():
-    clear_envs()
 
 def prod_demo():
     os.system('docker-compose -f docker-compose.demo.yml build')
@@ -40,15 +65,17 @@ def prod_demo():
     print("running prod no services")
 
 # TODO:
-def kill_services():
-    print("killing services")
+
+def deploy_test():
+    start_postgres()
+    os.chdir('app')
+    os.system('pytest --cov=. ')
 
 function_dict ={
-    'dev': dev_no_services,
+    'dev': dev_postgres,
     'dev_on_docker': dev_on_docker,
-    'dev_redis': dev_redis,
     'prod_demo': prod_demo,
-    'prod': prod,
+    'deploy_test': deploy_test,
 }
 
 try:
@@ -58,5 +85,5 @@ try:
 except:
     print([key for key in function_dict.keys()])
 finally:
-    kill_services()
+    # kill_services()
     print('Execute cleanup code here')

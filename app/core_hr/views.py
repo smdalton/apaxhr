@@ -9,15 +9,17 @@ from users.models import Employee
 from django.contrib import messages
 
 
-class EmployeePortal(TemplateView):
-    template_name = 'core-hr/employee_self_service.html'
+
+
+class CoreHrEmployeeHomepage(TemplateView):
+    template_name = 'core-hr/core_hr_home.html'
     try:
         dummy_user = Employee.objects.get(id=4)
     except:
         dummy_user = ""
 
     def get_context_data(self, **kwargs):
-        context = super(EmployeePortal, self).get_context_data()
+        context = super(CoreHrEmployeeHomepage, self).get_context_data()
 
         # TODO: Stub that needs replacement when user system is in place
 

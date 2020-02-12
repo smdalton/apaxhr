@@ -3,7 +3,8 @@ from django.conf import settings
 from . import views
 
 
+app_name='lifecycle'
 
 urlpatterns=[
-path('',views.ManagementHomePage.as_view(), name='landing'),
+path('',views.LifeCycleHome.as_view(), name='landing'),
 ]
