@@ -4,6 +4,8 @@ from django.contrib.auth.views import LoginView
 from django.shortcuts import render, redirect, get_object_or_404
 from django.views.generic import CreateView, UpdateView, ListView, TemplateView
 from django.urls import reverse
+
+from core_hr.extras.dummy import get_dummy_user
 from users.forms import EmployeeCreationForm
 
 # Create your views here.
@@ -36,8 +38,6 @@ class UserUpdateView(UpdateView):
     model = Employee
     template_name = 'users/user_creation.html'
 
-    #
-    # def get_object(self, queryset=None):
     fields = [
         'id',
         'last_login',
@@ -54,9 +54,8 @@ class UserUpdateView(UpdateView):
 
     def get_object(self, *args, **kwargs):
         #TODO: replace this stub with the request.user
-        self.request.user.pk = 5
-        user = get_object_or_404(Employee, pk=self.request.user.pk)
-        return user
+        self.request.user = get_dummy_user()
+        return self.request.user
 
 
     def get_context_data(self, **kwargs):

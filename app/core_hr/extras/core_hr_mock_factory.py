@@ -4,7 +4,7 @@ from django.db.models import ImageField
 from django.test import TestCase
 import faker
 from core_hr.models import Passport, RegistryOfStay, WorkPermit
-from users.models import Employee, EmployeePermissions
+from users.models import Employee
 from django_countries.fields import CountryField
 from django.contrib.auth import get_user_model
 import random
@@ -20,8 +20,10 @@ small_gif = (
     b'\x02\x4c\x01\x00\x3b'
 )
 
+
 def get_mock_photo():
     return SimpleUploadedFile('small.gif', small_gif, 'content_type=image/gif')
+
 
 def create_mock_user():
     User = Employee
@@ -43,7 +45,7 @@ def create_mock_user():
         gender=gender,
         employee_id_number=employee_id_number,
         employment_status=employment_status,
-        employment_status_note= employment_status_note,
+        employment_status_note=employment_status_note,
         phone_number=phone_number,
         personal_email=personal_email,
         date_joined=date_joined,
@@ -51,56 +53,46 @@ def create_mock_user():
         password='foo'
     )
 
-    list = [False,False,False]
-    list[random.choice([0,0,0,1,1,1,1,1,1,1,1,1,1,2])] = True
-
-
-    permissions = EmployeePermissions.objects.create(
-        owner=user,
-        is_applicant=list[0],
-        is_teacher=list[1],
-        is_head_teacher=list[2],
-    )
-
     return user
 
 
 def create_mock_passport(employee, expired=False, has_image=False):
-
-    dob=fake.date_between(start_date="-49y", end_date="-21y")
+    dob = fake.date_between(start_date="-49y", end_date="-21y")
     date_of_expiration = fake.date_between(start_date="-6m", end_date="+9y")
     place_of_issue = fake.country_code()
     date_of_issue = fake.date_between(start_date="-9y", end_date="-1m")
     owner = Employee.objects.get(pk=employee.pk)
+    passport_number = fake.numerify('#########')
     passport = ''
     if expired:
         date_of_expiration = fake.date_between(start_date="-1y", end_date='-1d')
     if has_image:
         photo = get_mock_photo()
-        owner = Employee.objects.get(pk=employee.pk)
         passport = Passport.objects.create(
             owner=owner,
             place_of_issue=place_of_issue,
             issue_date=date_of_issue,
             expiration_date=date_of_expiration,
             dob=dob,
-            image=photo
+            image=photo,
+            passport_number=passport_number,
+
         )
 
     else:
         passport = Passport.objects.create(
-        owner=owner,
-        place_of_issue=place_of_issue,
-        issue_date=date_of_issue,
-        expiration_date=date_of_expiration,
-        dob=dob,
-    )
+            owner=owner,
+            place_of_issue=place_of_issue,
+            issue_date=date_of_issue,
+            expiration_date=date_of_expiration,
+            passport_number=passport_number,
+            dob=dob,
+        )
 
     return passport
 
 
 def create_mock_ros_form(employee, expired=False, has_image=False):
-
     employee_address = fake.address()
     landlords_name = fake.name()
     landlords_cell_phone = fake.phone_number()
@@ -139,7 +131,6 @@ def create_mock_ros_form(employee, expired=False, has_image=False):
 
 
 def create_mock_work_permit(employee, type='visa', expired=False, has_image=False):
-
     date_of_expiration = ''
     if expired == False:
         date_of_expiration = fake.date_between(start_date="+6m", end_date="+2y")
@@ -165,6 +156,7 @@ def create_mock_work_permit(employee, type='visa', expired=False, has_image=Fals
         )
     return work_permit
 
+
 def get_mock_resume(employee):
     pass
 
@@ -175,6 +167,7 @@ def get_mock_achievement_certificate(employee):
 
 def get_mock_tefl_form(employee):
     pass
+
 
 def get_mock_degree(employee):
     pass

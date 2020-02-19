@@ -15,7 +15,7 @@ def start_dev_server():
     os.environ['SQL_ENGINE'] = 'django.db.backends.postgresql_psycopg2'
     os.environ['SQL_NAME'] = 'postgres-dev'
     os.environ['DEV_POSTGRES']='TRUE'
-    os.environ['USE_S3'] = 'TRUE'
+    # os.environ['USE_S3'] = 'TRUE'
     os.environ['AWS_ACCESS_KEY_ID'] = 'AKIATWWKT35LU5ED5FDY'
     os.environ['AWS_SECRET_ACCESS_KEY'] = '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'
     os.environ['AWS_STORAGE_BUCKET_NAME'] = 'apaxhr-test'

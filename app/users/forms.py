@@ -32,6 +32,7 @@ class EmployeeCreationForm(UserCreationForm):
             self.helper.form_method = 'post'
             self.helper.add_input((Submit('submit', 'Save person')))
 
+
 class EmployeeChangeForm(UserChangeForm):
     class Meta:
         model = Employee

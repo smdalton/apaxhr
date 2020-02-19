@@ -28,11 +28,17 @@ admin.site.index_title = "APAX HR administrator Portal"
 app_name='apaxhr'
 # path('employee_management/', include('employee_management.urls')),
 urlpatterns = [
-    path('', views.HomePage.as_view()),
+    path('', views.HomePage.as_view(),name='home_simple'),
+    path('home/', views.HomePage.as_view(), name='home'),
+    path('home/<access_tier>', views.HomePage.as_view(), name='home'),
+
+
     path('core_hr/', include('core_hr.urls')),
     path('users/', include('users.urls')),
     path('employee_mgmt/', include('employee_mgmt.urls')),
     path('lifecycle/', include('lifecycle.urls')),
+    path('schedules/', include('schedules.urls')),
+
     # auth routes
     path('login/', auth_views.auth_login),
     path('logout/', auth_views.auth_logout),
@@ -44,10 +50,10 @@ urlpatterns = [
 
 if settings.DEBUG:
     import debug_toolbar
-    urlpatterns += [
-        path('__debug__/', include(debug_toolbar.urls)),
-    ]
+    urlpatterns += path('__debug__/', include(debug_toolbar.urls)),
+
+
+if not settings.USE_S3:
+    urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 #
-# if os.environ.get('SERVE_STATIC'):
-#     urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
-#     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

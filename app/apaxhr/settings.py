@@ -9,7 +9,7 @@ https://docs.djangoproject.com/en/3.0/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.0/ref/settings/
 """
-#!/usr/bin/env python
+# !/usr/bin/env python
 
 import os
 
@@ -31,22 +31,21 @@ EMAIL_PORT = 587
 EMAIL_HOST_USER = 'apaxhremails@gmail.com'
 EMAIL_HOST_PASSWORD = 'trashcanflight'
 
-
 # static files settings
 
 
 STATIC_URL = '/staticfiles/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
-STATICFILES_DIRS = (os.path.join(BASE_DIR,'static'),)
+STATICFILES_DIRS = (os.path.join(BASE_DIR, 'static'),)
 
 STATICFILES_FINDERS = (
     'django.contrib.staticfiles.finders.FileSystemFinder',
     'django.contrib.staticfiles.finders.AppDirectoriesFinder',
 )
 AWS_DEFAULT_ACL = 'public-read'
-USE_S3 = os.getenv('USE_S3') == 'TRUE'
 
-
+USE_S3 = os.getenv('USE_S3')
+print("OS ENV FOR S3:--->", os.getenv('USE_S3'))
 
 if USE_S3:
     AWS_ACCESS_KEY_ID = os.getenv('AWS_ACCESS_KEY_ID')
@@ -69,18 +68,20 @@ if USE_S3:
     PRIVATE_FILE_STORAGE = 'apaxhr.storage_backends.PrivateMediaStorage'
 
 else:
+    print('skipping S3')
     DEFAULT_FILESYSTEM_STORAGE = 'django.core.files.storage.FileSystemStorage'
+    PRIVATE_FILE_STORAGE = 'django.core.files.storage.FileSystemStorage'
+    STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.StaticFilesStorage'
+    STATIC_URL = '/static/'
     MEDIA_URL = '/media/'
     MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
-
-
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.environ.get('SECRET_KEY','change me to a real key')
+SECRET_KEY = os.environ.get('SECRET_KEY', 'change me to a real key')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 
-DEBUG=True
+DEBUG = True
 if os.environ.get('DEV'):
     DEBUG = True
     ALLOWED_HOSTS = ['*']
@@ -89,18 +90,16 @@ if os.environ.get('DEV'):
         '127.0.0.1',
     ]
 else:
-    ALLOWED_HOSTS=['*']
+    ALLOWED_HOSTS = ['*']
 
 # Application definition
-
-
 
 
 INSTALLED_APPS = [
 
     # packages
     # 'whitenoise.runserver_nostatic',
-    # 'livereload',
+    'livereload',
     'django.contrib.staticfiles',
     'admin_interface',
     'colorfield',
@@ -109,14 +108,13 @@ INSTALLED_APPS = [
     'django.contrib.auth',
     'django.contrib.sessions',
     'django.contrib.messages',
-
-
+    'bootstrap_datepicker_plus',
     # Applications
     'users',
     'apaxhr',
     'core_hr',
     'employee_mgmt',
-
+    'schedules',
 
     # extensions
     'crispy_forms',
@@ -130,8 +128,6 @@ INSTALLED_APPS = [
 
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
 
-
-
 TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
 NOSE_ARGS = [
     '--with-cover',
@@ -141,8 +137,8 @@ NOSE_ARGS = [
 ]
 
 MIDDLEWARE = [
-    #'livereload.middleware.LiveReloadScript',
-    #'whitenoise.middleware.WhiteNoiseMiddleware',
+    # 'livereload.middleware.LiveReloadScript',
+    # 'whitenoise.middleware.WhiteNoiseMiddleware',
 
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -160,7 +156,7 @@ ROOT_URLCONF = 'apaxhr.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [os.path.join(BASE_DIR, 'templates'),],
+        'DIRS': [os.path.join(BASE_DIR, 'templates'), ],
         # 'DIRS':[],
         'APP_DIRS': True,
         'OPTIONS': {
@@ -176,7 +172,6 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'apaxhr.wsgi.application'
 
-
 # Database
 # https://docs.djangoproject.com/en/3.0/ref/settings/#databases
 if os.environ.get('PROD'):
@@ -190,7 +185,7 @@ if os.environ.get('PROD'):
             "PORT": os.environ.get("SQL_PORT", "5432"),
         }
     }
-else :
+else:
     DATABASES = {
         "default": {
             "ENGINE": 'django.db.backends.postgresql_psycopg2',
@@ -202,13 +197,18 @@ else :
         }
     }
 
+# CACHES = {
+#     'default': {
+#         'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+#         'LOCATION': 'unique-snowflake',
+#     }
+# }
+
 # CUSTOM USER MODEL
 AUTH_USER_MODEL = 'users.Employee'
 
-
 # Password validation
 # https://docs.djangoproject.com/en/3.0/ref/settings/#auth-password-validators
-
 
 
 AUTH_PASSWORD_VALIDATORS = [
@@ -226,7 +226,6 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
 # Internationalization
 # https://docs.djangoproject.com/en/3.0/topics/i18n/
 
@@ -238,12 +237,24 @@ USE_I18N = True
 
 USE_L10N = False
 DATE_FORMAT = 'd/m/Y'
-DATE_INPUT_FORMATS = ( '%d/%m/%Y', '%d/%m/%y', '%d %b %Y',)
+DATE_INPUT_FORMATS = ['%d/%m/%Y', '%d/%m/%y', '%d %b %Y', ]
+
+DATETIME_INPUT_FORMATS = [
+    '%d/%m/%y',
+    '%Y-%m-%d %H:%M:%S',
+    '%Y-%m-%d %H:%M:%S.%f',
+    '%Y-%m-%d %H:%M',
+    '%Y-%m-%d',
+    '%m/%d/%Y %H:%M:%S',
+    '%m/%d/%Y %H:%M:%S.%f',
+    '%m/%d/%Y %H:%M',
+    '%m/%d/%Y',
+    '%m/%d/%y %H:%M:%S',
+    '%m/%d/%y %H:%M:%S.%f',
+    '%m/%d/%y %H:%M',
+    '%m/%d/%y']
 
 USE_TZ = True
 
-
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.0/howto/static-files/
-
-

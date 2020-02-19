@@ -1,0 +1,99 @@
+{% extends "apaxhr/base.html" %}
+
+{% block content %}
+    <div class="row">
+    <div class="my-5 mx-auto">
+    <h1 class="my-2 display-4 ">Legal Document Management </h1>
+
+        <div class="col-lg-12 text-center">Welcome {{ request.user.first_name }} {{ request.user.last_name }} </div>
+    </div>
+
+    </div>
+
+    <div class="container rounded bg-transparent"
+         style=" background-size: cover; height:100%; width: 100%; background-position: center;  background-repeat: no-repeat; background-image: url('https://images.unsplash.com/photo-1521087926340-f428c113026c?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=964&q=80')">
+
+
+        <div class="row">
+            {% for document_name, document in legal_documents.items %}
+                {{ document_name.expired }}
+                <div class="col-md-4 my-5">
+                    <div class="card rounded">
+                        <div class="card-body">
+                            <h4 class="card-title">{{ document_name }}</h4>
+
+
+                            {% if document.data_complete %}
+                                <p class="card-text text outline">
+                                    Data Input Complete
+                                </p>
+                            {% else %}
+                                <p>
+                                    <b class="blinking">Data Input NOT Complete!</b>
+                                </p>
+                            {% endif %}
+                            {% if document.expired %}
+                                <p class="card-text text btn-outline-danger outline">
+                                    {{ document_name }} Expired!
+                                </p>
+                            {% else %}
+                                <p>
+                                    Document valid.
+                                </p>
+                            {% endif %}
+
+
+
+                            <a href="{{ document.get_view_url }}"
+                               class="btn my-1 {% if document.expired %}btn-danger{% else %} btn-success{% endif %}">
+                                <span class="text-">View {{ document_name }}</span>
+                            </a>
+
+                            <a href="{{ document.get_update_url }}"
+                               class="btn
+                            {% if document.expired %}
+                            btn-warning
+                            {% endif %}
+                            {% if not document.expired %}
+                                btn-success
+                            {% else %}
+                                btn-info
+                            {% endif %}">
+                                <span class="text-">Edit {{ document_name }}</span>
+                            </a>
+
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+
+        <div class="row">
+            {% for document_name, document in other_documents.items %}
+                <div class="col-md-4 my-5">
+                    <div class="card rounded">
+                        <div class="card-body">
+                            <h4 class="card-title">{{ document_name }}</h4>
+                            <p class="card-text text outline">Manage your {{ document_name }} here</p>
+                            <a href="{{ document.get_update_url }}" class="btn my-1 btn-success">
+                                <span class="text-">View {{ document_name }}</span>
+                            </a>
+                            <a href="{{ document.get_update_url }}" class="btn btn-success">
+                                <span class="text-">Edit {{ document_name }}</span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+
+
+        <div class="hero-unit">
+            Critical Documents
+        </div>
+        <div class="container">
+
+        </div>
+    </div>
+
+{% endblock %}

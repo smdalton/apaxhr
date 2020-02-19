@@ -63,7 +63,6 @@ class DocumentExpirationStatusFilter(SimpleListFilter):
         if self.value() == 'expired':
             return Employee.objects.has_expired_documents()
         elif self.value() == 'expiring_very_soon':
-
             return Employee.objects.has_documents_expiring_very_soon()
         elif self.value() == 'expiring_soon':
             return Employee.objects.has_documents_expiring_soon()
@@ -77,10 +76,12 @@ class CustomUserAdmin(UserAdmin):
     class Meta:
         verbose_name= 'Employees'
 
+    def has_delete_permission(self, request, obj=None):
+        return False
+
     add_form = CustomUserCreationForm
     form = CustomUserChangeForm
     model = Employee
-
     search_fields = ('email','full_name','employee_id_number')
     list_display = ('full_name', 'registryofstay', 'workpermit', 'passport',)
 

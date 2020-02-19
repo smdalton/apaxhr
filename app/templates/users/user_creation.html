@@ -11,19 +11,16 @@
             </div>
         </div>
         <div class="row">
-
             <form method="post" class="col-lg-auto mx-auto ">
                 {% csrf_token %}
                 {{ form | crispy }}
-                <button type="submit" class="btn btn-primary">Sign in</button>
+                <button type="submit" class="btn btn-primary">Submit</button>
             </form>
-
         </div>
 
 
     </div>
 
-    </div>
 
 {% endblock %}
 

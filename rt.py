@@ -17,7 +17,7 @@ def clear_envs():
 
 def start_postgres():
     print('Starting Postgres')
-    for x in range(2):
+    for x in range(1):
         time.sleep(1)
         print(str(x) + "...")
     postgres_start = 'docker run -d -p 5432:5432 --name postgres-dev' \
@@ -51,6 +51,7 @@ def dev_postgres():
     clear_envs()
     start_postgres()
     os.chdir('app')
+
     os.system('python3 start_server.py dev')
 
 
@@ -72,7 +73,7 @@ def deploy_test():
     os.system('pytest --cov=. ')
 
 function_dict ={
-    'dev': dev_postgres,
+    'dev_postgres': dev_postgres,
     'dev_on_docker': dev_on_docker,
     'prod_demo': prod_demo,
     'deploy_test': deploy_test,
@@ -85,5 +86,5 @@ try:
 except:
     print([key for key in function_dict.keys()])
 finally:
-    # kill_services()
+    kill_services()
     print('Execute cleanup code here')

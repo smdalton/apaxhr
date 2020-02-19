@@ -156,7 +156,4 @@ class CustomUserManager(BaseUserManager):
         return self.all()
 
 
-    # from core-hr.models import Passport, RegistryOfStay, WorkPermit
-    # ros_forms = RegistryOfStay.objects.all()
-    # work_permit = WorkPermit.objects.all()
-    # passport_id_set = passports.distinct()
+

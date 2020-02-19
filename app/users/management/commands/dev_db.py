@@ -52,7 +52,7 @@ class Command(BaseCommand):
             os.system('find . -path "*/migrations/*.py" -not -name "__init__.py" -delete')
             os.system('find . -path "*/migrations/*.pyc"  -delete')
             print("Waiting for db")
-            for x in range(5):
+            for x in range(2):
                 time.sleep(1)
                 print(str(x) + "...")
             os.system('python3 manage.py makemigrations --no-input')
