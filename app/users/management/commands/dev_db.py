@@ -6,8 +6,12 @@ from django.core.management import call_command
 from django.core.management.base import BaseCommand, CommandError
 
 from users.models import Employee
-from core_hr.extras.core_hr_mock_factory import  \
-    create_mock_user, create_mock_work_permit, create_mock_passport, create_mock_ros_form
+
+from core_hr.extras.core_hr_mock_factory import \
+    create_mock_user, create_mock_work_permit, create_mock_passport,\
+    create_mock_ros_form, create_mock_teaching_certificate,\
+    create_mock_achievement_certificate, \
+    create_mock_degree, create_mock_resume
 
 #
 # fake=Faker()
@@ -42,21 +46,12 @@ class Command(BaseCommand):
         if os.environ.get("DEV_POSTGRES")=='TRUE':
 
             self.stdout.write('Running dev postgres')
-            # print('Wiping Database')
-            # dbinfo = settings.DATABASES['default']
-            # print('Dropping DB: ',dbinfo)
-            # cursor = connection.cursor()
-            # cursor.execute("DROP DATABASE " + dbinfo["NAME"])
-            # cursor.execute("CREATE DATABASE " + dbinfo["NAME"])
-            # cursor.execute("USE " + dbinfo["NAME"])
+            print('deleting migrations')
             os.system('find . -path "*/migrations/*.py" -not -name "__init__.py" -delete')
             os.system('find . -path "*/migrations/*.pyc"  -delete')
+            print('done')
             print("Waiting for db")
-            for x in range(2):
-                time.sleep(1)
-                print(str(x) + "...")
             os.system('python3 manage.py makemigrations --no-input')
-
             os.system('python3 manage.py migrate')
 
         else:
@@ -82,9 +77,12 @@ class Command(BaseCommand):
                 has_image=random.choice([True, True, False]),
                 expired=random.choice([True, False, False, False])
             )
+            create_mock_achievement_certificate(user)
+            create_mock_degree(user)
+            create_mock_teaching_certificate(user)
+            create_mock_resume(user)
 
     def create_super_user(self):
-        # print(os.getcwd())
         user = Employee.objects.create_superuser(email='smd@gmail.com',password='pass1234')
         #user.save()
 
@@ -113,9 +111,5 @@ class Command(BaseCommand):
         import time
         self.reset_db_and_migrations()
         self.create_super_user()
-        self.create_many_users_and_documents()
+        self.create_many_users_and_documents(num_users=5)
         self.load_admin_themes()
-        #self.run_server()
-
-
-

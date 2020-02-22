@@ -3,7 +3,8 @@ from datetime import datetime, timedelta
 from django.db.models import ImageField
 from django.test import TestCase
 import faker
-from core_hr.models import Passport, RegistryOfStay, WorkPermit
+from core_hr.models import Passport, RegistryOfStay, WorkPermit, Resume, AchievementCertificate, TeachingCertificate, \
+    DegreeDocument
 from users.models import Employee
 from django_countries.fields import CountryField
 from django.contrib.auth import get_user_model
@@ -157,17 +158,49 @@ def create_mock_work_permit(employee, type='visa', expired=False, has_image=Fals
     return work_permit
 
 
-def get_mock_resume(employee):
-    pass
+def create_mock_resume(employee):
+    try:
+        resume = Resume.objects.get(owner=employee)
+    except Resume.DoesNotExist:
+        resume = Resume.objects.create(
+        owner=employee,
+        type = random.choice(['rs','cv']),
+        image = get_mock_photo(),
+    )
+    return resume
 
 
-def get_mock_achievement_certificate(employee):
-    pass
+def create_mock_achievement_certificate(employee):
+    try:
+        cert = AchievementCertificate.objects.get(owner=employee)
+    except AchievementCertificate.DoesNotExist:
+        cert = AchievementCertificate.objects.create(
+            owner=employee,
+            image=get_mock_photo(),
+            message_text=fake.paragraphs(nb=4)
+        )
+    return cert
 
 
-def get_mock_tefl_form(employee):
-    pass
+def create_mock_teaching_certificate(employee):
+    try:
+        cert = TeachingCertificate.objects.get(owner=employee)
+    except TeachingCertificate.DoesNotExist:
+        cert=TeachingCertificate.objects.create(
+            owner=employee,
+            id_number=fake.numerify('###-###-####'),
+            type = random.choice(['c','ts','tf','ot']),
+            image=get_mock_photo(),
+        )
+    return cert
 
 
-def get_mock_degree(employee):
-    pass
+def create_mock_degree(employee):
+    try:
+        degree = DegreeDocument.objects.get(owner=employee)
+    except DegreeDocument.DoesNotExist:
+        degree =DegreeDocument.objects.create(
+            owner=employee,
+            image=get_mock_photo(),
+        )
+    return degree

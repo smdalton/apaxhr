@@ -1,6 +1,6 @@
 {% extends "core_hr/document_templates/view_document.html" %}
 {% block document_detail_view %}
-
+{% load countries %}
     <div class="row">
         <div class="col-md-4 mx-auto">
             {% if passport.expired %}
@@ -16,7 +16,6 @@
     </div>
 
     <div class="row">
-
         <div class="card rounded col-md-6 mx-auto">
             <a href="{{ passport.get_photo_url }}" class="img-card-top my-1">
                 <img src="{{ passport.get_photo_url }}" class="img-thumbnail img-card-top" alt="">
@@ -30,7 +29,8 @@
                     </tr>
                     <tr>
                         <td>Country of Issue</td>
-                        <td>{{ passport.place_of_issue }}</td>
+                        </td>
+                        <td><img src="{{ passport.place_of_issue.flag }}"> {{ passport.place_of_issue.name }}</td>
                     </tr>
                     <tr>
                         <td>Passport Number</td>

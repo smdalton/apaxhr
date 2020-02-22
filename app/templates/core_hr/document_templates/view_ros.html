@@ -1,14 +1,13 @@
 {% extends "core_hr/document_templates/view_document.html" %}
 {% block document_detail_view %}
-
-    <div class="row">
+<div class="row">
         <div class="col-md-4 mx-auto">
-        {{ ros.expired }}
-            {% if ros.expired %}
-                <h2 class="bg-danger my-5 py-4 rounded text-center text-white text-capitalize">Registry Of Stay Status:
+            {% if passport.expired %}
+                <h2 class="bg-danger my-5 py-4 rounded text-center text-white text-capitalize">ROS Status:
                     Expired</h2>
-            {% elif not ros.expired %}
-                <h2 class="bg-success rounded text-center">Registry Of Stay Status: Valid</h2>
+            {% elif not passport.expired %}
+                <h2 class="bg-success my-5 py-4 rounded text-white text-capitalize text-center">ROS Status:
+                    Valid</h2>
             {% else %}
                 <h4>Document Error</h4>
             {% endif %}
@@ -16,7 +15,6 @@
     </div>
 
     <div class="row">
-
         <div class="card rounded col-md-6 mx-auto">
             <a href="{{ ros.get_photo_url }}" class="img-card-top my-1">
                 <img src="{{ ros.get_photo_url}}" class="img-thumbnail img-card-top" alt="">

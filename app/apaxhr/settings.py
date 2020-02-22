@@ -93,40 +93,45 @@ else:
     ALLOWED_HOSTS = ['*']
 
 # Application definition
-
-
-INSTALLED_APPS = [
-
-    # packages
-    # 'whitenoise.runserver_nostatic',
-    'livereload',
-    'django.contrib.staticfiles',
-    'admin_interface',
-    'colorfield',
-    'django.contrib.contenttypes',
-    'django.contrib.admin',
-    'django.contrib.auth',
-    'django.contrib.sessions',
-    'django.contrib.messages',
-    'bootstrap_datepicker_plus',
+CREATED_APPS = [
     # Applications
     'users',
     'apaxhr',
     'core_hr',
     'employee_mgmt',
     'schedules',
+]
 
+BASE_APPS = [
+    # packages
+    'livereload',
+    'django.contrib.staticfiles',
+    'admin_interface',
+    'django.contrib.contenttypes',
+    'django.contrib.admin',
+    'django.contrib.auth',
+    'django.contrib.sessions',
+    'django.contrib.messages',
+]
+
+EXTENSION_APPS = [
     # extensions
+    'colorfield',
     'crispy_forms',
     'debug_toolbar',
     'django_countries',
     'django_nose',
     'storages',
     'django_extensions'
-
 ]
 
+INSTALLED_APPS = CREATED_APPS + BASE_APPS + EXTENSION_APPS
+# TODO: LOGGING
+#  https://stackoverflow.com/questions/16876045/django-logging-only-for-my-apps
+
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
+
+
 
 TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
 NOSE_ARGS = [
@@ -137,9 +142,6 @@ NOSE_ARGS = [
 ]
 
 MIDDLEWARE = [
-    # 'livereload.middleware.LiveReloadScript',
-    # 'whitenoise.middleware.WhiteNoiseMiddleware',
-
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -148,7 +150,6 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'debug_toolbar.middleware.DebugToolbarMiddleware',
-
 ]
 
 ROOT_URLCONF = 'apaxhr.urls'
@@ -157,7 +158,6 @@ TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
         'DIRS': [os.path.join(BASE_DIR, 'templates'), ],
-        # 'DIRS':[],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -186,6 +186,7 @@ if os.environ.get('PROD'):
         }
     }
 else:
+    # Disposable database made from a docker container
     DATABASES = {
         "default": {
             "ENGINE": 'django.db.backends.postgresql_psycopg2',
@@ -231,8 +232,8 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
-
+USE_TZ = True
+TIME_ZONE = 'Asia/Ho_Chi_Minh'
 USE_I18N = True
 
 USE_L10N = False
@@ -254,7 +255,7 @@ DATETIME_INPUT_FORMATS = [
     '%m/%d/%y %H:%M',
     '%m/%d/%y']
 
-USE_TZ = True
+
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.0/howto/static-files/

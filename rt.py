@@ -15,11 +15,17 @@ def clear_envs():
      except:
          print(env, "Not set")
 
+def start_rabbit():
+    rabbit_start = 'docker run -d --hostname my-rabbit' \
+                   ' --name anony-rabbit' \
+                   ' -p 15672:15672 -p 5672:5672' \
+                   ' rabbitmq:3-management'
+    os.system(rabbit_start)
+
+
 def start_postgres():
     print('Starting Postgres')
-    for x in range(1):
-        time.sleep(1)
-        print(str(x) + "...")
+    time.sleep(.5)
     postgres_start = 'docker run -d -p 5432:5432 --name postgres-dev' \
                      ' -e POSTGRES_PASSWORD=pass1234' \
                      ' -e POSTGRES_USER=postgres-dev ' \

@@ -1,9 +1,10 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Submit
 from django import forms
 from django.contrib.admindocs.views import ModelDetailView
+from django.http import Http404
 from django.shortcuts import render, redirect, HttpResponse, get_object_or_404
 from django.urls import reverse_lazy
 from django.views.generic import UpdateView, DetailView
@@ -13,20 +14,16 @@ from django.shortcuts import render
 from django.conf import settings
 
 from core_hr.extras.core_hr_mock_factory import get_mock_photo
-from core_hr.models import Passport, WorkPermit, RegistryOfStay, Resume, TeachingCertificate, DegreeDocument
+from core_hr.models import Passport, WorkPermit, RegistryOfStay, Resume, TeachingCertificate, DegreeDocument, \
+    AchievementCertificate
 from core_hr.tests.test_resumes import ResumeFormTestCase
 from users.models import Employee
 from django.contrib import messages
 
 from core_hr.extras.dummy import get_dummy_user
 
-years = [x for x in range(1950, 2040)]
-years.reverse()
 
-dob_years = [x for x in range(1950, 2005)]
-dob_years.reverse()
-wp_years = [x for x in range(2017,2025)]
-wp_years.reverse()
+
 
 
 
@@ -71,13 +68,19 @@ class PassportForm(forms.ModelForm):
             'expiration_date',
             'dob',
             'place_of_issue',
-            'image'
+            'image',
+            'passport_number'
         ]
-
+        issue_years = [x for x in range(datetime.now().year - 15, datetime.now().year+1)]
+        issue_years.reverse()
+        dob_years = [x for x in range (datetime.now().year-70, (datetime.now().year - 14))]
+        dob_years.reverse()
+        expiration_years = [x for x in range(datetime.now().year, datetime.now().year+15)]
+        expiration_years.reverse()
         widgets = {
-            'issue_date': forms.SelectDateWidget(years=years),
-            'expiration_date': forms.SelectDateWidget(years=years),
-            'dob': forms.SelectDateWidget(years=years),
+            'issue_date': forms.SelectDateWidget(years=issue_years),
+            'expiration_date': forms.SelectDateWidget(years=expiration_years),
+            'dob': forms.SelectDateWidget(years=dob_years),
         }
 
     def __init__(self, *args, **kwargs):
@@ -98,9 +101,11 @@ class PassportUpdateCreate(UpdateView):
         self.request.user = get_dummy_user()
         try:
             obj = Passport.objects.get(owner__id=self.request.user.pk)
-        except :
-            return Exception('Passport does not exist')
-
+        except Passport.DoesNotExist:
+            obj = Passport(
+                owner=self.request.user,
+                expiration_date=(datetime.now().date()+timedelta(days=800))
+                           )
         return obj
 
 
@@ -114,11 +119,13 @@ class WorkPermitForm(forms.ModelForm):
             'image'
         ]
 
+        wp_years = [x for x in range(2017, 2025)]
+        wp_years.reverse()
+        work_permit_issue_years = reversed([x for x in range(datetime.now().year-1, datetime.now().year+2)])
         widgets = {
-            'issue_date': forms.SelectDateWidget(years=years),
-            'expiration_date': forms.SelectDateWidget(years=years)
+            'issue_date': forms.SelectDateWidget(years=work_permit_issue_years),
+            'expiration_date': forms.SelectDateWidget(years=work_permit_issue_years)
         }
-        print('test')
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.helper = FormHelper()
@@ -128,7 +135,7 @@ class WorkPermitForm(forms.ModelForm):
 
 
 class WorkPermitUpdateCreate(UpdateView):
-    form_class = PassportForm
+    form_class = WorkPermitForm
     template_name = 'core_hr/document_templates/update_document.html'
     success_url = reverse_lazy('core_hr:document_center')
 
@@ -137,9 +144,12 @@ class WorkPermitUpdateCreate(UpdateView):
         self.access_tier = kwargs.get('access_tier', "access tier not present")
         self.request.user = get_dummy_user()
         try:
-            obj = Passport.objects.get(owner__id=self.request.user.id)
+            obj = WorkPermit.objects.get(owner__id=self.request.user.id)
         except :
-            return Exception('Passport does not exist')
+            obj = WorkPermit(
+                owner=self.request.user,
+                expiration_date=datetime.now().date() + timedelta(days=700)
+            )
 
         return obj
 
@@ -157,8 +167,8 @@ class ROSForm(forms.ModelForm):
             'image'
         ]
         # this year and next year only
-        ros_issue_years = [datetime.now().year-1, datetime.now().year]
-        ros_expiration_years = [datetime.now().year]
+        ros_issue_years = [datetime.now().year-1, datetime.now().year+1]
+        ros_expiration_years = [datetime.now().year+1]
         widgets = {
             'issue_date': forms.SelectDateWidget(years=ros_issue_years),
             'expiration_date': forms.SelectDateWidget(years=ros_expiration_years),
@@ -183,7 +193,9 @@ class ROSUpdateCreate(UpdateView):
         try:
             obj = RegistryOfStay.objects.get(owner=self.request.user)
         except :
-            return Exception('Work Permit does not exist')
+            obj = RegistryOfStay(
+                owner=self.request.user
+            )
 
         return obj
 
@@ -195,8 +207,10 @@ class RosView(DetailView):
 
     def get_object(self, *args, **kwargs):
         self.request.user = get_dummy_user()
-        print(self.request.user.pk)
-        obj = RegistryOfStay.objects.get(owner=self.request.user)
+        try:
+            obj = self.request.user.registryofstay
+        except:
+            raise Http404('No registry of stay document found')
         if obj.image is None:
             obj.image=get_mock_photo()
         print(obj)
@@ -210,9 +224,11 @@ class PassportView(DetailView):
 
     def get_object(self, *args, **kwargs):
         self.request.user = get_dummy_user()
-        print(self.request.user.pk)
-        obj = Passport.objects.get(owner=self.request.user)
-        print(obj)
+        try:
+            obj = self.request.user.passport
+        except:
+            raise Http404('No document created')
+
         return obj
 
 class WorkPermitView(DetailView):
@@ -223,7 +239,10 @@ class WorkPermitView(DetailView):
     def get_object(self, *args, **kwargs):
         self.request.user = get_dummy_user()
         print(self.request.user.pk)
-        obj = Passport.objects.get(owner=self.request.user)
+        try:
+            obj = self.request.user.workpermit
+        except:
+            return redirect('core_hr:work_permit_update')
         print(obj)
         return obj
 
@@ -231,71 +250,100 @@ class WorkPermitView(DetailView):
 class ResumeForm(forms.ModelForm):
     class Meta:
         model = Resume
-        fields = '__all__'
-
+        fields = ['image', 'type']
+        labels = {
+            'image':'Document File'
+        }
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.helper = FormHelper()
         self.helper.form_method = 'post'
-        self.helper.add_input((Submit('submit', 'Save ROS')))
+        self.helper.add_input((Submit('submit', 'Save Resume')))
 
 
 class ResumeUpdateCreate(UpdateView):
     form_class = ResumeForm
-    template_name = 'core_hr/document_templates/..'
-    success_url = reverse_lazy('core_hr:resume_update')
+    template_name = 'core_hr/document_templates/update_document.html'
+    success_url = reverse_lazy('core_hr:document_center')
 
     def get_object(self, * args, **kwargs):
         self.access_tier = kwargs.get('access_tier', "Access tier not present")
         #Todo: remove for real auth situations
         self.request.user = get_dummy_user()
+        try:
+            resume = self.request.user.resume
+        except Resume.DoesNotExist:
+            resume = Resume(
+                owner=self.request.user,
+            )
+        return resume
 
 ### FORM ##
-class CertificateForm(forms.ModelForm):
+class TeachingCertificateForm(forms.ModelForm):
     class Meta:
         model = TeachingCertificate
-        fields = '__all__'
+        fields = ['image','type']
+        labels = {
+            'image': 'Document File'
+        }
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.helper = FormHelper()
         self.helper.form_method = 'post'
-        self.helper.add_input((Submit('submit', 'Save ROS')))
+        self.helper.add_input((Submit('submit', 'Save Teaching Certificate')))
 
 
-class CertificateUpdateCreate(UpdateView):
-    form_class = CertificateForm
-    template_name ='core_hr/document_templates/..'
-    success_url = reverse_lazy('core_hr:certificate_view')
+class TeachingCertificateUpdateCreate(UpdateView):
+    form_class = TeachingCertificateForm
+    template_name ='core_hr/document_templates/update_document.html'
+    success_url = reverse_lazy('core_hr:document_center')
 
     def get_object(self, * args, **kwargs):
         self.access_tier = kwargs.get('access_tier', "Access tier not present")
         #Todo: remove for real auth situations
         self.request.user = get_dummy_user()
+        try:
+            teaching_cert = self.request.user.teachingcertificate
+        except TeachingCertificate.DoesNotExist:
+            teaching_cert = TeachingCertificate(
+                owner=self.request.user,
+            )
+        return teaching_cert
 
 
 class DegreeForm(forms.ModelForm):
     class Meta:
-        model = Resume
-        fields = '__all__'
+        model = DegreeDocument
+        fields = ['image']
+        labels = {'image': 'Degree Document'}
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.helper = FormHelper()
         self.helper.form_method = 'post'
-        self.helper.add_input((Submit('submit', 'Save ROS')))
+        self.helper.add_input((Submit('submit', 'Save Degree')))
+
+
+
 
 
 class DegreeUpdateCreate(UpdateView):
     form_class = DegreeForm
-    template_name ='core_hr/document_templates/..'
-    success_url = reverse_lazy('core_hr:degree_view')
+    template_name ='core_hr/document_templates/update_document.html'
+    success_url = reverse_lazy('core_hr:document_center')
 
     def get_object(self, * args, **kwargs):
         self.access_tier = kwargs.get('access_tier', "Access tier not present")
         #Todo: remove for real auth situations
         self.request.user = get_dummy_user()
-
+        try:
+            degree = self.request.user.degreedocument
+        except:
+            degree = DegreeDocument(
+                owner=self.request.user,
+            )
+        return degree
 
 
 
@@ -309,14 +357,15 @@ class ResumeView(DetailView):
         try:
             obj = Resume.objects.get(owner=self.request.user)
         except:
-            return Exception('Document not found')
+            return redirect('core_hr:resume_update')
         return(obj)
 
 
-class CertificateView(DetailView):
+
+class TeachingCertificateView(DetailView):
     model = TeachingCertificate
-    context_object_name = 'certificate'
-    template_name= 'core_hr/document_templates/view_certificate.html'
+    context_object_name = 'teaching_certificate'
+    template_name= 'core_hr/document_templates/view_teaching_certificate.html'
     def get_object(self, *args, **kwargs):
         #TODO remove for real auth situations
         self.request.user= get_dummy_user()
@@ -325,6 +374,7 @@ class CertificateView(DetailView):
         except:
             return Exception('Document not found')
         return(obj)
+
 
 
 class DegreeView(DetailView):
@@ -341,3 +391,14 @@ class DegreeView(DetailView):
             return Exception('Document not found')
         return(obj)
 
+class AchievementCertificateView(DetailView):
+    model = AchievementCertificate
+    context_object_name = 'achivement_certificate'
+    template_name = 'core_hr/document_templates/view_achievement_certificate.html'
+
+    def get_object(self, *args, **kwargs):
+        self.request.user = get_dummy_user()
+        try:
+            obj = AchievementCertificate.objects.get(owner=self.request.user)
+        except AchievementCertificate.DoesNotExist:
+            return HttpResponse('<h2> It appears you don\'t have any achievement certificates</h3>')

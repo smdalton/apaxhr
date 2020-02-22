@@ -1,6 +1,7 @@
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
+from django.urls import reverse_lazy
 from django.utils.translation import gettext_lazy as _
 from django.utils import timezone
 
@@ -67,17 +68,18 @@ class Employee(AbstractBaseUser, PermissionsMixin):
         docs = {}
 
         try:
-            docs['Passport'] = (Passport.objects.get(owner__id=self.pk))
+            docs['Passport'] = Passport.objects.get(owner__id=self.pk)
         except:
-            docs['Passport'] = ('not found')
+            docs['Passport'] = 'not found'
+
         try:
-            docs['ROS'] = (RegistryOfStay.objects.get(owner__id=self.pk))
+            docs['ROS'] = RegistryOfStay.objects.get(owner__id=self.pk)
         except:
-            docs['ROS'] = ('not found')
+            docs['ROS'] = 'not found'
         try:
-            docs['Work Permit'] = (WorkPermit.objects.get(owner__id=self.pk))
+            docs['Work Permit'] = WorkPermit.objects.get(owner__id=self.pk)
         except:
-            docs['Work Permit'] = ('not found')
+            docs['Work Permit'] = 'not found'
 
         return docs
 
@@ -85,17 +87,18 @@ class Employee(AbstractBaseUser, PermissionsMixin):
         docs = {}
 
         try:
-            docs['Resume'] = (Resume.objects.get(owner__id=self.pk))
+            docs['Resume'] = Resume.objects.get(owner__id=self.pk)
         except:
-            docs['Resume'] = ('not found')
+            docs['Resume'] = 'not found'
+
         try:
-            docs['Certificate'] = (TeachingCertificate.objects.get(owner__id=self.pk))
+            docs['Certificate'] = TeachingCertificate.objects.get(owner__id=self.pk)
         except:
-            docs['Certificate'] = ('not found')
+            docs['Certificate'] = 'not found'
         try:
-            docs['Degree'] = (DegreeDocument.objects.get(owner__id=self.pk))
+            docs['Degree'] = DegreeDocument.objects.get(owner__id=self.pk)
         except:
-            docs['Degree'] = ('not found')
+            docs['Degree'] = 'not found'
 
 
         return docs
@@ -105,7 +108,7 @@ class Employee(AbstractBaseUser, PermissionsMixin):
         try:
             docs['Achievment Certificates'] = AchievementCertificate.objects.get(id=self.pk)
         except:
-            docs['Achievement Certificates'] = ('not found')
+            docs['Achievement Certificates'] = 'not found'
         return docs
 
     def test_passports(self):

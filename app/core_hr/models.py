@@ -68,6 +68,7 @@ class LegalDocument(models.Model):
 class Passport(TrackingUtilitiesMixin, LegalDocument):
     "https://pypi.org/project/django-countries/"
     #place_of_issue = CountryField(blank=False,null=True)
+
     class Meta:
         verbose_name = 'Passport'
     dob = models.DateField(blank=False, null=False)
@@ -156,10 +157,16 @@ class BaseDocument(TrackingUtilitiesMixin, models.Model):
     class Meta:
         abstract = True
     owner = models.OneToOneField(Employee, on_delete=models.CASCADE)
-    image = models.ImageField(
+    image = models.FileField(
         storage=PrivateMediaStorage(),
         upload_to='base_documents', blank=False, null=False)
 
+    @property
+    def get_file_url(self):
+        if self.image and hasattr(self.image, 'url'):
+            return self.image.url
+        else:
+            return "No image"
 
 
 class Resume(BaseDocument):
@@ -169,36 +176,15 @@ class Resume(BaseDocument):
     help = "Stores a resume or CV document"
     document_choices = (('rs','Resume'),('cv','Curriculum Vitae'))
     type =  models.CharField(max_length=20,choices=document_choices)
-    image = models.ImageField(
+    image = models.FileField(
         storage=PrivateMediaStorage(),
         upload_to='resumes_cvs', blank=False, null=False
     )
 
     def get_update_url(self):
-        return redirect('core_hr:ros_update')
+        return reverse('core_hr:resume_update')
     def get_view_url(self):
-        return redirect('core_hr:ros_view')
-
-
-
-
-class AchievementCertificate(BaseDocument):
-    class Meta:
-        verbose_name =u"\u200B" + 'FAS/KPI Certificate'
-    help = "Store information for KPI and FAS certificates of achievement"
-    owner = models.ForeignKey(Employee, on_delete=models.CASCADE)
-    image = models.ImageField(
-        storage=PrivateMediaStorage(),
-        upload_to='kpi_certificates',
-        blank=False,
-        null=False
-    )
-    message_text = models.TextField(_('Enter award message for email here'), max_length=1000, blank=False)
-    def get_update_url(self):
-        return redirect('core_hr:ros_update')
-
-    def get_view_url(self):
-        return redirect('core_hr:ros_view')
+        return reverse('core_hr:resume_view')
 
 
 class TeachingCertificate(BaseDocument):
@@ -207,8 +193,9 @@ class TeachingCertificate(BaseDocument):
     help = "Stores a teaching certificate"
     certificate_choices = (('c', 'CELTA'), ('ts', 'TESOL'), ('tf', 'TEFL'), ('ot', 'other'))
     id_number = models.CharField(max_length=100)
+    # issue_date = models.DateField(default=datetime.now())
     type  = models.CharField(max_length=15, choices=certificate_choices, blank=False, null=False)
-    image = models.ImageField(
+    image = models.FileField(
         storage=PrivateMediaStorage(),
         upload_to='tefl_certs',
         blank=False,
@@ -216,16 +203,15 @@ class TeachingCertificate(BaseDocument):
     )
 
     def get_update_url(self):
-        return redirect('core_hr:ros_update')
-
+        return reverse('core_hr:teach_certificate_update')
     def get_view_url(self):
-        return redirect('core_hr:ros_view')
+        return reverse('core_hr:teach_certificate_view')
 
 class DegreeDocument(BaseDocument):
     class Meta:
         verbose_name = u"\u200B" + 'Degree Document'
     help = "Stores a College diploma document"
-    image = models.ImageField(
+    image = models.FileField(
         storage=PrivateMediaStorage(),
         upload_to='degree_certs',
         blank=False,
@@ -233,9 +219,27 @@ class DegreeDocument(BaseDocument):
     )
 
     def get_update_url(self):
-        return redirect('core_hr:ros_update')
+        return reverse('core_hr:degree_update')
+    def get_view_url(self):
+        return reverse('core_hr:degree_view')
+
+
+
+class AchievementCertificate(BaseDocument):
+    class Meta:
+        verbose_name =u"\u200B" + 'FAS/KPI Certificate'
+    help = "Store information for KPI and FAS certificates of achievement"
+    email_sent = models.BooleanField(default=False)
+    owner = models.ForeignKey(Employee, on_delete=models.CASCADE)
+    image = models.ImageField(
+        storage=PrivateMediaStorage(),
+        upload_to='kpi_certificates',
+        blank=False,
+        null=False
+    )
+    message_text = models.TextField(_('Enter award message for email here'), max_length=1000, blank=False)
 
     def get_view_url(self):
-        return redirect('core_hr:ros_view')
+        return reverse('core_hr:ach_cert_view')
 
 
