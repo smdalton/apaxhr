@@ -121,7 +121,7 @@ class WorkPermitForm(forms.ModelForm):
 
         wp_years = [x for x in range(2017, 2025)]
         wp_years.reverse()
-        work_permit_issue_years = reversed([x for x in range(datetime.now().year-1, datetime.now().year+2)])
+        work_permit_issue_years = [x for x in range(datetime.now().year-1, datetime.now().year+2)]
         widgets = {
             'issue_date': forms.SelectDateWidget(years=work_permit_issue_years),
             'expiration_date': forms.SelectDateWidget(years=work_permit_issue_years)
@@ -148,7 +148,6 @@ class WorkPermitUpdateCreate(UpdateView):
         except :
             obj = WorkPermit(
                 owner=self.request.user,
-                expiration_date=datetime.now().date() + timedelta(days=700)
             )
 
         return obj
