@@ -6,7 +6,9 @@ from django.contrib.auth.base_user import BaseUserManager
 from django.db.models import Q, Subquery
 from django.utils.translation import ugettext_lazy as _
 
-from core_hr.models import Passport, RegistryOfStay, WorkPermit
+from core_hr.models import \
+    Passport, RegistryOfStay, WorkPermit, AchievementCertificate, DegreeDocument\
+
 
 """
 https://testdriven.io/blog/django-custom-user-model/
@@ -155,7 +157,3 @@ class CustomUserManager(BaseUserManager):
 
 
 
-    # from core_hr.models import Passport, RegistryOfStay, WorkPermit
-    # ros_forms = RegistryOfStay.objects.all()
-    # work_permit = WorkPermit.objects.all()
-    # passport_id_set = passports.distinct()

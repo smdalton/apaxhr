@@ -1,3 +1,4 @@
+import csv
 from datetime import datetime, timedelta
 
 from botocore.exceptions import EndpointConnectionError
@@ -6,6 +7,7 @@ from django.contrib import admin
 from django.apps import apps
 from django.contrib.admin import SimpleListFilter
 from django.db.models import Subquery
+from django.http import HttpResponse
 from django.utils.safestring import mark_safe
 
 import datedelta
@@ -19,6 +21,8 @@ class WorkPermitStatusFilter(SimpleListFilter):
     title='Work Permit Status'
     parameter_name = 'documents'
 
+
+
     def lookups(self, request, model_admin):
         return[
             ('not_complete', 'Work Permit Input not complete'),
@@ -27,8 +31,6 @@ class WorkPermitStatusFilter(SimpleListFilter):
         ]
 
     def queryset(self, request, queryset):
-
-
 
         if self.value() == 'not_complete':
             return queryset.exclude(pk__in=Subquery(WorkPermit.objects.all().values('owner__pk')))
@@ -41,11 +43,30 @@ class WorkPermitStatusFilter(SimpleListFilter):
 class LegalDocumentAdminMixin(object):
     class Meta:
         abstract = True
+
     ordering = ('expiration_date',)
     list_filter = ('expiration_date',)
     list_display = ('owner', 'expiration_date', 'valid', )
     search_fields = ('owner__full_name', 'owner__employee_id_number')
     readonly_fields = ('owner', 'document_image',)
+    actions=["export_as_csv"]
+
+
+    def export_as_csv(self, request, queryset):
+        meta = self.model._meta
+        field_names = [field.name for field in meta.fields]
+
+        response = HttpResponse(content_type='text/csv')
+        response['Content-Disposition'] = 'attachment; filename={}.csv'.format(meta)
+        writer = csv.writer(response)
+
+        writer.writerow(field_names)
+        for obj in queryset:
+            row = writer.writerow([getattr(obj, field) for field in field_names])
+        return response
+
+
+    export_as_csv.short_description = "Export Selected"
 
     def valid(self, obj):
         return obj.expiration_date > datetime.now().date()
@@ -67,6 +88,11 @@ class LegalDocumentAdminMixin(object):
 class WorkPermitAdmin(LegalDocumentAdminMixin, admin.ModelAdmin):
     verbose_name_plural = 'Work Permits'
     model = WorkPermit
+    #
+    # def get_queryset(self, request):
+
+    def has_delete_permission(self, request, obj=None):
+        return False
 
 class RegistryOfStayStatusFilter(SimpleListFilter):
     title='ROS Status'
@@ -124,8 +150,14 @@ class PassportStatusFilter(SimpleListFilter):
 class PassportAdmin(LegalDocumentAdminMixin, admin.ModelAdmin):
     model = Passport
     autocomplete_fields = ('owner',)
+    def has_delete_permission(self, request, obj=None):
+        return False
 
 class BaseDocumentAdminMixin(object):
+
+    def has_delete_permission(self, request, obj=None):
+        return False
+
     class Meta:
         abstract = True
     list_display = ('owner','date_added')
@@ -135,18 +167,24 @@ class BaseDocumentAdminMixin(object):
 
 @admin.register(Resume)
 class ResumeAdmin(BaseDocumentAdminMixin, admin.ModelAdmin):
+    def has_delete_permission(self, request, obj=None):
+        return False
     model = Resume
     verbose_name_plural =  u"\u200B" + 'Resumes'
 
 
 @admin.register(AchievementCertificate)
 class AchievementCertificateAdmin(BaseDocumentAdminMixin, admin.ModelAdmin):
+    def has_delete_permission(self, request, obj=None):
+        return False
     model= AchievementCertificate
     verbose_name=  u"\u200B" + 'FAS/KPI Achievement Certs'
 
 
 @admin.register(TeachingCertificate)
 class TeachingCertificateAdmin(BaseDocumentAdminMixin, admin.ModelAdmin):
+    def has_delete_permission(self, request, obj=None):
+        return False
     model = TeachingCertificate
     verbose_name_plural =  u"\u200B" + 'TEFL/CELTA/TESOL etc. Certs.'
 
@@ -154,6 +192,8 @@ class TeachingCertificateAdmin(BaseDocumentAdminMixin, admin.ModelAdmin):
 
 @admin.register(DegreeDocument)
 class DegreeDocumentAdmin(BaseDocumentAdminMixin, admin.ModelAdmin):
+    def has_delete_permission(self, request, obj=None):
+        return False
     model = DegreeDocument
 
 #

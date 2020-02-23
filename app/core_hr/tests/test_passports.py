@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from django.test import TestCase
+from django.test import TestCase, LiveServerTestCase
 import faker
 from core_hr.models import Passport
 from core_hr.extras.core_hr_mock_factory import create_mock_passport
@@ -36,6 +36,7 @@ class PassportTestCase(TestCase):
 
     def test_passport_data_complete(self):
         complete_passport = create_mock_passport(create_mock_user(), has_image=True)
+
         self.assertEqual(complete_passport.data_complete, True)
 
     def test_passport_data_not_complete(self):

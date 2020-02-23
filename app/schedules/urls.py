@@ -1,6 +1,9 @@
 from django.urls import path, include
+from django.conf import settings
 from . import views
 
+app_name = 'schedules'
+
 urlpatterns = [
-    path('', views.SchedulesHomePageView.as_view(),name='schedules_homepage'),
-    ]
+    path('', views.SchedulesHome.as_view(), name='landing'),
+]

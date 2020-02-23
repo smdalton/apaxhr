@@ -3,41 +3,39 @@
 <html lang="en">
 <head>
 
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <meta charset="UTF-8">
     <title>APAX HRS</title>
     {% block header_block %}
     {% endblock %}
 </head>
-<body>
+<body class="bg-rose">
 
+{% block title_block %}
 
-  <!-- Navigation -->
-{% block nav_block %}
-    {% include "header-footer/nav.html" %}
 {% endblock %}
-  <!-- Page Content -->
-  <div class="container">
-    <div class="row">
-      <div class="col-lg-12 text-center">
-        <h1 class="mt-5">APAX HR Tools</h1>
-          <p class="lead"> <a class="btn btn-success btn-lg" href="{% url 'admin:index' %}">Manage Information Here</a></p>
-{#test#}
-      </div>
-    </div>
-  </div>
 
-  {% block content%}
+<!-- Navigation -->
+{% block nav_block %}
+    {% include "header_footer/nav.html" %}
+{% endblock %}
+<!-- Page Content -->
 
-  {%  endblock %}
-  <!-- Bootstrap core JavaScript -->
+<div>
+    <span class="mx-auto">Privilege Level {{request.session.privilege_level}}</span>
+</div>
+{% block content %}
 
-
+{% endblock %}
+<!-- Bootstrap core JavaScript -->
 
 
 </body>
 
 {% block footer_block %}
-    {%  include 'header-footer/footer.html' %}
+    {% include 'header_footer/footer.html' %}
 {% endblock %}
 
 </html>
