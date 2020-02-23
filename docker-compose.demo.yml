@@ -12,6 +12,17 @@ services:
 #      - "15672"
 #  https://stackoverflow:
 #    com/questions/54911090/serve-django-media-files-via-server_nginx-django-react-server_nginx-docker-compose:
+  database:
+    container_name: database
+    image: "postgres"
+    ports:
+      - 5432:5432
+    expose:
+      - "5432"
+    env_file:
+      - database.env
+#    volumes:
+#      - database-data:/var/lib/postgresql/data/
 
   web:
     container_name: web
@@ -25,6 +36,10 @@ services:
       - .env.dev
     ports:
       - 80:8000
-#    depends_on:
+    depends_on:
+      - database
 #      - rabbitmq
     command: python3 start_server.py prod_demo
+
+#volumes:
+#  database-data:

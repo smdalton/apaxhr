@@ -49,13 +49,16 @@ def start_prod_server():
         --workers 3')
 
 def start_prod_demo_server():
+    print("sleeping for db")
+    time.sleep(5)
     os.environ['DEV_POSTGRES']='TRUE'
     os.environ['USE_S3'] = 'TRUE'
     os.environ['AWS_ACCESS_KEY_ID'] = 'AKIATWWKT35LU5ED5FDY'
     os.environ['AWS_SECRET_ACCESS_KEY'] = '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'
     os.environ['AWS_STORAGE_BUCKET_NAME'] = 'apaxhr-test'
     os.environ['DEV']='TRUE'
-    os.system('echo Starting Prod server.')
+    os.system('echo Starting Prod Demo server.')
+    os.system('python3 manage.py collectstatic --no-input')
     os.system('python3 manage.py dev_db')
 
     #os.system('python3 manage.py collectstatic --no-input')
