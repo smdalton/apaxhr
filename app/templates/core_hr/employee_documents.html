@@ -30,12 +30,7 @@
                                 </p>
                                 <p><b class="text-danger">Please edit document and update required fields</b></p>
                             {% endif %}
-                            {% if document.expired %}
-                                <p class="card-text blinking">
-                                    <b>{{ document_name }} Expired!</b>
-                                </p>
-                                <p><p><b class="text-danger">Please edit document and update required fields</b></p></p>
-                            {% endif %}
+
                             {% if document == 'not found' %}
                             {# Had to hardcode this for document creation  with no existing document#}
                                 <a href="{% url 'core_hr:document_center' %}{{ document_name | lower | cut:" "}}/update/"
