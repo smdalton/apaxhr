@@ -32,8 +32,6 @@ class WorkPermitStatusFilter(SimpleListFilter):
 
     def queryset(self, request, queryset):
 
-
-
         if self.value() == 'not_complete':
             return queryset.exclude(pk__in=Subquery(WorkPermit.objects.all().values('owner__pk')))
         elif self.value() == 'expiring_soon':
@@ -65,7 +63,6 @@ class LegalDocumentAdminMixin(object):
         writer.writerow(field_names)
         for obj in queryset:
             row = writer.writerow([getattr(obj, field) for field in field_names])
-
         return response
 
 

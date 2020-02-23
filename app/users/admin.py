@@ -2,11 +2,12 @@ from _testcapi import datetime_check_delta
 from datetime import datetime, timedelta
 import datedelta
 from datedelta import datedelta
-
+import csv
 from django.contrib import admin
 from django.contrib.admin import ModelAdmin, SimpleListFilter
 from django.contrib.auth.admin import UserAdmin
 from django.db.models import Subquery, Q
+from django.http import HttpResponse
 
 from core_hr.models import Passport, RegistryOfStay, WorkPermit
 from .forms import CustomUserCreationForm, CustomUserChangeForm
@@ -87,20 +88,26 @@ class CustomUserAdmin(UserAdmin):
 
     list_filter = (DocumentExpirationStatusFilter, DocumentCompletionStatusFilter, 'is_active')
     #list_filter = ('employment_status','is_staff', 'is_active')
-
+    actions = ["export_as_csv"]
     fieldsets = (
         ('Credentials', {'fields': (('email','personal_email','is_staff', 'is_active',),)}),
         ('Name',{'fields':('full_name',)}),
         #('Permissions', {'fields': (('is_staff', 'is_active',),)}),
     )
 
-    # add_fieldsets = (
-    #     ('Unknown', {
-    #         'classes': ('wide',),
-    #         'fields': ('email', 'password1', 'password2', 'is_staff', 'is_active'),
-    #     }
-    #      ),
-    # )
+
+    def export_as_csv(self, request, queryset):
+        meta = self.model._meta
+        field_names = [field.name for field in meta.fields]
+
+        response = HttpResponse(content_type='text/csv')
+        response['Content-Disposition'] = 'attachment; filename={}.csv'.format(meta)
+        writer = csv.writer(response)
+
+        writer.writerow(field_names)
+        for obj in queryset:
+            row = writer.writerow([getattr(obj, field) for field in field_names])
+        return response
 
     inlines = [
         inlines.PassportInline,

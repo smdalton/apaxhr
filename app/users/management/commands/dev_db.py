@@ -111,5 +111,5 @@ class Command(BaseCommand):
         import time
         self.reset_db_and_migrations()
         self.create_super_user()
-        self.create_many_users_and_documents(num_users=5)
+        self.create_many_users_and_documents(num_users=350)
         self.load_admin_themes()

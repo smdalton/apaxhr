@@ -58,7 +58,8 @@ def start_prod_demo_server():
     os.environ['AWS_STORAGE_BUCKET_NAME'] = 'apaxhr-test'
     os.environ['DEV']='TRUE'
     os.system('echo Starting Prod Demo server.')
-    os.system('python3 manage.py collectstatic --no-input')
+    # TODO: Reset this for deployment
+    # os.system('python3 manage.py collectstatic --no-input')
     os.system('python3 manage.py dev_db')
 
     #os.system('python3 manage.py collectstatic --no-input')
