@@ -12,6 +12,7 @@ def postgres_message():
 
 def start_dev_server():
     # set env's
+
     os.environ['SQL_ENGINE'] = 'django.db.backends.postgresql_psycopg2'
     os.environ['SQL_NAME'] = 'postgres-dev'
     os.environ['DEV_POSTGRES']='TRUE'
@@ -23,14 +24,10 @@ def start_dev_server():
 
     os.system('echo Starting Dev server.')
     os.system('python3 manage.py dev_db')
-
+    os.system('python3 manage.py runserver 0.0.0.0:8000')
     # os.system('exec gunicorn apaxhr.wsgi:application \
     #         --bind 0.0.0.0:8000\
-    #         --workers 3')
-    # Profiling
-    # os.system('python3 -m cProfile manage.py collectstatic --no-input > profiled_collectstatic')
-    # os.system(' python3 -m cProfile manage.py runserver > profiled_runserver')
-    os.system('python3 manage.py runserver')
+    #         --workers 3 --reload' )
 
 def start_prod_server():
 
