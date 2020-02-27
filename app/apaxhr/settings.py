@@ -15,6 +15,9 @@ import os
 
 # Build paths inside the docker_files like this: os.path.join(BASE_DIR, ...)
 from django.core.files.storage import FileSystemStorage
+from celery.schedules import crontab
+
+
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 TEMPLATE_DIR = os.path.join(BASE_DIR, '/templates')
@@ -100,6 +103,7 @@ CREATED_APPS = [
     'core_hr',
     'employee_mgmt',
     'schedules',
+    'tasks'
 ]
 
 BASE_APPS = [
@@ -114,6 +118,7 @@ BASE_APPS = [
     'django.contrib.messages',
 ]
 
+
 EXTENSION_APPS = [
     # extensions
     'colorfield',
@@ -122,12 +127,36 @@ EXTENSION_APPS = [
     'django_countries',
     'django_nose',
     'storages',
-    'django_extensions'
+    'django_extensions',
+    'django_celery_results',
 ]
 
 INSTALLED_APPS = CREATED_APPS + BASE_APPS + EXTENSION_APPS
 # TODO: LOGGING
 #  https://stackoverflow.com/questions/16876045/django-logging-only-for-my-apps
+
+
+###______________ CELERY CONFIG__________________###
+CELERY_BROKER_URL = 'amqp://guest:guest@rabbitmq:5672//'
+CELERY_RESULT_BACKEND = 'redis://redis:6379'
+CELERY_CACHE_BACKEND = 'default'
+
+
+CELERY_BEAT_SCHEDULE = {
+    'hello': {
+        'task': 'tasks.tasks.hello',
+        'schedule': crontab()  # execute every minute
+    }
+}
+
+
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+        'LOCATION': 'unique-snowflake',
+    }
+}
+
 
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
 
@@ -197,13 +226,6 @@ else:
             "PORT": os.environ.get("SQL_PORT", "5432"),
         }
     }
-
-# CACHES = {
-#     'default': {
-#         'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
-#         'LOCATION': 'unique-snowflake',
-#     }
-# }
 
 # CUSTOM USER MODEL
 AUTH_USER_MODEL = 'users.Employee'

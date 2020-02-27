@@ -1,15 +1,14 @@
 version: "3.7"
 services:
-#  rabbitmq:
-#    container_name: rabbitmq
-#    hostname: rabbitmq
-#    image: rabbitmq:latest
-#    ports:
-#      - "15672:15672"
-#      - "5672:5672"
-#    expose:
-#      - "5672"
-#      - "15672"
+  rabbitmq:
+    container_name: rabbitmq
+    hostname: rabbitmq
+    image: rabbitmq:3-management
+    ports:
+      - 15672:15672
+      - 5672:5672
+    expose:
+      - 15672
 #  https://stackoverflow:
 #    com/questions/54911090/serve-django-media-files-via-server_nginx-django-react-server_nginx-docker-compose:
 
@@ -22,11 +21,15 @@ services:
       - "5432"
     env_file:
       - database.env
+    depends_on:
+      - rabbitmq
 #    volumes:
 #      - database-data:/var/lib/postgresql/data/
+
   web:
     container_name: web
     hostname: apaxhr
+    image: &web web
     build: app
     stdin_open: true
     tty: true
@@ -40,5 +43,38 @@ services:
       - "8000"
     depends_on:
       - database
-#      - rabbitmq
+      - rabbitmq
     command: python3 start_server.py dev
+
+  redis:
+    image: "redis:alpine"
+    ports:
+      - 6739:6739
+
+
+  celery:
+      build: .
+      image: *web
+      command: celery -A tasks worker --loglevel=info
+      volumes:
+        - ./app:/app
+      restart: on-failure
+      depends_on:
+        - redis
+        - web
+        - database
+        - rabbitmq
+
+  celery-beat:
+    build: .
+    image: *web
+    command: celery -A tasks beat --loglevel=info
+    volumes:
+      - ./app:/app
+    restart: on-failure
+    depends_on:
+      - redis
+      - database
+      - web
+      - rabbitmq
+      - celery
