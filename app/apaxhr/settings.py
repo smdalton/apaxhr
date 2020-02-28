@@ -17,8 +17,6 @@ import os
 from django.core.files.storage import FileSystemStorage
 from celery.schedules import crontab
 
-
-
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 TEMPLATE_DIR = os.path.join(BASE_DIR, '/templates')
 # Quick-start development settings - unsuitable for production
@@ -116,8 +114,8 @@ BASE_APPS = [
     'django.contrib.auth',
     'django.contrib.sessions',
     'django.contrib.messages',
-]
 
+]
 
 EXTENSION_APPS = [
     # extensions
@@ -129,6 +127,7 @@ EXTENSION_APPS = [
     'storages',
     'django_extensions',
     'django_celery_results',
+    'django_celery_beat',
 ]
 
 INSTALLED_APPS = CREATED_APPS + BASE_APPS + EXTENSION_APPS
@@ -140,15 +139,19 @@ INSTALLED_APPS = CREATED_APPS + BASE_APPS + EXTENSION_APPS
 CELERY_BROKER_URL = 'amqp://guest:guest@rabbitmq:5672//'
 CELERY_RESULT_BACKEND = 'redis://redis:6379'
 CELERY_CACHE_BACKEND = 'default'
-
+CELERY_ENABLE_UTC = False
 
 CELERY_BEAT_SCHEDULE = {
     'hello': {
         'task': 'tasks.tasks.hello',
         'schedule': crontab()  # execute every minute
+    },
+    'core_hr': {
+        'task':'core_hr.tasks.core_hr_task',
+        'schedule': crontab()
     }
-}
 
+}
 
 CACHES = {
     'default': {
@@ -157,10 +160,7 @@ CACHES = {
     }
 }
 
-
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
-
-
 
 TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
 NOSE_ARGS = [
@@ -226,7 +226,7 @@ else:
             "PORT": os.environ.get("SQL_PORT", "5432"),
         }
     }
-
+# CELERY_BEAT_SCHEDULER = "django_celery_beat.schedulers:DatabaseScheduler"
 # CUSTOM USER MODEL
 AUTH_USER_MODEL = 'users.Employee'
 
@@ -276,8 +276,6 @@ DATETIME_INPUT_FORMATS = [
     '%m/%d/%y %H:%M:%S.%f',
     '%m/%d/%y %H:%M',
     '%m/%d/%y']
-
-
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.0/howto/static-files/

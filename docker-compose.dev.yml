@@ -53,25 +53,28 @@ services:
 
 
   celery:
-      build: .
-      image: *web
-      command: celery -A tasks worker --loglevel=info
-      volumes:
-        - ./app:/app
-      restart: on-failure
-      depends_on:
-        - redis
-        - web
-        - database
-        - rabbitmq
-
-  celery-beat:
-    build: .
     image: *web
-    command: celery -A tasks beat --loglevel=info
+    command: celery -A apaxhr worker --loglevel=info
     volumes:
       - ./app:/app
     restart: on-failure
+    env_file:
+      - .env.dev
+    depends_on:
+      - redis
+      - web
+      - database
+      - rabbitmq
+
+  celery-beat:
+    image: *web
+#    command: celery -A tasks beat -l info --scheduler django_celery_beat.schedulers:DatabaseScheduler
+    command: celery -A apaxhr beat --loglevel=info  -S django_celery_beat.schedulers:DatabaseScheduler
+    volumes:
+      - ./app:/app
+    restart: on-failure
+    env_file:
+      - .env.dev
     depends_on:
       - redis
       - database
