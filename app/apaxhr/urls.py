@@ -29,19 +29,21 @@ app_name='apaxhr'
 # path('employee_management/', include('employee_management.urls')),
 urlpatterns = [
     path('', views.HomePage.as_view(),name='home_simple'),
-    path('home/', views.HomePage.as_view(), name='home'),
+    path('logout/', views.logout_view, name='logout'),
+    # path('home/', views.HomePage.as_view(), name='home'),
     path('home/<access_tier>', views.HomePage.as_view(), name='home'),
 
 
     path('core_hr/', include('core_hr.urls')),
     path('users/', include('users.urls')),
     path('employee_mgmt/', include('employee_mgmt.urls')),
-    path('lifecycle/', include('lifecycle.urls')),
-    path('schedules/', include('schedules.urls')),
+    path('employment/', include('employment.urls')),
+    path('centers/', include('centers.urls')),
+
 
     # auth routes
-    path('login/', auth_views.auth_login),
-    path('logout/', auth_views.auth_logout),
+    # path('login/', auth_views.auth_login),
+    # path('logout/', auth_views.auth_logout),
     path('admin/', admin.site.urls),
 
 ]

@@ -4,6 +4,7 @@ import random
 
 from django.core.management import call_command
 from django.core.management.base import BaseCommand, CommandError
+from django.db import IntegrityError
 
 from users.models import Employee
 
@@ -13,9 +14,11 @@ from core_hr.extras.core_hr_mock_factory import \
     create_mock_achievement_certificate, \
     create_mock_degree, create_mock_resume
 
-#
-# fake=Faker()
-# Faker.seed(2323)
+import faker
+
+
+fake= faker.Faker()
+
 # fake.phone_number()
 # fake.city()
 # fake.building_number()
@@ -30,11 +33,33 @@ from core_hr.extras.core_hr_mock_factory import \
 # fake.local_latlng(country_code="US", coords_only=False)
 # fake.local_latlng(country_code='VN', coords_only=True)
 # fake.date(pattern="%Y-%m-%d", end_datetime=None)
+def assign_documents_to_user(user):
+    create_mock_passport(
+        user,
+        has_image=random.choice([True, True, False]),
+        expired=random.choice([True, False, False, False, False, False])
+    )
+    create_mock_ros_form(
+        user,
+        has_image=random.choice([True, True, False]),
+        expired=random.choice([True, False, False, False, False, False])
+    )
+    create_mock_work_permit(
+        user,
+        has_image=random.choice([True, True, False]),
+        expired=random.choice([True, False, False, False, False, False])
+    )
+    create_mock_achievement_certificate(user)
+    create_mock_degree(user)
+    create_mock_teaching_certificate(user)
+    create_mock_resume(user)
+
 
 class Command(BaseCommand):
     help = "Initializes users, clears db, makes and applies migrations, runs server"
+    users = []
 
-    def reset_db_and_migrations(self):
+    def delete_migrations(self):
         self.stdout.write(os.getcwd())
         # print("deleting db")
         # os.system('rm devdb.sqlite3')
@@ -51,31 +76,37 @@ class Command(BaseCommand):
             os.system('find . -path "*/migrations/*.pyc"  -delete')
             print('done')
             print("Waiting for db")
-            os.system('python3 manage.py makemigrations --no-input')
-            os.system('python3 manage.py migrate')
+            # os.system('python3 manage.py makemigrations --no-input')
+            # os.system('python3 manage.py migrate')
 
         else:
             self.stdout.write('Running on development postgresql wipe_db aborted')
             return
 
+
     def create_many_users_and_documents(self, num_users=15):
         for x in range(num_users):
-            user = create_mock_user()
-            if x % 5 == 0:print(x)
+            if x == 0:
+                user = Employee.objects.get(email='smd@gmail.com')
+            else:
+                user = create_mock_user()
+
+            if x % 5 == 0: print(x)
+            self.users.append(user)
             create_mock_passport(
                 user,
                 has_image=random.choice([True, True, False]),
-                expired=random.choice([False, False,True])
+                expired=random.choice([True, False, False, False, False, False])
             )
             create_mock_ros_form(
                 user,
                 has_image=random.choice([True, True, False]),
-                expired=random.choice([True, False, False, False])
+                expired=random.choice([True, False, False, False, False, False])
             )
             create_mock_work_permit(
                 user,
                 has_image=random.choice([True, True, False]),
-                expired=random.choice([True, False, False, False])
+                expired=random.choice([True, False, False, False, False, False])
             )
             create_mock_achievement_certificate(user)
             create_mock_degree(user)
@@ -83,8 +114,22 @@ class Command(BaseCommand):
             create_mock_resume(user)
 
     def create_super_user(self):
-        user = Employee.objects.create_superuser(email='smd@gmail.com',password='pass1234')
-        #user.save()
+        try:
+            from users import Employee
+            Employee.objects.create_superuser(
+                email='smd@gmail.com',
+                password='pass1234',
+                full_name = 'Shane Martin Dalton',
+                gender = 'M',
+                employee_id_number=f"G-12345678",
+                employment_status='em',
+                employment_status_note=fake.bs(),
+                phone_number=fake.phone_number(),
+                personal_email=fake.email(),
+            )
+        except Exception as e:
+            print(e.args)
+
 
     def load_admin_themes(self):
         themes =  [
@@ -96,11 +141,6 @@ class Command(BaseCommand):
         for theme in themes:
             call_command('loaddata', theme)
 
-
-
-    def run_server(self):
-        os.system('python3 manage.py runserver 0.0.0.0:8000')
-
     def run_tests(self):
         # run simple test that checks to make sure the users were created and asuepruser exists
 
@@ -109,7 +149,14 @@ class Command(BaseCommand):
     def handle(self, **args):
         os.system('export DJANGO_COLORS="light;error=yellow/blue,blink;notice=magenta"')
         import time
-        self.reset_db_and_migrations()
+        num_users = int(os.getenv('NUM_USERS', 25))
+        # self.delete_migrations()
+        print( '---> Creating SuperUser')
         self.create_super_user()
-        self.create_many_users_and_documents(num_users=350)
+
+        print( '---> Creating Documents and Users')
+
+        self.create_many_users_and_documents(num_users=num_users)
+
+        print( '---> Loading Admin themese')
         self.load_admin_themes()

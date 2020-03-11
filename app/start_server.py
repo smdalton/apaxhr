@@ -10,9 +10,19 @@ def postgres_message():
     print("*" +" "* 78 + "*\n")
     print("*" +" "* 78 + "*\n")
 
-def start_dev_server():
-    # set env's
+def celery_worker():
+    print('Celery worker waiting')
+    time.sleep(18)
+    os.system('celery -A apaxhr worker --loglevel=info')
 
+def celery_beat():
+    print('Celery beat waiting')
+    time.sleep(20)
+    os.system('celery -A apaxhr beat --loglevel=info  -S django_celery_beat.schedulers:DatabaseScheduler')
+
+def dev():
+    # set env's
+    os.environ['NUM_USERS']='25'
     os.environ['SQL_ENGINE'] = 'django.db.backends.postgresql_psycopg2'
     os.environ['SQL_NAME'] = 'postgres-dev'
     os.environ['DEV_POSTGRES']='TRUE'
@@ -22,17 +32,32 @@ def start_dev_server():
     os.environ['AWS_STORAGE_BUCKET_NAME'] = 'apaxhr-test'
     os.environ['DEV']='TRUE'
     os.environ['DJANGO_SETTINGS_MODULE'] = 'apaxhr.settings'
+
     os.system('echo Starting Dev server.')
-    os.system('python3 manage.py dev_db')
+
+    ## Configure and initialize database
+    os.system('python3 manage.py reset_db --noinput')
+    os.system('find . -path "*/migrations/*.py" -not -name "__init__.py" -delete')
+    os.system('find . -path "*/migrations/*.pyc"  -delete')
+    time.sleep(2)
     os.system('python3 manage.py makemigrations')
-    os.system('python3 manage.py migrate django_celery_beat')
     os.system('python3 manage.py migrate')
+    os.system('python3 manage.py migrate django_celery_beat')
+    time.sleep(2)
+    # populate database
+    os.system('python3 manage.py create_users_and_documents')
+    os.system('python3 manage.py create_permissions')
+    os.system('python3 manage.py create_positions')
+    os.system('python3 manage.py create_centers')
+
+
+    # start webserver
     os.system('python3 manage.py runserver 0.0.0.0:8000')
     # os.system('exec gunicorn apaxhr.wsgi:application \
     #         --bind 0.0.0.0:8000\
     #         --workers 3 --reload' )
 
-def start_prod_server():
+def prod_server():
     os.environ['DJANGO_SETTINGS_MODULE']='apaxhr.settings'
 
     os.environ['USE_S3'] = 'TRUE'
@@ -50,7 +75,8 @@ def start_prod_server():
         --bind 0.0.0.0:8000\
         --workers 3')
 
-def start_prod_demo_server():
+
+def prod_demo():
     print("sleeping for db")
     time.sleep(5)
     os.environ['DEV_POSTGRES']='TRUE'
@@ -62,33 +88,28 @@ def start_prod_demo_server():
     os.system('echo Starting Prod Demo server.')
     # TODO: Reset this for deployment
     # os.system('python3 manage.py collectstatic --no-input')
-    os.system('python3 manage.py dev_db')
+    os.system('python3 manage.py create_users_and_documents')
+    os.system('python3 manage.py create_permissions')
+
 
     #os.system('python3 manage.py collectstatic --no-input')
     time.sleep(1)
-
     os.system('exec gunicorn apaxhr.wsgi:application \
         --bind 0.0.0.0:8000\
         --workers 3')
 
-def start_dev_rabbit():
-    os.environ['REDIS']='True'
-    print('bring up redis container')
-
-    start_dev_server()
-    pass
 
 func_dict = {
-    'dev': start_dev_server,
-    'dev_redis': start_dev_rabbit,
-    'prod': start_prod_server,
-    'dev_rabbit': start_dev_rabbit,
-    'prod_demo': start_prod_demo_server,
+    'dev': dev,
+    'prod': prod_server,
+    'prod_demo': prod_demo,
+    'celery_beat':celery_beat,
+    'celery_worker':celery_worker,
 }
 
 
 option = sys.argv[1]
-valid_options = ['dev','prod','demo']
+valid_options = ['dev','prod','prod_demo','celery_beat','celery_worker']
 try:
     assert(option in valid_options)
 except:

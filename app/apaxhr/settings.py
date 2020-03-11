@@ -23,6 +23,11 @@ TEMPLATE_DIR = os.path.join(BASE_DIR, '/templates')
 # See https://docs.djangoproject.com/en/3.0/howto/deployment/checklist/
 
 
+AUTHENTICATION_BACKENDS = (
+    'django.contrib.auth.backends.ModelBackend',  # default
+    'guardian.backends.ObjectPermissionBackend',
+)
+
 # EMAIL SETTINGS
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
@@ -44,9 +49,12 @@ STATICFILES_FINDERS = (
     'django.contrib.staticfiles.finders.AppDirectoriesFinder',
 )
 AWS_DEFAULT_ACL = 'public-read'
-
+num = 0
 USE_S3 = os.getenv('USE_S3')
-print("OS ENV FOR S3:--->", os.getenv('USE_S3'))
+
+if num == 0:
+    print("OS ENV FOR S3:--->", os.getenv('USE_S3'))
+    num = 1
 
 if USE_S3:
     AWS_ACCESS_KEY_ID = os.getenv('AWS_ACCESS_KEY_ID')
@@ -96,16 +104,20 @@ else:
 # Application definition
 CREATED_APPS = [
     # Applications
-    'users',
+
     'apaxhr',
+    'users',
     'core_hr',
+    'employment',
+    'payroll',
     'employee_mgmt',
-    'schedules',
-    'tasks'
+    'centers',
+
 ]
 
 BASE_APPS = [
     # packages
+    'djmoney',
     'livereload',
     'django.contrib.staticfiles',
     'admin_interface',
@@ -119,6 +131,7 @@ BASE_APPS = [
 
 EXTENSION_APPS = [
     # extensions
+    'guardian',
     'colorfield',
     'crispy_forms',
     'debug_toolbar',
@@ -143,11 +156,11 @@ CELERY_ENABLE_UTC = False
 
 CELERY_BEAT_SCHEDULE = {
     'hello': {
-        'task': 'tasks.tasks.hello',
+        'task': 'create_users_and_documents.hello',
         'schedule': crontab()  # execute every minute
     },
     'core_hr': {
-        'task':'core_hr.tasks.core_hr_task',
+        'task': 'core_hr.tasks.core_hr_task',
         'schedule': crontab()
     }
 
@@ -170,6 +183,14 @@ NOSE_ARGS = [
     # Change `MY_APP` to your `app` name
 ]
 
+
+def custom_show_toolbar(request):
+    return True  # Always show toolbar, for example purposes only.
+
+
+DEBUG_TOOLBAR_CONFIG = {
+    'SHOW_TOOLBAR_CALLBACK': custom_show_toolbar,
+}
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -256,6 +277,7 @@ LANGUAGE_CODE = 'en-us'
 
 USE_TZ = True
 TIME_ZONE = 'Asia/Ho_Chi_Minh'
+CELERY_TIMEZONE = 'Asia/Ho_Chi_Minh'
 USE_I18N = True
 
 USE_L10N = False

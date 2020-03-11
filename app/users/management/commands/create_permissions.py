@@ -2,7 +2,7 @@ from django.core.management import call_command
 from django.core.management.base import BaseCommand, CommandError
 from django.contrib.auth.models import Group, Permission
 from users.models import Employee
-
+from .create_users_and_documents import assign_documents_to_user
 
 class Command(BaseCommand):
 
@@ -12,8 +12,6 @@ class Command(BaseCommand):
             'Applicants',
             'Trainees',
             'Teachers',
-
-
 
             'Head Teachers',
             'Faculty Managers',
@@ -62,6 +60,7 @@ class Command(BaseCommand):
             email='tier1@gmail.com',
             password='pass1234',
         )
+
         # applicants
         teachers = Group.objects.get(name='Teachers')
         teachers.user_set.add(tier1)
@@ -87,7 +86,10 @@ class Command(BaseCommand):
         directors = Group.objects.get(name='Area Managers')
         directors.user_set.add(tier4)
 
-
+        assign_documents_to_user(tier1)
+        assign_documents_to_user(tier2)
+        assign_documents_to_user(tier3)
+        assign_documents_to_user(tier4)
 
     def assign_tier1_permissions(self, user_list):
 

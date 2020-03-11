@@ -54,7 +54,8 @@ services:
 
   celery:
     image: *web
-    command: celery -A apaxhr worker --loglevel=info
+#    command: celery -A apaxhr worker --loglevel=info
+    command: python3 start_server.py celery_worker
     volumes:
       - ./app:/app
     restart: on-failure
@@ -69,7 +70,8 @@ services:
   celery-beat:
     image: *web
 #    command: celery -A tasks beat -l info --scheduler django_celery_beat.schedulers:DatabaseScheduler
-    command: celery -A apaxhr beat --loglevel=info  -S django_celery_beat.schedulers:DatabaseScheduler
+#    command: celery -A apaxhr beat --loglevel=info  -S django_celery_beat.schedulers:DatabaseScheduler
+    command: python3 start_server.py celery_beat
     volumes:
       - ./app:/app
     restart: on-failure

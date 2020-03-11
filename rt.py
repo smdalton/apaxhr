@@ -57,11 +57,11 @@ def dev_postgres():
     clear_envs()
     start_postgres()
     os.chdir('app')
-
     os.system('python3 start_server.py dev')
 
 
 def dev_on_docker():
+    os.system('docker container rm postgres-dev')
     os.system('docker-compose -f docker-compose.dev.yml build')
     os.system('docker-compose -f docker-compose.dev.yml up')
 
