@@ -21,11 +21,13 @@ class HomePage(LoginView):
         return reverse_lazy('home_simple')
 
     def dispatch(self, request, *args, **kwargs):
+        # store permissions session data at login time
         self.access_tier = kwargs.get('access_tier', "access tier not present")
-        print(self.request.get_host())
-        return super(HomePage, self).dispatch(request, *args, **kwargs)
+        #print(self.request.get_host())
+        # assign permissions this way
 
-    tier_list = ['tier0','tier1','tier2','tier3','tier4',]
+        self.request.user.groups.filter(name__in=['group1', 'group2']).exists()
+        return super(HomePage, self).dispatch(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
         context = super(HomePage, self).get_context_data(**kwargs)

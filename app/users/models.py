@@ -1,3 +1,4 @@
+from cached_property import cached_property
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
@@ -38,7 +39,7 @@ class Employee(AbstractBaseUser, PermissionsMixin):
     genders = (('M', 'male'), ('F', 'female'))
     # core information
 
-    full_name = models.CharField(_('Name as on Passport'), validators=[name_validator], max_length=45, blank=False)
+    full_name = models.CharField(_('Name as on Passport'), validators=[name_validator], max_length=45, blank=False,)
 
     # employment data
 
@@ -123,7 +124,7 @@ class Employee(AbstractBaseUser, PermissionsMixin):
     def get_current_center(self):
         # query the employees current center
         center = LearningCenter.objects.get(
-            centerteacher__teacher__employee=self
+            centerteacher__teacher__employee_id=self.pk
         )
         return center
 
@@ -154,7 +155,7 @@ class Employee(AbstractBaseUser, PermissionsMixin):
         try:
             return str(self.full_name.split()[1])
         except:
-            pass
+            return self.full_name
     def middle_name(self):
         try:
             return str(self.full_name.split()[2])
@@ -165,6 +166,7 @@ class Employee(AbstractBaseUser, PermissionsMixin):
             return str(self.full_name.split()[0])
         except:
             pass
+
 
     def __str__(self):
         try:

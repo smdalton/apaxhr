@@ -3,57 +3,28 @@ from django.core.management.base import BaseCommand, CommandError
 from django.contrib.auth.models import Group, Permission
 from users.models import Employee
 from .create_users_and_documents import assign_documents_to_user
-
+import ahr_extras.permissions as p
+from ahr_extras.permissions import permissions_groups as pg
 class Command(BaseCommand):
 
     def __init__(self):
 
-        self.groups = [
-            'Applicants',
-            'Trainees',
-            'Teachers',
+        self.groups = p.get_all_permissions_groups()
+        self.tier1 = pg['tier1']
+        self.tier2 = pg['tier2']
+        self.tier3 = pg['tier3']
+        self.tier4 = pg['tier4']
+        self.tier5 = pg['tier5']
 
-            'Head Teachers',
-            'Faculty Managers',
-            'Area Managers',
-            'HR Managers',
-
-            'Teacher Management Directors',
-            'Training Directors',
-            'Recruiting Directors',
-
-            'HR Directors',
-            'Developers'
-        ]
-        self.tier1 = [
-            'Applicants',
-            'Trainees',
-            'Teachers',
-        ]
-        self.tier2 = [
-            'Head Teachers',
-            'Faculty Managers',
-
-        ]
-        self.tier3 = [
-            # documents and PII
-            'Area Managers',
-            'HR Managers',
-        ]
-        self.tier4 = [
-            # No documents and PII
-            'Teacher Management Directors',
-            'Training Directors',
-            'Recruiting Directors',
-        ]
-        self.tier5 = [
-            'HR Directors',
-            'Developers'
-        ]
     def create_groups(self):
         for group_name in self.groups:
             obj, created = Group.objects.get_or_create(name=group_name)
 
+    def make_super_user_all_groups_member(self):
+        superuser=Employee.objects.get(email='smd@gmail.com')
+        for name in self.groups:
+            group=Group.objects.get(name=name)
+            superuser.groups.add(group)
 
     def make_all_tiers_employee(self):
         tier1 = Employee.objects.create(
@@ -142,7 +113,9 @@ class Command(BaseCommand):
 
 
 
+
     def handle(self, *args, **options):
         print('Setting permissions')
         self.create_groups()
+        self.make_super_user_all_groups_member()
         self.make_all_tiers_employee()

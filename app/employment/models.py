@@ -22,14 +22,12 @@ class BasePositionMixin(models.Model):
     position_start = models.DateTimeField(auto_now_add=True)
     position_end = models.DateTimeField(null=True, auto_now_add=True)
     active = models.BooleanField(default=True)
-    employee = models.OneToOneField(Employee, on_delete=models.CASCADE)
+    employee = models.ForeignKey(Employee, on_delete=models.CASCADE)
     employment_status_note = models.TextField(max_length=500, default='no one has written about this position yet...')
 
     def __str__(self):
         return f"{self.employee} works in {self.department} as a {self.get_title_display()}"
     # email_active = models.BooleanField(default=True)
-
-
 
 
 # represents and instance of an employee at a specific job for a duration of time

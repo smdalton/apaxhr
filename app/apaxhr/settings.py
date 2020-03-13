@@ -90,15 +90,16 @@ SECRET_KEY = os.environ.get('SECRET_KEY', 'change me to a real key')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 
-DEBUG = True
-if os.environ.get('DEV'):
+
+if os.environ.get('DEV') == 'TRUE':
     DEBUG = True
     ALLOWED_HOSTS = ['*']
-    INTERNAL_IPS = [
-        'localhost',
-        '127.0.0.1',
-    ]
+#     INTERNAL_IPS = [
+#     'localhost',
+#     '127.0.0.1',
+# ]
 else:
+    DEBUG = False
     ALLOWED_HOSTS = ['*']
 
 # Application definition
@@ -134,7 +135,6 @@ EXTENSION_APPS = [
     'guardian',
     'colorfield',
     'crispy_forms',
-    'debug_toolbar',
     'django_countries',
     'django_nose',
     'storages',
@@ -142,6 +142,8 @@ EXTENSION_APPS = [
     'django_celery_results',
     'django_celery_beat',
 ]
+if DEBUG:
+    EXTENSION_APPS.append('debug_toolbar')
 
 INSTALLED_APPS = CREATED_APPS + BASE_APPS + EXTENSION_APPS
 # TODO: LOGGING
@@ -187,10 +189,6 @@ NOSE_ARGS = [
 def custom_show_toolbar(request):
     return True  # Always show toolbar, for example purposes only.
 
-
-DEBUG_TOOLBAR_CONFIG = {
-    'SHOW_TOOLBAR_CALLBACK': custom_show_toolbar,
-}
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -199,8 +197,16 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'debug_toolbar.middleware.DebugToolbarMiddleware',
+
 ]
+
+if DEBUG:
+    DEBUG_TOOLBAR_CONFIG = {
+        'SHOW_TOOLBAR_CALLBACK': custom_show_toolbar,
+        'DISABLE_PANELS': ( 'debug_toolbar.panels.templates.TemplatesPanel', 'debug_toolbar.panels.redirects.RedirectsPanel',),
+        'SHOW_TEMPLATE_CONTEXT': False,
+    }
+    MIDDLEWARE.append('debug_toolbar.middleware.DebugToolbarMiddleware')
 
 ROOT_URLCONF = 'apaxhr.urls'
 
@@ -210,6 +216,7 @@ TEMPLATES = [
         'DIRS': [os.path.join(BASE_DIR, 'templates'), ],
         'APP_DIRS': True,
         'OPTIONS': {
+
             'context_processors': [
                 'django.template.context_processors.debug',
                 'django.template.context_processors.request',

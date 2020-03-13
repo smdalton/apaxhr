@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.contrib import admin
 
 # Register your models here.
@@ -10,37 +11,120 @@ from centers.models import LearningCenter, CenterRoom, CenterTeacher, BiWeeklyCl
 from core_hr.extras.dummy import get_dummy_user
 from employment.models import SalariedPosition
 
+class LCPermissionsMixin(admin.ModelAdmin):
 
-@admin.register(LearningCenter)
-class LearningCenterAdmin(GuardedModelAdmin):
+    def has_module_permission(self,request, obj=None):
+
+        perms = list(request.user.groups.values_list('name', flat=True))
+        if any(item in ['Head Teachers', 'Faculty Managers'] for item in perms):
+            print('has change permission')
+            return True
+        else:
+            print('Permission Denied ')
+
     def has_delete_permission(self, request, obj=None):
         return False
+
+
+
+
+@admin.register(LearningCenter)
+class LearningCenterAdmin(LCPermissionsMixin):
     model = LearningCenter
     search_fields = ('name','code')
     verbose_name_plural =  u"\u200B" + 'Learning Centers'
 
 
 @admin.register(CenterRoom)
-class CenterRoomAdmin(admin.ModelAdmin):
-    def has_delete_permission(self, request, obj=None):
-        return False
+class CenterRoomAdmin(LCPermissionsMixin):
+    search_fields = ('name',)
     list_filter = ('center__code',)
     ordering = ('name',)
     model = CenterRoom
     verbose_name_plural =  u"\u200B" + 'Center Rooms'
+
+    # BiWeeklyClass.objects.filter(day1_teacher__employee.name)
     def get_queryset(self, request):
         # return the request for a specific user here
-        return CenterRoom.objects.filter(center__code='HP')
+        return CenterRoom.objects.filter(center=request.user.get_current_center())
 
 @admin.register(CenterTeacher)
-class CenterTeacherAdmin(admin.ModelAdmin):
-    def has_delete_permission(self, request, obj=None):
-        return False
+class CenterTeacherAdmin(LCPermissionsMixin):
+    search_fields = ('teacher__employee__full_name',)
     model = CenterTeacher
     verbose_name_plural = u"\u200B" + 'Center Teachers'
     list_filter = ('center',)
 
     autocomplete_fields = ('center',)
+    def get_queryset(self, request):
+        # return the request for a specific user here
+        return CenterTeacher.objects.filter(center=request.user.get_current_center())
+
+
+
+
+@admin.register(BiWeeklyClass)
+class BiWeeklyClassAdmin(LCPermissionsMixin):
+    model = BiWeeklyClass
+    list_display = ('block','room','class_title','day1_teacher','day2_teacher','is_active',)
+    list_display_links = None
+    autocomplete_fields = ('day1_teacher','day2_teacher')
+    list_editable =('block','day1_teacher','day2_teacher',)
+    exclude = ('center',)
+    list_filter = ( 'is_active','block','day1','day2','class_title',)
+
+    if settings.DEBUG:
+        list_per_page = 40
+    else:
+        list_per_page = 14
+
+    list_select_related = (
+        'day1_teacher__teacher',
+        'day2_teacher__teacher',
+        'day1_teacher__teacher__employee',
+        'day2_teacher__teacher__employee',
+        'room'
+    )
+
+
+    def change_view(self, request, object_id, form_url='', extra_context=None):
+        try:
+            return super().change_view(request, object_id, form_url, extra_context)
+        except Exception as e:
+            print(e)
+
+    def formfield_for_foreignkey(self, db_field, request, **kwargs):
+        # print(self.request.user)
+        # self.request.user = get_dummy_user()
+        center = request.user.get_current_center().pk
+        self.center = center
+        if db_field.name == "room":
+            kwargs["queryset"] = CenterRoom.objects.filter(
+                center_id=center
+            )
+        if db_field.name == "day1_teacher":
+            kwargs["queryset"] =CenterTeacher.objects.filter(
+                center_id=center
+            )
+        if db_field.name == "day2_teacher":
+            kwargs["queryset"] = CenterTeacher.objects.filter(
+                center_id=center
+            )
+        return super().formfield_for_foreignkey(db_field, request, **kwargs)
+
+    verbose_name_plural = u"\u200B" + 'Center Teachers'
+
+
+    def get_queryset(self, request):
+        # return the request for a specific user here
+        self.request = request
+        queryset = super(BiWeeklyClassAdmin, self).get_queryset(self.request)
+        queryset.filter(center=self.request.user.get_current_center())
+        # select_related('day1_teacher__teacher__employee','day2_teacher__teacher__employee','room')
+        return queryset
+
+            # prefetch_related('day1_teacher__teacher__employee','day2_teacher__teacher__employee','room',)
+
 
 #
 # class ClassDayFilter(SimpleListFilter):
@@ -66,28 +150,3 @@ class CenterTeacherAdmin(admin.ModelAdmin):
 #             return queryset.filter(expiration_date__range=[now,expiring_in_two_weeks])
 #         else:
 #             return queryset
-
-
-
-
-@admin.register(BiWeeklyClass)
-class BiWeeklyClassAdmin(GuardedModelAdmin):
-    def has_delete_permission(self, request, obj=None):
-        return False
-    model = BiWeeklyClass
-
-    def formfield_for_foreignkey(self, db_field, request, **kwargs):
-        print(self.request.user)
-        self.request.user = get_dummy_user()
-        if db_field.name == "room":
-            kwargs["queryset"] = CenterRoom.objects.filter(
-                center=self.request.user.get_current_center()
-            )
-        return super().formfield_for_foreignkey(db_field, request, **kwargs)
-
-    verbose_name_plural = u"\u200B" + 'Center Teachers'
-    list_filter = ('center','block','day1','day2','class_title')
-    autocomplete_fields = ('center',)
-    def get_queryset(self, request):
-        # return the request for a specific user here
-        return BiWeeklyClass.objects.filter(center__code='HP')

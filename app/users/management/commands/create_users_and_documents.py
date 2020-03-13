@@ -54,6 +54,7 @@ def assign_documents_to_user(user):
     create_mock_teaching_certificate(user)
     create_mock_resume(user)
 
+from django.contrib.admin.templatetags import base
 
 class Command(BaseCommand):
     help = "Initializes users, clears db, makes and applies migrations, runs server"
@@ -114,22 +115,20 @@ class Command(BaseCommand):
             create_mock_resume(user)
 
     def create_super_user(self):
-        try:
-            from users import Employee
-            Employee.objects.create_superuser(
-                email='smd@gmail.com',
-                password='pass1234',
-                full_name = 'Shane Martin Dalton',
-                gender = 'M',
-                employee_id_number=f"G-12345678",
-                employment_status='em',
-                employment_status_note=fake.bs(),
-                phone_number=fake.phone_number(),
-                personal_email=fake.email(),
-            )
-        except Exception as e:
-            print(e.args)
 
+
+        Employee.objects.create_superuser(
+            email='smd@gmail.com',
+            password='pass1234',
+            full_name = 'Shane Martin Dalton',
+            gender = 'M',
+            employee_id_number=f"G-12345678",
+            employment_status='em',
+            employment_status_note=fake.bs(),
+            phone_number=fake.phone_number(),
+            personal_email=fake.email(),
+        )
+        time.sleep(1)
 
     def load_admin_themes(self):
         themes =  [

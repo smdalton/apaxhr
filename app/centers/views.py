@@ -14,6 +14,8 @@ def home(request):
 #
 # class CentersHomePageView(TemplateView):
 #
+
+
 # the big one
 class ScheduleGridDisplay(ListView):
 
@@ -29,6 +31,7 @@ class ScheduleGridDisplay(ListView):
             print(arg)
 
         context = super(ScheduleGridDisplay, self).get_context_data()
+        # TODO: Stub that needs replacement when user system is in place
         self.request.user = get_dummy_user()
         # get center from the employee
         center = self.request.user.get_current_center()
@@ -39,6 +42,6 @@ class ScheduleGridDisplay(ListView):
         context['sat_sun_pm'] = BiWeeklyClass.objects.sat_sun_pm(center=center)
 
         return context
-        # TODO: Stub that needs replacement when user system is in place
+
 
 

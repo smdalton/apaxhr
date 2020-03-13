@@ -43,7 +43,7 @@ class Command(BaseCommand):
 
     def assign_employees_to_teaching_positions(self):
         department = Department.objects.get(id=1)
-        for employee in list(Employee.objects.all())[:14]:
+        for employee in list(Employee.objects.all()):
             self.placed_employees.append(
                 SalariedPosition.objects.create(
                     title='tch',

@@ -45,7 +45,7 @@ class LearningCenter(models.Model):
         return BiWeeklyClass.objects.filter(center=self)
 
     def __str__(self):
-        return f" {self.code}: {self.name} "
+        return f" {self.code}"
 
 
 class CenterTeacher(models.Model):
@@ -60,7 +60,7 @@ class CenterTeacher(models.Model):
     preferred_room = models.SmallIntegerField(default=-1)
 
     def __str__(self):
-        return str(self.teacher.employee)
+        return f"{self.teacher.employee.full_name}"
 
 
 class CenterRoom(models.Model):
@@ -70,12 +70,12 @@ class CenterRoom(models.Model):
         ]
 
     center = models.ForeignKey(LearningCenter, on_delete=models.CASCADE)
-    name = models.CharField(_('If these aren\'t named exactly and consistently room checking will not work'),
+    name = models.CharField(_('unique room'),
                             default=-1, max_length=12)
     note = models.TextField(_('Note any important details about a room here'), max_length=250)
 
     def __str__(self):
-        return f"Room # {self.name}"
+        return self.name
 
 
 class BaseEvent(models.Model):
@@ -122,16 +122,10 @@ class BiWeeklyClass(BaseEvent):
 
 
     def __str__(self):
-        if self.day1_teacher != self.day2_teacher:
-            return f"{self.class_title}:{self.block_display()} {self.room}" \
-                   f"{self.day1_teacher} teaches:{self.get_day1_display()}," \
-                   f"{self.day2_teacher} teaches:{self.get_day2_display()} "
-
-        else:
-            return f"{self.day1_teacher} teaches:{self.get_day1_display()} "
+            return f"{self.class_title} Block {self.block_display()} {self.get_day1_display(),self.get_day2_display()} "
 
 
-# an event that is added to some kind of schedule
+    # an event that is added to some kind of schedule
 class BaseScheduledEvent(models.Model):
     class Meta:
         abstract = True
