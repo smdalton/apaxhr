@@ -151,6 +151,8 @@ class Employee(AbstractBaseUser, PermissionsMixin):
     def documents_complete(self):
         completion_statuses = [self.passport_complete, self.ros_form_complete]
         return False if False in completion_statuses else True
+
+    @property
     def first_name(self):
         try:
             return str(self.full_name.split()[1])

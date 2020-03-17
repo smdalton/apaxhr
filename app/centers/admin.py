@@ -7,25 +7,13 @@ from django.contrib import admin
 from django.contrib.admin import SimpleListFilter
 from guardian.admin import GuardedModelAdmin
 # Register your models here.
+from ahr_extras.permissions import DefaultPermissionsMixin
 from centers.models import LearningCenter, CenterRoom, CenterTeacher, BiWeeklyClass
 from core_hr.extras.dummy import get_dummy_user
 from employment.models import SalariedPosition
 
-class LCPermissionsMixin(admin.ModelAdmin):
-
-    def has_module_permission(self,request, obj=None):
-
-        perms = list(request.user.groups.values_list('name', flat=True))
-        if any(item in ['Head Teachers', 'Faculty Managers'] for item in perms):
-            print('has change permission')
-            return True
-        else:
-            print('Permission Denied ')
-
-    def has_delete_permission(self, request, obj=None):
-        return False
-
-
+class LCPermissionsMixin(DefaultPermissionsMixin):
+    perms_list = ['Head Teachers', 'Area Managers', 'Faculty Managers', '']
 
 
 @admin.register(LearningCenter)

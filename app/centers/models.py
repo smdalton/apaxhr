@@ -56,7 +56,7 @@ class CenterTeacher(models.Model):
 
     is_active = models.BooleanField(default=True)  # deactivate to "delete"
     center = models.ForeignKey(LearningCenter, on_delete=models.CASCADE)
-    teacher = models.OneToOneField(SalariedPosition, on_delete=models.CASCADE)
+    teacher = models.OneToOneField(SalariedPosition, on_delete=models.CASCADE, related_name='teacher_salaries')
     preferred_room = models.SmallIntegerField(default=-1)
 
     def __str__(self):

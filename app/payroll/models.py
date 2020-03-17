@@ -19,7 +19,6 @@ class CityStipend(models.IntegerChoices):
     TIER_6 = 6, ('Tier 6 City')
 
 
-
 class CompletionBonus(models.IntegerChoices):
     MONTH_4 = 1, ('4 month')
     MONTH_8 = 2, ('8 month')
@@ -44,8 +43,10 @@ class PositionSalaryInfo(models.Model):
     position = models.OneToOneField(SalariedPosition, on_delete=models.CASCADE)
     city_stipend = models.SmallIntegerField(choices=CityStipend.choices, default=1)
     salary_step = models.SmallIntegerField(choices=SalarySteps.choices, default=1)
+    def name(self):
+        return self.position.employee
     def __str__(self):
-        return f"{self.position.employee.first_name} {self.salary_step}"
+        return f"{self.position.employee} step:{self.salary_step}"
 
 class Bonus(models.Model):
     related_salary = models.ForeignKey(PositionSalaryInfo, on_delete=models.CASCADE)
@@ -57,8 +58,10 @@ class Bonus(models.Model):
     part_2_awarded = models.BooleanField(default=False)
     part_2_awarded_on = models.DateTimeField(default=None)
 
-    # def __str__(self):
-    #     return f" pt1:{self.amount} awarded on {self.}"
+
+
+
+
 
 # def compute_monthly_pay():
     # compute salary

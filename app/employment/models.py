@@ -26,7 +26,7 @@ class BasePositionMixin(models.Model):
     employment_status_note = models.TextField(max_length=500, default='no one has written about this position yet...')
 
     def __str__(self):
-        return f"{self.employee} works in {self.department} as a {self.get_title_display()}"
+        return f"{self.employee.full_name} {self.department} {self.get_title_display()}"
     # email_active = models.BooleanField(default=True)
 
 
@@ -57,3 +57,6 @@ class SalariedPosition(BasePositionMixin, models.Model):
 
     title = models.CharField(choices=titles, default='tch', max_length=25)
 
+    @property
+    def name(self):
+        return str(self.employee.full_name)
