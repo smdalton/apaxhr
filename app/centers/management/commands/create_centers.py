@@ -60,12 +60,12 @@ class Command(BaseCommand):
                     name=center_name,
                     city=center_name,
                     address=fake.address(),
-
                 )
+                print(f"Created: {center_code}")
 
     def create_and_assign_center_rooms(self):
         for center in LearningCenter.objects.all():
-
+            print(f"creating {center} rooms")
             for room in self.april_rooms:
                 try:
                     CenterRoom.objects.create(center=center, name=room)
@@ -80,13 +80,22 @@ class Command(BaseCommand):
 
     def create_center_teachers(self):
         # get teachers from positions of type teacher
+
         teachers = SalariedPosition.objects.filter(title='tch').exclude(employee__full_name='')
-        center = LearningCenter.objects.get(code='HP')
+
+        hp_teachers = teachers[:10]
+        hn_teachers = teachers[10:20]
+        hcmc_teachers = teachers[20:25]
+
+        hp_center = LearningCenter.objects.get(code='HP')
+        hn_center = LearningCenter.objects.get(code='HN')
+        hcmc_center = LearningCenter.objects.get(code='HCMC')
+
         # assign teachers for Hai Phong
         num = 1
-        for teacher in teachers:
+        for teacher in hp_teachers:
             result = CenterTeacher.objects.get_or_create(
-                center=center,
+                center=hp_center,
                 teacher=teacher,
                 preferred_room=str(num),
             )
@@ -94,17 +103,28 @@ class Command(BaseCommand):
             if result[1]:
                 self.center_teachers.append(result[0])
 
+        for teacher in hn_teachers:
+            result = CenterTeacher.objects.get_or_create(
+                center=hn_center,
+                teacher=teacher,
+                preferred_room=str(num),
+            )
+            num += 1
+            if result[1]:
+                self.center_teachers.append(result[0])
+            pass
+
+        for teacher in hcmc_teachers:
+            result = CenterTeacher.objects.get_or_create(
+                center=hcmc_center,
+                teacher=teacher,
+                preferred_room=str(num),
+            )
+            num += 1
+            if result[1]:
+                self.center_teachers.append(result[0])
+            pass
     course_titles_cycle = cycle(course_titles)
-
-    def create_center_course(self, teacher):
-
-        bi_weekly_class = BiWeeklyClass.objects.create(
-
-        )
-
-        # each teacher gets 10 classes 6 are blocks 5 & 6
-        # two are blocks 1 & 2
-        # two are blocks 3 & 4
 
     def create_weekday_biweekly_courses(self):
         global cm, block, class_title
@@ -122,7 +142,7 @@ class Command(BaseCommand):
         # cycle the teachers evenly
         for day_set in weekday_sets:
             for block in [5,6]:
-                teachers = cycle(list(CenterTeacher.objects.filter(center__code='HP').all()))
+                teachers = cycle(list(CenterTeacher.objects.filter(center__code='HP').all())[:12])
                 for room in list(CenterRoom.objects.filter(center__code='HP').all()):
                     class_title = random.choice(self.course_titles)
                     try:
@@ -135,7 +155,6 @@ class Command(BaseCommand):
                             day2_teacher=teacher,
                             day1=day_set[0],
                             day2=day_set[1],
-                            single_day=False,
                             class_title=class_title,
                             cm=random.choice(self.cms)
                         )
@@ -156,7 +175,6 @@ class Command(BaseCommand):
                         day2_teacher=teacher,
                         day1=sat_sun[0],
                         day2=sat_sun[1],
-                        single_day=False,
                         class_title=class_title,
                         cm=random.choice(self.cms)
                     )
@@ -171,6 +189,7 @@ class Command(BaseCommand):
         self.create_centers()
         print('---> Creating Rooms')
         self.create_and_assign_center_rooms()
+        time.sleep(1)
         print('---> Creating Center Teachers')
         self.create_center_teachers()
         print('---> Creating BiWeeklyCenterCourses')

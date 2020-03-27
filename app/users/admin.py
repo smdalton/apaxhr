@@ -91,6 +91,9 @@ class CustomUserAdmin(UserAdmin):
         'is_active',
         'groups',
     )
+    list_select_related = (
+        'passport',
+    )
     # list_filter = ('employment_status','is_staff', 'is_active')
     actions = ["export_as_csv"]
     fieldsets = (
@@ -126,6 +129,7 @@ class CustomUserAdmin(UserAdmin):
         inlines.WorkPermitInline,
         inlines.RegistryOfStayInline
     ]
+
     ordering = ('email',)
 
 

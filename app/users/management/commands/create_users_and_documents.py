@@ -61,7 +61,7 @@ class Command(BaseCommand):
     users = []
 
     def delete_migrations(self):
-        self.stdout.write(os.getcwd())
+        print(os.getcwd())
         # print("deleting db")
         # os.system('rm devdb.sqlite3')
         # time.sleep(1)
@@ -71,7 +71,7 @@ class Command(BaseCommand):
 
         if os.environ.get("DEV_POSTGRES")=='TRUE':
 
-            self.stdout.write('Running dev postgres')
+            print('Running dev postgres')
             print('deleting migrations')
             os.system('find . -path "*/migrations/*.py" -not -name "__init__.py" -delete')
             os.system('find . -path "*/migrations/*.pyc"  -delete')
@@ -81,7 +81,7 @@ class Command(BaseCommand):
             # os.system('python3 manage.py migrate')
 
         else:
-            self.stdout.write('Running on development postgresql wipe_db aborted')
+            print('Running on development postgresql wipe_db aborted')
             return
 
 

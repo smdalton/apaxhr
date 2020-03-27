@@ -7,14 +7,15 @@ import ahr_extras.permissions as p
 from ahr_extras.permissions import permissions_groups as pg
 class Command(BaseCommand):
 
-    def __init__(self):
-
+    def __init__(self, *args, **kwargs):
+        super(Command, self).__init__(*args, **kwargs)
         self.groups = p.get_all_permissions_groups()
         self.tier1 = pg['tier1']
         self.tier2 = pg['tier2']
         self.tier3 = pg['tier3']
         self.tier4 = pg['tier4']
         self.tier5 = pg['tier5']
+
 
     def create_groups(self):
         for group_name in self.groups:

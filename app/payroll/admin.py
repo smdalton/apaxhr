@@ -21,8 +21,6 @@ class PRLPermissionsMixin(admin.ModelAdmin):
         return False
 
 
-
-
 class UserInLine(admin.TabularInline):
     model = Group.user_set.through
     extra = 0
@@ -31,7 +29,7 @@ class UserInLine(admin.TabularInline):
 class GenericGroup(GroupAdmin):
     inlines = [UserInLine]
 
-#
+
 @admin.register(PositionSalaryInfo)
 class EmployeePositionAdmin(PRLPermissionsMixin):
     def has_delete_permission(self, request, obj=None):

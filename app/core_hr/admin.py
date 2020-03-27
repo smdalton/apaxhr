@@ -52,6 +52,7 @@ class ExpiredDocumentStatusFilter(SimpleListFilter):
             ('expiring_in_six_months', 'Within 6 months'),
         ]
 
+
     def queryset(self, request, queryset):
         now = datetime.datetime.now().date()
 

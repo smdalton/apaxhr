@@ -15,6 +15,11 @@ class Department(models.Model):
     def __str__(self):
         return self.name
 
+
+class EmploymentContract(models.Model):
+    # some rules here
+    hours = models.SmallIntegerField(default=18)
+
 class BasePositionMixin(models.Model):
     class Meta:
         abstract = True
@@ -24,10 +29,11 @@ class BasePositionMixin(models.Model):
     active = models.BooleanField(default=True)
     employee = models.ForeignKey(Employee, on_delete=models.CASCADE)
     employment_status_note = models.TextField(max_length=500, default='no one has written about this position yet...')
-
+    employment_contract = models.ForeignKey(EmploymentContract, on_delete=models.CASCADE, null=True)
     def __str__(self):
         return f"{self.employee.full_name} {self.department} {self.get_title_display()}"
     # email_active = models.BooleanField(default=True)
+
 
 
 # represents and instance of an employee at a specific job for a duration of time
@@ -39,6 +45,7 @@ class SalariedPosition(BasePositionMixin, models.Model):
         (2,'II'),
         (3, 'III'),
     )
+
     titles = (
         ('ap', 'Applicant'),
         ('tr', 'Trainee'),
@@ -56,6 +63,7 @@ class SalariedPosition(BasePositionMixin, models.Model):
     )
 
     title = models.CharField(choices=titles, default='tch', max_length=25)
+
 
     @property
     def name(self):

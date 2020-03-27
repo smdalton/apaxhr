@@ -1,9 +1,10 @@
 from django.db import models
 from djmoney.models.fields import MoneyField
 from djmoney.money import Money
-
-
+import calendar
+from calendar import monthrange
 # Create your models here.
+from centers.models import LearningCenter, CenterTeacher
 from employment.models import SalariedPosition
 
 # Build data for salaries, that is then applied in a monthly task object which generates
@@ -39,10 +40,14 @@ class SalarySteps(models.IntegerChoices):
     STEP_11 = 11, ('Salary Step 11')
     STEP_12 = 12, ('Salary Step 12')
 
+
+
 class PositionSalaryInfo(models.Model):
     position = models.OneToOneField(SalariedPosition, on_delete=models.CASCADE)
     city_stipend = models.SmallIntegerField(choices=CityStipend.choices, default=1)
     salary_step = models.SmallIntegerField(choices=SalarySteps.choices, default=1)
+    leave_hours = models.SmallIntegerField(default=0)
+
     def name(self):
         return self.position.employee
     def __str__(self):
@@ -59,10 +64,38 @@ class Bonus(models.Model):
     part_2_awarded_on = models.DateTimeField(default=None)
 
 
-
-
-
-
+#
+# # make an annual payroll period for each year
+# class AnnualCompanyPayroll(models.Model):
+#     year = models.DateField()
+#     pass
+#
+# class MonthlyCompanyPayroll(models.Model):
+#     payroll_year = models.ForeignKey(AnnualCompanyPayroll, on_delete=models.CASCADE)
+#     month_start_date = models.DateField(auto_now_add=True)
+#     month_end_date = models.DateField(auto_now_add=False, default=-1)
+#
+#     pass
+#
+# # make a center monthly payroll period
+# class CenterMonthlyPayrollPeriod(models.Model):
+#     monthly_payroll = models.ForeignKey(MonthlyCompanyPayroll, on_delete=models.CASCADE)
+#     center = models.ForeignKey(LearningCenter, on_delete=models.CASCADE)
+#
+#     def get_month_name(self):
+#         pass
+#
+#     def __str__(self):
+#         return f"{self.month_start_date.strftime('%B')} pay period   days: {self.month_start_date} - {self.month_end_date}"
+#     pass
+#
+#
+#
+#
+#
+#
+#
+#
 # def compute_monthly_pay():
     # compute salary
     # compute hours
@@ -73,4 +106,5 @@ class Bonus(models.Model):
     # apply taxes
     # print readable report
 
-
+#
+# teacher.get_hours_from_schedule()

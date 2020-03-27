@@ -132,6 +132,8 @@ BASE_APPS = [
 
 EXTENSION_APPS = [
     # extensions
+    'django_json_widget',
+    'django_admin_listfilter_dropdown',
     'guardian',
     'colorfield',
     'crispy_forms',
