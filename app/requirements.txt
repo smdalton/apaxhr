@@ -1,5 +1,6 @@
 alabaster==0.7.12
 amqp==2.5.2
+anyjson==0.3.3
 appnope==0.1.0
 asgiref==3.2.3
 attrs==19.3.0
@@ -7,7 +8,7 @@ Babel==2.8.0
 backcall==0.1.0
 bcrypt==3.1.7
 beautifulsoup4==4.8.1
-billiard==3.6.1.0
+billiard==3.6.2.0
 bleach==3.1.0
 boto3==1.10.34
 botocore==1.13.34
@@ -25,6 +26,8 @@ Django==3.0
 django-admin-interface==0.12.0
 django-admin-thumbnails==0.2.4
 django-bootstrap-datepicker-plus==3.0.5
+django-celery==3.3.1
+django-celery-results==1.2.0
 django-colorfield==0.1.15
 django-countries==5.5
 django-crispy-forms==1.8.1
@@ -33,9 +36,11 @@ django-extensions==2.2.5
 django-flat-responsive==2.0
 django-flat-theme==1.1.4
 django-livereload-server==0.3.2
+django-money==1.0
 django-nose==1.4.6
 django-redis==4.11.0
 django-storages==1.8
+django-timezone-field==3.1
 djangorestframework==3.11.0
 docker==4.1.0
 docker-compose==1.25.0
@@ -89,6 +94,7 @@ psutil==5.6.7
 psycopg2-binary==2.8.4
 ptyprocess==0.6.0
 py==1.8.1
+py-moneyed==0.8.0
 pycparser==2.19
 pydot==1.4.1
 Pygments==2.5.2
@@ -102,6 +108,7 @@ pytest-django==3.8.0
 pytest-docker-compose==3.1.2
 pytest-env==0.6.2
 pytest-pgsql==1.1.1
+python-crontab==2.4.0
 python-dateutil==2.8.0
 python-social-auth==0.3.6
 python3-openid==3.1.0
@@ -146,3 +153,8 @@ webencodings==0.5.1
 websocket-client==0.57.0
 widgetsnbextension==3.5.1
 zipp==0.6.0
+django-json-widget
+django-admin-list-filter-dropdown
+django-guardian
+colorama
+https://github.com/celery/django-celery-beat/zipball/master#egg=django-celery-beat

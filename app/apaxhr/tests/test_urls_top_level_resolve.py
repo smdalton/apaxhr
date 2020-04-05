@@ -6,7 +6,7 @@ from django.urls import resolve
 import apaxhr.views
 import core_hr.views
 import employee_mgmt.views
-import lifecycle.views
+import employment.views
 import users.views
 
 
@@ -26,8 +26,8 @@ class BaseLandingUrlsResolve(SimpleTestCase):
         self.assertEqual(found.func.view_class, employee_mgmt.views.EmployeeManagementHome)
 
     def test_lifecycle_landing_resolves_to_view(self):
-        found = resolve('/lifecycle/')
-        self.assertEqual(found.func.view_class, lifecycle.views.LifeCycleHome)
+        found = resolve('/employment/')
+        self.assertEqual(found.func.view_class, employment.views.LifeCycleHome)
 
     def test_users_resolves_to_view(self):
         found = resolve('/users/')

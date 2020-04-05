@@ -1,3 +1,4 @@
+from cached_property import cached_property
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
@@ -5,6 +6,7 @@ from django.urls import reverse_lazy
 from django.utils.translation import gettext_lazy as _
 from django.utils import timezone
 
+from centers.models import LearningCenter
 from core_hr.models import Passport, RegistryOfStay, WorkPermit, Resume, TeachingCertificate, DegreeDocument, \
     AchievementCertificate
 from .managers import CustomUserManager
@@ -37,7 +39,7 @@ class Employee(AbstractBaseUser, PermissionsMixin):
     genders = (('M', 'male'), ('F', 'female'))
     # core information
 
-    full_name = models.CharField(_('Name as on Passport'), validators=[name_validator], max_length=45, blank=False)
+    full_name = models.CharField(_('Name as on Passport'), validators=[name_validator], max_length=45, blank=False,)
 
     # employment data
 
@@ -82,7 +84,6 @@ class Employee(AbstractBaseUser, PermissionsMixin):
             docs['Work Permit'] = 'not found'
 
         return docs
-
     def get_other_documents(self):
         docs = {}
 
@@ -102,7 +103,6 @@ class Employee(AbstractBaseUser, PermissionsMixin):
 
 
         return docs
-
     def get_achievement_certificates(self):
         docs = {}
         try:
@@ -110,18 +110,23 @@ class Employee(AbstractBaseUser, PermissionsMixin):
         except:
             docs['Achievement Certificates'] = 'not found'
         return docs
-
     def test_passports(self):
         from core_hr.models import Passport
         owners_passport = Passport.objects.get(owner__pk=self.id)
         if owners_passport.image == None:
             print('image is none')
-
     def get_contact_info(self):
         try:
             return f"{self.phone_number}, {self.email}, {self.personal_email}"
         except:
             return "Error during retrieval of contact info, perhaps it isn't complete"
+
+    def get_current_center(self):
+        # query the employees current center
+        center = LearningCenter.objects.get(
+            centerteacher__teacher__employee_id=self.pk
+        )
+        return center
 
     @property
     def passport_complete(self):
@@ -147,26 +152,29 @@ class Employee(AbstractBaseUser, PermissionsMixin):
         completion_statuses = [self.passport_complete, self.ros_form_complete]
         return False if False in completion_statuses else True
 
+    @property
     def first_name(self):
         try:
             return str(self.full_name.split()[1])
         except:
-            pass
-
+            return self.full_name
     def middle_name(self):
         try:
             return str(self.full_name.split()[2])
         except:
             pass
-
     def last_name(self):
         try:
             return str(self.full_name.split()[0])
         except:
             pass
 
+
     def __str__(self):
-        return f"{self.full_name} {self.email}"
+        try:
+            return f"{self.full_name} {self.email}"
+        except Exception as e:
+            return 'name-error'
 
 
 #

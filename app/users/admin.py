@@ -33,9 +33,9 @@ class DocumentCompletionStatusFilter(SimpleListFilter):
 
     def queryset(self, request, queryset):
         complex_query = \
-            Q(pk__in=Subquery(Passport.objects.all().values('owner__pk')))\
-            &Q(pk__in=Subquery(RegistryOfStay.objects.all().values('owner__pk')))\
-            &Q(pk__in=Subquery(WorkPermit.objects.all().values('owner__pk')))
+            Q(pk__in=Subquery(Passport.objects.all().values('owner__pk'))) \
+            & Q(pk__in=Subquery(RegistryOfStay.objects.all().values('owner__pk'))) \
+            & Q(pk__in=Subquery(WorkPermit.objects.all().values('owner__pk')))
         all_created = queryset.filter(complex_query)
 
         # Subquery(Passport.objects.all().values('owner__pk')
@@ -75,7 +75,7 @@ class DocumentExpirationStatusFilter(SimpleListFilter):
 
 class CustomUserAdmin(UserAdmin):
     class Meta:
-        verbose_name= 'Employees'
+        verbose_name = 'Employees'
 
     def has_delete_permission(self, request, obj=None):
         return False
@@ -83,18 +83,33 @@ class CustomUserAdmin(UserAdmin):
     add_form = CustomUserCreationForm
     form = CustomUserChangeForm
     model = Employee
-    search_fields = ('email','full_name','employee_id_number')
-    list_display = ('full_name', 'registryofstay', 'workpermit', 'passport',)
-
-    list_filter = (DocumentExpirationStatusFilter, DocumentCompletionStatusFilter, 'is_active')
-    #list_filter = ('employment_status','is_staff', 'is_active')
+    search_fields = ('email', 'full_name', 'employee_id_number')
+    list_display = ('full_name', 'employee_id_number')
+    list_filter = (
+        DocumentExpirationStatusFilter,
+        DocumentCompletionStatusFilter,
+        'is_active',
+        'groups',
+    )
+    list_select_related = (
+        'passport',
+    )
+    # list_filter = ('employment_status','is_staff', 'is_active')
     actions = ["export_as_csv"]
     fieldsets = (
-        ('Credentials', {'fields': (('email','personal_email','is_staff', 'is_active',),)}),
-        ('Name',{'fields':('full_name',)}),
-        #('Permissions', {'fields': (('is_staff', 'is_active',),)}),
-    )
+        ('Name', {'fields': ('full_name',)}),
 
+        ('Credentials',
+         {
+             'fields':
+                 (('email', 'personal_email', 'is_staff', 'is_active',),)
+         }),
+        ('Groups',
+         {
+             'fields': (('groups',))
+         })
+
+    )
 
     def export_as_csv(self, request, queryset):
         meta = self.model._meta
@@ -114,8 +129,8 @@ class CustomUserAdmin(UserAdmin):
         inlines.WorkPermitInline,
         inlines.RegistryOfStayInline
     ]
-    ordering = ('email',)
 
+    ordering = ('email',)
 
 
 admin.site.register(Employee, CustomUserAdmin)

@@ -1,12 +1,12 @@
 import csv
-from datetime import datetime, timedelta
+
 
 from botocore.exceptions import EndpointConnectionError
 from django.contrib import admin
-
+import datetime
 from django.apps import apps
 from django.contrib.admin import SimpleListFilter
-from django.db.models import Subquery
+from django.db.models import Subquery, Q
 from django.http import HttpResponse
 from django.utils.safestring import mark_safe
 
@@ -35,41 +35,92 @@ class WorkPermitStatusFilter(SimpleListFilter):
         if self.value() == 'not_complete':
             return queryset.exclude(pk__in=Subquery(WorkPermit.objects.all().values('owner__pk')))
         elif self.value() == 'expiring_soon':
-            now = datetime.now().date()
+            now = datetime.datetime.now().date()
             expiring_in_one_month = now + datedelta.datedelta(days=14)
             return queryset.filter(expiration_date__range=[now, expiring_in_one_month])
         # elif self.value() =='expiring_soon':
+
+class ExpiredDocumentStatusFilter(SimpleListFilter):
+    title='Document Expiration Status'
+    parameter_name = 'exp-info'
+    def lookups(self, request, model_admin):
+        return[
+            ('missing_picture', 'Picture file missing'),
+            ('expired', 'Document Expired'),
+            ('expiring_very_soon', 'Within 2 weeks'),
+            ('expiring_soon', 'Within 1 month'),
+            ('expiring_in_six_months', 'Within 6 months'),
+        ]
+
+
+    def queryset(self, request, queryset):
+        now = datetime.datetime.now().date()
+
+        if self.value() == 'expiring_in_six_months':
+            expiring_in_six_months = now +datedelta.datedelta(days=180)
+            return queryset.filter(expiration_date__range=[now, expiring_in_six_months])
+        elif self.value() == 'expiring_soon':
+            expiring_in_one_month = now + datedelta.datedelta(days=30)
+            return queryset.filter(expiration_date__range=[now, expiring_in_one_month])
+        elif self.value() == 'expiring_very_soon':
+            expiring_in_two_weeks = now + datedelta.datedelta(days=14)
+            return queryset.filter(expiration_date__range=[now, expiring_in_two_weeks])
+        elif self.value() == 'expired':
+            return queryset.filter(expiration_date__lte=datetime.datetime.now().date())
+        elif self.value() == 'missing_picture':
+            return queryset.filter(Q(image='') | Q(image=None))
+        else:
+            return queryset.all()
+
 
 class LegalDocumentAdminMixin(object):
     class Meta:
         abstract = True
 
     ordering = ('expiration_date',)
-    list_filter = ('expiration_date',)
+    list_filter = (ExpiredDocumentStatusFilter,)
     list_display = ('owner', 'expiration_date', 'valid', )
     search_fields = ('owner__full_name', 'owner__employee_id_number')
     readonly_fields = ('owner', 'document_image',)
-    actions=["export_as_csv"]
+    actions=["export_as_csv", "email_selected"]
 
 
     def export_as_csv(self, request, queryset):
         meta = self.model._meta
         field_names = [field.name for field in meta.fields]
-
+        field_names = ['owner',]
         response = HttpResponse(content_type='text/csv')
-        response['Content-Disposition'] = 'attachment; filename={}.csv'.format(meta)
+        response['Content-Disposition'] = 'attachment; filename=Expired{}.csv'.format( meta)
         writer = csv.writer(response)
 
         writer.writerow(field_names)
         for obj in queryset:
-            row = writer.writerow([getattr(obj, field) for field in field_names])
-        return response
+            email = [getattr(obj, field).email for field in field_names if field=='owner']
+            row = writer.writerow(
+                [getattr(obj, field).email if field=='owner' else getattr(obj, field) for field in field_names] )
 
+        return response
 
     export_as_csv.short_description = "Export Selected"
 
+
+    def email_selected(self, request, queryset):
+        meta = self.model._meta
+        field_names = [field.name for field in meta.fields]
+
+        for obj in queryset:
+            email_addresses = [getattr(obj, field).email for field in field_names if field == 'owner']
+            message =' Whatever you want to say here up to and including' \
+                     ' a fully formatted html page' \
+                     ' Hi user, your document is expired...' \
+                     ' please update it or risk being deported and fined'
+            for email_address in email_addresses:
+                print(f"{email_address} Sent message:{message}")
+        pass
+
+
     def valid(self, obj):
-        return obj.expiration_date > datetime.now().date()
+        return obj.expiration_date > datetime.datetime.now().date()
 
 
     def document_image(self, obj):
@@ -94,57 +145,9 @@ class WorkPermitAdmin(LegalDocumentAdminMixin, admin.ModelAdmin):
     def has_delete_permission(self, request, obj=None):
         return False
 
-class RegistryOfStayStatusFilter(SimpleListFilter):
-    title='ROS Status'
-    parameter_name = 'ros-status'
-
-    def lookups(self, request, model_admin):
-        return[
-
-            ('not_complete', 'Not Complete'),
-            ('expiring_soon', 'expiring w/in 2 weeks'),
-            ('expired', 'expired')
-        ]
-
-    def queryset(self, request, queryset):
-
-        if self.value() == 'not_complete':
-            return queryset.exclude(pk__in=Subquery(RegistryOfStay.objects.all().values('owner__pk')))
-        elif self.value() == 'expiring_soon':
-            now = datetime.now().date()
-            expiring_in_two_weeks = now + datedelta.datedelta(days=14)
-            return queryset.filter(expiration_date__range=[now, expiring_in_two_weeks])
-        elif self.value() == 'expired':
-            return queryset.filter(expiration_date__lte=datetime.now().date())
-
 @admin.register(RegistryOfStay)
 class RegistryOfStayAdmin(LegalDocumentAdminMixin, admin.ModelAdmin):
     model = RegistryOfStay
-
-
-class PassportStatusFilter(SimpleListFilter):
-    title='Passport Status'
-    parameter_name = 'documents'
-
-    def lookups(self, request, model_admin):
-        return[
-            ('expired', 'Expiring'),
-            ('expiring', 'Expires w/in 2mo'),
-            ('expired', 'Passport is Expired'),
-        ]
-
-    def queryset(self, request, queryset):
-        # Employee.objects.filter(pk__in=Subquery(Passport.objects.all().values('owner__pk')))
-        if self.value() == 'expiring':
-            return queryset.filter(pk__in=Subquery(Passport.objects.all().values('owner__pk')))
-        elif self.value() == 'expired':
-            return queryset.exclude(pk__in=Subquery(Passport.objects.all().values('owner__pk')))
-        elif self.value() == 'expiring_soon':
-            now = datetime.now().date()
-            expiring_in_two_weeks = now + datedelta.datedelta(days=14)
-            return queryset.filter(expiration_date__range=[now,expiring_in_two_weeks])
-        else:
-            return queryset
 
 @admin.register(Passport)
 class PassportAdmin(LegalDocumentAdminMixin, admin.ModelAdmin):

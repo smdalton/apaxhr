@@ -1,25 +1,39 @@
 from django.contrib.admindocs.views import ModelDetailView
-from django.shortcuts import render
+from django.contrib.auth import logout
+from django.contrib.auth.views import LoginView, LogoutView
+from django.shortcuts import render, redirect
+from django.urls import reverse_lazy
 from django.views.generic import ListView
 from django.views.generic.base import TemplateView
 
 
 from core_hr.models import Employee
 
+def logout_view(request):
+    logout(request)
+    return redirect('home_simple')
+    # Redirect to a success page.
 
-class HomePage(TemplateView):
+class HomePage(LoginView):
 
     template_name = 'apaxhr/home.html'
+    def get_success_url(self):
+        return reverse_lazy('home_simple')
 
     def dispatch(self, request, *args, **kwargs):
+        # store permissions session data at login time
         self.access_tier = kwargs.get('access_tier', "access tier not present")
+        #print(self.request.get_host())
+        # assign permissions this way
+
+        self.request.user.groups.filter(name__in=['group1', 'group2']).exists()
         return super(HomePage, self).dispatch(request, *args, **kwargs)
-    tier_list = ['tier0','tier1','tier2','tier3','tier4',]
 
     def get_context_data(self, **kwargs):
         context = super(HomePage, self).get_context_data(**kwargs)
-        # TODO: Implement user request authentication here
+        # TODO: Implement user request authentication and slotting here
         tier_list = ['tier0', 'tier1', 'tier2', 'tier3', 'tier4', ]
+
         def pop_session(save_tier='none'):
             for tier in tier_list:
                 try:
@@ -61,3 +75,7 @@ class HomePage(TemplateView):
         context['privilege_level'] = self.access_tier
 
         return context
+#
+# class Logout(LogoutView):
+#     template_name = 'users/logout.html'
+#     next_page = reverse_lazy('home_simple')

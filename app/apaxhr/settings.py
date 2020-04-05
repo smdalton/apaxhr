@@ -15,12 +15,18 @@ import os
 
 # Build paths inside the docker_files like this: os.path.join(BASE_DIR, ...)
 from django.core.files.storage import FileSystemStorage
+from celery.schedules import crontab
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 TEMPLATE_DIR = os.path.join(BASE_DIR, '/templates')
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.0/howto/deployment/checklist/
 
+
+AUTHENTICATION_BACKENDS = (
+    'django.contrib.auth.backends.ModelBackend',  # default
+    'guardian.backends.ObjectPermissionBackend',
+)
 
 # EMAIL SETTINGS
 
@@ -43,9 +49,12 @@ STATICFILES_FINDERS = (
     'django.contrib.staticfiles.finders.AppDirectoriesFinder',
 )
 AWS_DEFAULT_ACL = 'public-read'
-
+num = 0
 USE_S3 = os.getenv('USE_S3')
-print("OS ENV FOR S3:--->", os.getenv('USE_S3'))
+
+if num == 0:
+    print("OS ENV FOR S3:--->", os.getenv('USE_S3'))
+    num = 1
 
 if USE_S3:
     AWS_ACCESS_KEY_ID = os.getenv('AWS_ACCESS_KEY_ID')
@@ -81,29 +90,35 @@ SECRET_KEY = os.environ.get('SECRET_KEY', 'change me to a real key')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 
-DEBUG = True
-if os.environ.get('DEV'):
+
+if os.environ.get('DEV') == 'TRUE':
     DEBUG = True
     ALLOWED_HOSTS = ['*']
-    INTERNAL_IPS = [
-        'localhost',
-        '127.0.0.1',
-    ]
+#     INTERNAL_IPS = [
+#     'localhost',
+#     '127.0.0.1',
+# ]
 else:
+    DEBUG = False
     ALLOWED_HOSTS = ['*']
 
 # Application definition
 CREATED_APPS = [
     # Applications
-    'users',
+
     'apaxhr',
+    'users',
     'core_hr',
+    'employment',
+    'payroll',
     'employee_mgmt',
-    'schedules',
+    'centers',
+
 ]
 
 BASE_APPS = [
     # packages
+    'djmoney',
     'livereload',
     'django.contrib.staticfiles',
     'admin_interface',
@@ -112,26 +127,57 @@ BASE_APPS = [
     'django.contrib.auth',
     'django.contrib.sessions',
     'django.contrib.messages',
+
 ]
 
 EXTENSION_APPS = [
     # extensions
+    'django_json_widget',
+    'django_admin_listfilter_dropdown',
+    'guardian',
     'colorfield',
     'crispy_forms',
-    'debug_toolbar',
     'django_countries',
     'django_nose',
     'storages',
-    'django_extensions'
+    'django_extensions',
+    'django_celery_results',
+    'django_celery_beat',
 ]
+if DEBUG:
+    EXTENSION_APPS.append('debug_toolbar')
 
 INSTALLED_APPS = CREATED_APPS + BASE_APPS + EXTENSION_APPS
 # TODO: LOGGING
 #  https://stackoverflow.com/questions/16876045/django-logging-only-for-my-apps
 
+
+###______________ CELERY CONFIG__________________###
+CELERY_BROKER_URL = 'amqp://guest:guest@rabbitmq:5672//'
+CELERY_RESULT_BACKEND = 'redis://redis:6379'
+CELERY_CACHE_BACKEND = 'default'
+CELERY_ENABLE_UTC = False
+
+CELERY_BEAT_SCHEDULE = {
+    'hello': {
+        'task': 'create_users_and_documents.hello',
+        'schedule': crontab()  # execute every minute
+    },
+    'core_hr': {
+        'task': 'core_hr.tasks.core_hr_task',
+        'schedule': crontab()
+    }
+
+}
+
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+        'LOCATION': 'unique-snowflake',
+    }
+}
+
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
-
-
 
 TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
 NOSE_ARGS = [
@@ -141,6 +187,10 @@ NOSE_ARGS = [
     # Change `MY_APP` to your `app` name
 ]
 
+
+def custom_show_toolbar(request):
+    return True  # Always show toolbar, for example purposes only.
+
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -149,8 +199,16 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'debug_toolbar.middleware.DebugToolbarMiddleware',
+
 ]
+
+if DEBUG:
+    DEBUG_TOOLBAR_CONFIG = {
+        'SHOW_TOOLBAR_CALLBACK': custom_show_toolbar,
+        'DISABLE_PANELS': ( 'debug_toolbar.panels.templates.TemplatesPanel', 'debug_toolbar.panels.redirects.RedirectsPanel',),
+        'SHOW_TEMPLATE_CONTEXT': False,
+    }
+    MIDDLEWARE.append('debug_toolbar.middleware.DebugToolbarMiddleware')
 
 ROOT_URLCONF = 'apaxhr.urls'
 
@@ -160,6 +218,7 @@ TEMPLATES = [
         'DIRS': [os.path.join(BASE_DIR, 'templates'), ],
         'APP_DIRS': True,
         'OPTIONS': {
+
             'context_processors': [
                 'django.template.context_processors.debug',
                 'django.template.context_processors.request',
@@ -197,14 +256,7 @@ else:
             "PORT": os.environ.get("SQL_PORT", "5432"),
         }
     }
-
-# CACHES = {
-#     'default': {
-#         'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
-#         'LOCATION': 'unique-snowflake',
-#     }
-# }
-
+# CELERY_BEAT_SCHEDULER = "django_celery_beat.schedulers:DatabaseScheduler"
 # CUSTOM USER MODEL
 AUTH_USER_MODEL = 'users.Employee'
 
@@ -234,6 +286,7 @@ LANGUAGE_CODE = 'en-us'
 
 USE_TZ = True
 TIME_ZONE = 'Asia/Ho_Chi_Minh'
+CELERY_TIMEZONE = 'Asia/Ho_Chi_Minh'
 USE_I18N = True
 
 USE_L10N = False
@@ -254,8 +307,6 @@ DATETIME_INPUT_FORMATS = [
     '%m/%d/%y %H:%M:%S.%f',
     '%m/%d/%y %H:%M',
     '%m/%d/%y']
-
-
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.0/howto/static-files/
