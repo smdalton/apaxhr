@@ -64,38 +64,38 @@ class Bonus(models.Model):
     part_2_awarded_on = models.DateTimeField(default=None)
 
 
-#
-# # make an annual payroll period for each year
-# class AnnualCompanyPayroll(models.Model):
-#     year = models.DateField()
-#     pass
-#
-# class MonthlyCompanyPayroll(models.Model):
-#     payroll_year = models.ForeignKey(AnnualCompanyPayroll, on_delete=models.CASCADE)
-#     month_start_date = models.DateField(auto_now_add=True)
-#     month_end_date = models.DateField(auto_now_add=False, default=-1)
-#
-#     pass
-#
-# # make a center monthly payroll period
-# class CenterMonthlyPayrollPeriod(models.Model):
-#     monthly_payroll = models.ForeignKey(MonthlyCompanyPayroll, on_delete=models.CASCADE)
-#     center = models.ForeignKey(LearningCenter, on_delete=models.CASCADE)
-#
-#     def get_month_name(self):
-#         pass
-#
-#     def __str__(self):
-#         return f"{self.month_start_date.strftime('%B')} pay period   days: {self.month_start_date} - {self.month_end_date}"
-#     pass
-#
-#
-#
-#
-#
-#
-#
-#
+
+# make an annual payroll period for each year
+class AnnualCompanyPayroll(models.Model):
+    year = models.DateField()
+    pass
+
+class MonthlyCompanyPayroll(models.Model):
+    payroll_year = models.ForeignKey(AnnualCompanyPayroll, on_delete=models.CASCADE)
+    month_start_date = models.DateField(auto_now_add=True)
+    month_end_date = models.DateField(auto_now_add=False, default=-1)
+
+    pass
+
+# make a center monthly payroll period
+class CenterMonthlyPayrollPeriod(models.Model):
+    monthly_payroll = models.ForeignKey(MonthlyCompanyPayroll, on_delete=models.CASCADE)
+    center = models.ForeignKey(LearningCenter, on_delete=models.CASCADE)
+
+    def get_month_name(self):
+        pass
+
+    def __str__(self):
+        return f"{self.month_start_date.strftime('%B')} pay period   days: {self.month_start_date} - {self.month_end_date}"
+    pass
+
+
+
+
+
+
+
+
 # def compute_monthly_pay():
     # compute salary
     # compute hours

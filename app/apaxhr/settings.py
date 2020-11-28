@@ -101,7 +101,7 @@ if os.environ.get('DEV') == 'TRUE':
 else:
     DEBUG = False
     ALLOWED_HOSTS = ['*']
-
+DEBUG = True
 # Application definition
 CREATED_APPS = [
     # Applications
@@ -145,7 +145,8 @@ EXTENSION_APPS = [
     'django_celery_beat',
 ]
 if DEBUG:
-    EXTENSION_APPS.append('debug_toolbar')
+    # EXTENSION_APPS.append('debug_toolbar')
+    pass
 
 INSTALLED_APPS = CREATED_APPS + BASE_APPS + EXTENSION_APPS
 # TODO: LOGGING
@@ -208,7 +209,7 @@ if DEBUG:
         'DISABLE_PANELS': ( 'debug_toolbar.panels.templates.TemplatesPanel', 'debug_toolbar.panels.redirects.RedirectsPanel',),
         'SHOW_TEMPLATE_CONTEXT': False,
     }
-    MIDDLEWARE.append('debug_toolbar.middleware.DebugToolbarMiddleware')
+    # MIDDLEWARE.append('debug_toolbar.middleware.DebugToolbarMiddleware')
 
 ROOT_URLCONF = 'apaxhr.urls'
 
@@ -242,6 +243,13 @@ if os.environ.get('PROD'):
             "PASSWORD": os.environ.get("SQL_PASSWORD", "password"),
             "HOST": os.environ.get("SQL_HOST", "localhost"),
             "PORT": os.environ.get("SQL_PORT", "5432"),
+        }
+    }
+elif DEBUG:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
         }
     }
 else:

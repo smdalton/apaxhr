@@ -20,7 +20,7 @@ from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib.auth import views as auth_views
 from . import views
-
+from core_hr.views import CoreHrHome
 import os
 admin.site.site_header = "APAX Admin"
 admin.site.site_title = "APAX Admin Portal"
@@ -29,7 +29,7 @@ admin.site.index_title = "APAX HR administrator Portal"
 app_name='apaxhr'
 # path('employee_management/', include('employee_management.urls')),
 urlpatterns = [
-    path('', views.HomePage.as_view(),name='home_simple'),
+    path('', CoreHrHome.as_view(),name='home_simple'),
     path('logout/', views.logout_view, name='logout'),
     # path('home/', views.HomePage.as_view(), name='home'),
     path('home/<access_tier>', views.HomePage.as_view(), name='home'),
@@ -53,7 +53,7 @@ urlpatterns = [
 
 if settings.DEBUG:
     import debug_toolbar
-    urlpatterns += path('__debug__/', include(debug_toolbar.urls)),
+    # urlpatterns += path('__debug__/', include(debug_toolbar.urls)),
 
 
 if not settings.USE_S3:

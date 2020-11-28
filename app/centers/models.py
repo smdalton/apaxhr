@@ -190,7 +190,7 @@ class CenterWeeklyTimesheet(models.Model):
     week_end = models.DateField(editable=True)
     # for each day in the week
 
-    # selectively skip payroll processing for specific days with these checkboxes based on business needs
+    # selectively skip payroll hour logging for specific days with these checkboxes based on business needs
     monday = models.BooleanField(default=False)
     tuesday = models.BooleanField(default=True)
     wednesday = models.BooleanField(default=True)

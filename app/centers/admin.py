@@ -66,13 +66,13 @@ class CenterWeeklyTimeSheetAdmin(LCPermissionsMixin):
     model = CenterWeeklyTimesheet
     exclude = ('',)
     actions = ["tally_hours_for_week"]
-
+    readonly_fields = ('current_hours',)
     formfield_overrides = {
         JSONField: {'widget': JSONEditorWidget},
     }
 
     def has_delete_permission(self, request, obj=None):
-        False
+        return False
 
     def tally_hours_for_week(self, request, queryset):
         print('Counting stuff here for the win')
