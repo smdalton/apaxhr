@@ -101,7 +101,7 @@ if os.environ.get('DEV') == 'TRUE':
 else:
     DEBUG = False
     ALLOWED_HOSTS = ['*']
-
+DEBUG = True
 # Application definition
 CREATED_APPS = [
     # Applications
@@ -242,6 +242,13 @@ if os.environ.get('PROD'):
             "PASSWORD": os.environ.get("SQL_PASSWORD", "password"),
             "HOST": os.environ.get("SQL_HOST", "localhost"),
             "PORT": os.environ.get("SQL_PORT", "5432"),
+        }
+    }
+elif DEBUG:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
         }
     }
 else:

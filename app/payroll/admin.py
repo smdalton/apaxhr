@@ -31,7 +31,7 @@ class GenericGroup(GroupAdmin):
 
 
 @admin.register(PositionSalaryInfo)
-class EmployeePositionAdmin(PRLPermissionsMixin):
+class EmployeePositionAdmin(PRLPermissionsMixin, admin.ModelAdmin):
     def has_delete_permission(self, request, obj=None):
         return False
 
@@ -48,20 +48,25 @@ class EmployeePositionAdmin(PRLPermissionsMixin):
         return CenterTeacher.objects.get(teacher=obj.position).center
 
 
+
+
 # @admin.register(Bonus)
 # class BonusAdmin()
-
-#@admin.register(SalariedPosition)
-class EmployeePositionAdmin(object):
-    def has_delete_permission(self, request, obj=None):
-        return False
-    model = SalariedPosition
-    # search_fields =
-    search_fields = ('employee__full_name', 'teacher_salaries__center__code')
-    list_display = ( 'name', 'department','title', 'position_start', 'position_end','get_center_name')
-    # model = SalariedPosition
-    list_filter = ('title','department',)
-
-    def get_center_name(self, obj):
-        return CenterTeacher.objects.get(teacher=obj).center
-
+#
+# @admin.register(SalariedPosition)
+# class EmployeePositionAdmin(admin.ModelAdmin):
+#     def has_delete_permission(self, request, obj=None):
+#         return False
+#
+#     class Meta:
+#         model = SalariedPosition
+#
+#     # search_fields =
+#     search_fields = ('employee__full_name', 'teacher_salaries__center__code')
+#     list_display = ( 'name', 'department','title', 'position_start', 'position_end','get_center_name')
+#     # model = SalariedPosition
+#     list_filter = ('title','department',)
+#
+#     def get_center_name(self, obj):
+#         return CenterTeacher.objects.get(teacher=obj).center
+#

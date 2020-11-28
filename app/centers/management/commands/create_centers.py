@@ -189,7 +189,6 @@ class Command(BaseCommand):
         self.create_centers()
         print('---> Creating Rooms')
         self.create_and_assign_center_rooms()
-        time.sleep(1)
         print('---> Creating Center Teachers')
         self.create_center_teachers()
         print('---> Creating BiWeeklyCenterCourses')
