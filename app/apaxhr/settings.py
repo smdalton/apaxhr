@@ -145,7 +145,8 @@ EXTENSION_APPS = [
     'django_celery_beat',
 ]
 if DEBUG:
-    EXTENSION_APPS.append('debug_toolbar')
+    # EXTENSION_APPS.append('debug_toolbar')
+    pass
 
 INSTALLED_APPS = CREATED_APPS + BASE_APPS + EXTENSION_APPS
 # TODO: LOGGING
@@ -208,7 +209,7 @@ if DEBUG:
         'DISABLE_PANELS': ( 'debug_toolbar.panels.templates.TemplatesPanel', 'debug_toolbar.panels.redirects.RedirectsPanel',),
         'SHOW_TEMPLATE_CONTEXT': False,
     }
-    MIDDLEWARE.append('debug_toolbar.middleware.DebugToolbarMiddleware')
+    # MIDDLEWARE.append('debug_toolbar.middleware.DebugToolbarMiddleware')
 
 ROOT_URLCONF = 'apaxhr.urls'
 
