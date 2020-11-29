@@ -15,6 +15,10 @@ chmod +x start.sh
 
 ./start.sh
 
-visit localhost:8000
-admin credentials are username: smd@gmail.com password: password 
+visit localhost:8000 click on the menubar items to access the backend. Permissions system was not implemented completely on the front due to difficulties for demo navigation of the site. See the videos on my blog @ https://blog.daltonsoftware.com/apax-english-internship/
+
+admin credentials are:
+
+username: smd@gmail.com password: password 
+
 smd@gmail.com is not my real email fwiw
