@@ -16,3 +16,5 @@ chmod +x start.sh
 ./start.sh
 
 visit localhost:8000
+admin credentials are username: smd@gmail.com password: password 
+smd@gmail.com is not my real email fwiw
