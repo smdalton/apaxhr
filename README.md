@@ -1,14 +1,12 @@
 # apaxhr
 Hr system for apax
 
-Instructions for Dev server
+Instructions for demo
 
+install docker (if you don't have it)
 git clone repo
-
-chmod +x devrun.sh (local server no services)
-./devrun.sh
-
-chmod +x prodservices.sh (nginx on port 80)
-./prodservices.sh
+cd <repo_dir>
+chmod +x start.sh
+./start.sh
 
 visit localhost:8000
