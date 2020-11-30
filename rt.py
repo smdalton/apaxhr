@@ -31,7 +31,6 @@ def start_postgres():
                      ' -e POSTGRES_USER=postgres-dev ' \
                      'postgres'
     os.system(postgres_start)
-    time.sleep(1.5)
 
 def stop_postgres():
     print('Stopping Postgres')
