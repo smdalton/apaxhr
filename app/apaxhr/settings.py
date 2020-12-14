@@ -141,8 +141,8 @@ EXTENSION_APPS = [
     'django_nose',
     'storages',
     'django_extensions',
-    'django_celery_results',
-    'django_celery_beat',
+    # 'django_celery_results',
+    # 'django_celery_beat',
 ]
 if DEBUG:
     # EXTENSION_APPS.append('debug_toolbar')

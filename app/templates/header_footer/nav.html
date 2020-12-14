@@ -9,36 +9,36 @@
 
         <div class="collapse navbar-collapse container" id="navbarResponsive">
             <ul class="nav navbar-nav ml-auto">
-{#                {% if request.session.tier1  or request.session.tier2 or request.session.tier3 or request.session.tier4 %}#}
-{#                    <li class="nav-item">#}
-{#                        <a class="nav-link btn text-white" href="{% url 'core_hr:self_service' %}">Employee Portal</a>#}
-{#                    </li>#}
-{#                {% endif %}#}
-{##}
-{#                {% if request.session.tier2 or request.session.tier3 or request.session.tier4 %}#}
-{#                    <li class="nav-item">#}
-{#                        <a class="nav-link btn text-white" href="#">Center Tools</a>#}
-{#                    </li>#}
-{#                {% endif %}#}
-{##}
-{#                {% if request.session.tier2 or request.session.tier3 or request.session.tier4 %}#}
-{#                    <li class="nav-item">#}
-{#                        <a class="nav-link btn text-white" href="#">Teacher Management</a>#}
-{#                    </li>#}
-{#                {% endif %}#}
-{##}
-{#                {% if request.session.tier3 or request.session.tier4 %}#}
-{#                    <li class="nav-item">#}
-{#                        <a class="nav-link btn text-white" href="#">HR Tools</a>#}
-{#                    </li>#}
-{#                {% endif %}#}
-{#                {% if request.session.tier3 or request.session.tier4 %}#}
-{#                    <li class="nav-item">#}
-{#                        <a class="nav-link btn text-white" href="#">Payroll</a>#}
-{#                    </li>#}
-{#                {% endif %}#}
+                {#                {% if request.session.tier1  or request.session.tier2 or request.session.tier3 or request.session.tier4 %}#}
+                {#                    <li class="nav-item">#}
+                {#                        <a class="nav-link btn text-white" href="{% url 'core_hr:self_service' %}">Employee Portal</a>#}
+                {#                    </li>#}
+                {#                {% endif %}#}
+                {##}
+                {#                {% if request.session.tier2 or request.session.tier3 or request.session.tier4 %}#}
+                {#                    <li class="nav-item">#}
+                {#                        <a class="nav-link btn text-white" href="#">Center Tools</a>#}
+                {#                    </li>#}
+                {#                {% endif %}#}
+                {##}
+                {#                {% if request.session.tier2 or request.session.tier3 or request.session.tier4 %}#}
+                {#                    <li class="nav-item">#}
+                {#                        <a class="nav-link btn text-white" href="#">Teacher Management</a>#}
+                {#                    </li>#}
+                {#                {% endif %}#}
+                {##}
+                {#                {% if request.session.tier3 or request.session.tier4 %}#}
+                {#                    <li class="nav-item">#}
+                {#                        <a class="nav-link btn text-white" href="#">HR Tools</a>#}
+                {#                    </li>#}
+                {#                {% endif %}#}
+                {#                {% if request.session.tier3 or request.session.tier4 %}#}
+                {#                    <li class="nav-item">#}
+                {#                        <a class="nav-link btn text-white" href="#">Payroll</a>#}
+                {#                    </li>#}
+                {#                {% endif %}#}
 
-            {% if request.user.is_authenticated %}
+                {% if request.user.is_authenticated %}
                     <li class="nav-item">
                         <a class="nav-link btn text-white" href="{% url 'core_hr:self_service' %}">Employee Portal</a>
                     </li>
@@ -53,20 +53,23 @@
                     <li class="nav-item">
                         <a class="nav-link btn text-white" href="/admin">HR Tools</a>
                     </li>
-                <li class="nav-item">
-                    <a class="nav-link btn text-white" href="{% url 'logout' %}">Logout</a>
-                </li>
+
+                {% endif %}
+                {% if user.is_authenticated %}
+
+                    <li class="nav-item">
+                        <a class="nav-link btn text-white" href="{% url 'users:user_login' %}">Login</a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a class="nav-link btn text-white" href="{% url 'users:registration' %}">Signup</a>
+                    </li>
+
+                     <li class="nav-item">
+                        <a class="nav-link btn text-white" href="{% url 'logout' %}">Logout</a>
+                    </li>
                 {% endif %}
 
-            {%  if not request.user.is_authenticated %}
-                <li class="nav-item">
-                    <a class="nav-link btn text-white" href="{% url 'users:user_login' %}">Login</a>
-                </li>
-
-                <li class="nav-item">
-                    <a class="nav-link btn text-white" href="{% url 'users:registration' %}">Signup</a>
-                </li>
-            {% endif %}
 
 
             </ul>

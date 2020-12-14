@@ -61,7 +61,7 @@ class CenterTeacherAdmin(LCPermissionsMixin):
         return CenterTeacher.objects.filter(center=request.user.get_current_center())
 
 
-@admin.register(CenterWeeklyTimesheet)
+# @admin.register(CenterWeeklyTimesheet)
 class CenterWeeklyTimeSheetAdmin(LCPermissionsMixin):
     model = CenterWeeklyTimesheet
     exclude = ('',)
